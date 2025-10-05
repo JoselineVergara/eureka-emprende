@@ -1,7 +1,6 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.CategoriasDTO;
-import com.example.eureka.general.dto.MultimediaDTO;
 import com.example.eureka.general.repository.ICategoriasRepository;
 import com.example.eureka.model.Categorias;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,10 @@
 package com.example.eureka.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -22,7 +25,7 @@ public class Emprendimientos {
     private String nombreComercial;
 
     @Column(name = "anio_creacion", nullable = false)
-    private String anioCreacion;
+    private Date anioCreacion;
 
     @Column(name = "activo_emprendimiento", nullable = false)
     private Boolean activoEmprendimiento;
@@ -36,6 +39,9 @@ public class Emprendimientos {
     @Column(name = "fecha_actualizacion", nullable = true)
     private Date fechaActualizacion;
 
+    @Column(name = "estado_emprendimiento",nullable = false)
+    private String estadoEmprendimiento;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuarios usuarios;
@@ -43,5 +49,10 @@ public class Emprendimientos {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ciudad", nullable = false)
     private Ciudades ciudades;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tipo_emprendimiento", nullable = false)
+    private TiposEmprendimientos tiposEmprendimientos;
+
 
 }
