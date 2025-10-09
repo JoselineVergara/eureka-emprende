@@ -1,5 +1,7 @@
 package com.example.eureka.model;
 
+import com.example.eureka.enums.EstadoEvento;
+import com.example.eureka.enums.TipoEvento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +21,7 @@ public class Eventos {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_evento", nullable = false)
-    private Long idEvento;
+    private Integer idEvento;
 
     @Column(name = "titulo", nullable = false)
     private String titulo;
@@ -33,8 +35,9 @@ public class Eventos {
     @Column(name = "lugar", nullable = false)
     private String lugar;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_evento", nullable = false, columnDefinition = "TEXT")
-    private String tipoEvento;
+    private TipoEvento tipoEvento;
 
     @Column(name = "link_inscripcion")
     private String linkInscripcion;
@@ -42,8 +45,9 @@ public class Eventos {
     @Column(name = "direccion")
     private String direccion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado_evento", nullable = false, columnDefinition = "TEXT")
-    private String estadoEvento;
+    private EstadoEvento estadoEvento;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
