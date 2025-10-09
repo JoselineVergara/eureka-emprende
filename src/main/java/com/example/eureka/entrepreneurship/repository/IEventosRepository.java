@@ -7,10 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EventosRepository extends JpaRepository<Eventos, Long> {
+public interface IEventosRepository extends JpaRepository<Eventos, Integer> {
 
     List<Eventos> findByEmprendimientoId(Integer idEmprendimiento);
 
-    List<Eventos> findByEmprendimientoUsuarioIdUsuario(Integer idUsuario);
+    List<Eventos> findByEmprendimiento_Usuarios_Id(Integer emprendimientoUsuariosId);
 
     List<Eventos> findByEstadoEvento(String estadoEvento);}

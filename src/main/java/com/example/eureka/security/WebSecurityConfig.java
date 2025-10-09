@@ -52,7 +52,7 @@ public class WebSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)//e -> e.disable()
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/v1/auth/register","/v1/auth/login","/v1/auth/validateToken","/v1/categorias","/v1/emprendimientos/categoria/").permitAll()
+                        .requestMatchers("/v1/auth/register","/v1/auth/login","/v1/auth/validateToken","/v1/categorias","/v1/roles","/v1/emprendimientos/crear").permitAll()
 //                        .requestMatchers("/v1/categorias").permitAll()
                         .anyRequest().authenticated()
                 )

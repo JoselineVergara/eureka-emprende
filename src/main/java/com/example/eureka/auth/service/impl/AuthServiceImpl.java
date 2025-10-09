@@ -44,7 +44,7 @@ public class AuthServiceImpl implements IAuthService {
         TiposEmprendimientos tiposEmprendimientos = tiposEmprendimientoRepository.findById(usuario.getTipoEmprendimiento())
                 .orElseThrow(() -> new Exception("Tipo de emprendimiento no encontrado"));
 
-        Roles rol = rolesRepository.findById(2)
+        Roles rol = rolesRepository.findById(usuario.getIdRol())
                 .orElseThrow(() -> new Exception("Rol no encontrado"));
 
         Ciudades ciudad = ciudadesRepository.findById(usuario.getCiudad())
