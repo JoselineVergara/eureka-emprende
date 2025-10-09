@@ -31,4 +31,10 @@ public class EmprendimientoController {
         emprendimientoService.estructuraEmprendimiento(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @GetMapping("/categoria/{categoriaId}")
+    public ResponseEntity<?> obtenerEmprendimientosPorCategoria(@PathVariable Integer categoriaId) {
+        var resultado = emprendimientoService.obtenerEmprendimientosPorCategoria(categoriaId);
+        return ResponseEntity.ok(resultado);
+    }
 }

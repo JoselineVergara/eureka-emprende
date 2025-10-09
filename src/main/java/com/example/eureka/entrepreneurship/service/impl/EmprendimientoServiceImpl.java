@@ -32,6 +32,8 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     private final ITiposMetricasRepository tiposMetricasRepository;
     private final IOpcionesParticipacionComunidadRepository opcionesParticipacionComunidadRepository;
     private final IDeclaracionesFinalesRepository declaracionesFinalesRepository;
+    private final ICategoriaRepository categoriaRepository; // NUEVO
+
 
     // Falta multimedia (pendiente)
 
@@ -176,5 +178,31 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         Emprendimientos emp = emprendimientosRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Emprendimiento no encontrado con id: " + id));
         return EmprendimientoMapper.toResponseDTO(emp);
+    }
+
+    @Override
+    public EmprendimientoPorCategoriaDTO obtenerEmprendimientosPorCategoria(Integer categoriaId) {
+        Categorias categoria = categoriaRepository.findById(categoriaId)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoriaId));
+
+        List<EmprendimientoCategorias> emprendimientoCategorias =
+                emprendimientoCategoriasRepository.findByCategoriaId(categoriaId);
+
+        List<EmprendimientoSimpleDTO> emprendimientos = emprendimientoCategorias.stream()
+                .map(ec -> {
+                    Emprendimientos emp = ec.getEmprendimiento();
+                    return EmprendimientoSimpleDTO.builder()
+                            .id(emp.getId().longValue())
+                            .nombreComercial(emp.getNombreComercial())
+                            //.ciudad(emp.getCiudades().getNombre())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return EmprendimientoPorCategoriaDTO.builder()
+                .categoriaId(categoria.getId())
+                .nombreCategoria(categoria.getNombre())
+                .emprendimientos(emprendimientos)
+                .build();
     }
 }
