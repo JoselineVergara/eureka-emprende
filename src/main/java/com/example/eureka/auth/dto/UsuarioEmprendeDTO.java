@@ -48,4 +48,9 @@ public class UsuarioEmprendeDTO {
 
     private Integer idRol;
 
+    private String nombrePariente;
+
+    private String carrera;
+
+    private String anioEstudio;
 }

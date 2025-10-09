@@ -1,15 +1,16 @@
-package com.example.eureka.entrepreneurship.service;
+package com.example.eureka.entrepreneurship.service.impl;
 
+import com.example.eureka.config.BusinessException;
 import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
-import com.example.eureka.config.exception.BusinessException;
+import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
+import com.example.eureka.entrepreneurship.service.IEventosService;
 import com.example.eureka.enums.EstadoEvento;
+import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.model.Emprendimientos;
 import com.example.eureka.model.Eventos;
 import com.example.eureka.model.Multimedia;
-import com.example.eureka.entrepreneurship.repository.EmprendimientosRepository;
-import com.example.eureka.entrepreneurship.repository.EventosRepository;
-import com.example.eureka.entrepreneurship.repository.MultimediaRepository;
+import com.example.eureka.entrepreneurship.repository.IEventosRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class EventosService {
+public class EventosServiceImpl implements IEventosService {
 
-    private final EventosRepository eventosRepository;
-    private final EmprendimientosRepository emprendimientosRepository;
-    private final MultimediaRepository multimediaRepository;
+    private final IEventosRepository IEventosRepository;
+    private final IEmprendimientosRepository emprendimientosRepository;
+    private final IMultimediaRepository multimediaRepository;
 
     @Transactional
     public EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idUsuario) {
@@ -54,14 +55,14 @@ public class EventosService {
         evento.setEmprendimiento(emprendimiento);
         evento.setMultimedia(multimedia);
 
-        Eventos eventoGuardado = eventosRepository.save(evento);
+        Eventos eventoGuardado = IEventosRepository.save(evento);
 
         return convertirADTO(eventoGuardado);
     }
 
     @Transactional
     public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idUsuario) {
-        Eventos evento = eventosRepository.findById(idEvento)
+        Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
         validarEmprendimientoAprobado(evento.getEmprendimiento().getId(), idUsuario);
@@ -96,14 +97,14 @@ public class EventosService {
         evento.setDireccion(request.getDireccion());
         evento.setFechaModificacion(LocalDateTime.now());
 
-        Eventos eventoActualizado = eventosRepository.save(evento);
+        Eventos eventoActualizado = IEventosRepository.save(evento);
 
         return convertirADTO(eventoActualizado);
     }
 
     @Transactional
     public void inactivarEvento(Integer idEvento, Integer idUsuario) {
-        Eventos evento = eventosRepository.findById(idEvento)
+        Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
         validarEmprendimientoAprobado(evento.getEmprendimiento().getId(), idUsuario);
@@ -119,12 +120,12 @@ public class EventosService {
         evento.setEstadoEvento(EstadoEvento.CANCELADO); // CAMBIO: usar ENUM
         evento.setFechaModificacion(LocalDateTime.now());
 
-        eventosRepository.save(evento);
+        IEventosRepository.save(evento);
     }
 
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerTodosLosEventos() {
-        List<Eventos> eventos = eventosRepository.findAll();
+        List<Eventos> eventos = IEventosRepository.findAll();
         return eventos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -132,7 +133,7 @@ public class EventosService {
 
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerEventosPorEmprendimiento(Integer idEmprendimiento) {
-        List<Eventos> eventos = eventosRepository.findByEmprendimientoId(idEmprendimiento);
+        List<Eventos> eventos = IEventosRepository.findByEmprendimientoId(idEmprendimiento);
         return eventos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -140,7 +141,7 @@ public class EventosService {
 
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerEventosPorUsuario(Integer idUsuario) {
-        List<Eventos> eventos = eventosRepository.findByEmprendimientoUsuarioIdUsuario(idUsuario);
+        List<Eventos> eventos = IEventosRepository.findByEmprendimiento_Usuarios_Id(idUsuario);
         return eventos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -148,7 +149,7 @@ public class EventosService {
 
     @Transactional(readOnly = true)
     public EventoResponseDTO obtenerEventoPorId(Integer idEvento) {
-        Eventos evento = eventosRepository.findById(idEvento)
+        Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
         return convertirADTO(evento);
     }
@@ -158,7 +159,7 @@ public class EventosService {
                 .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado"));
 
         // Validar que el emprendimiento pertenece al usuario
-        if (!emprendimiento.getUsuario().getIdUsuario().equals(idUsuario)) {
+        if (!emprendimiento.getUsuarios().getId().equals(idUsuario)) {
             throw new BusinessException("El emprendimiento no pertenece al usuario");
         }
 
