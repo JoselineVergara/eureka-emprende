@@ -33,5 +33,5 @@ public class TiposDescripcionEmprendimiento {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_emprendimiento", nullable = false)
-    private TiposEmprendimientos tipoEmprendimiento;
+    private Emprendimientos emprendimiento;
 }

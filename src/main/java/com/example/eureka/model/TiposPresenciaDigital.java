@@ -17,11 +17,15 @@ public class TiposPresenciaDigital {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "plataforma", nullable = false, columnDefinition = "TEXT")
     private String plataforma;
 
     @Column(name = "descripcion")
     private String descripcion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_emprendimiento", nullable = false)
+    private Emprendimientos emprendimiento;
 }
