@@ -5,6 +5,7 @@ import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.auth.service.IAuthService;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.repository.ITiposEmprendimientoRepository;
+import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
 import com.example.eureka.enums.EstadoEmprendimiento;
 import com.example.eureka.general.repository.ICiudadesRepository;
 import com.example.eureka.general.repository.IRolesRepository;
@@ -30,6 +31,8 @@ public class AuthServiceImpl implements IAuthService {
 
     private final ITiposEmprendimientoRepository tiposEmprendimientoRepository;
 
+    private final IEmprendimientoService emprendimientoService;
+
     @Override
     @Transactional
     public Usuarios createUser(UsuarioEmprendeDTO usuario) throws Exception {
@@ -41,14 +44,8 @@ public class AuthServiceImpl implements IAuthService {
         if (existingUsuarios != null)
             throw new Exception("El correo " + usuario.getCorreo() + " ya se encuentra en uso");
 
-        TiposEmprendimientos tiposEmprendimientos = tiposEmprendimientoRepository.findById(usuario.getTipoEmprendimiento())
-                .orElseThrow(() -> new Exception("Tipo de emprendimiento no encontrado"));
-
         Roles rol = rolesRepository.findById(usuario.getIdRol())
                 .orElseThrow(() -> new Exception("Rol no encontrado"));
-
-        Ciudades ciudad = ciudadesRepository.findById(usuario.getCiudad())
-                .orElseThrow(() -> new Exception("Ciudad no encontrada"));
 
         // Creación de usuario
         Usuarios newUsuarios = new Usuarios();
@@ -62,7 +59,7 @@ public class AuthServiceImpl implements IAuthService {
         newUsuarios.setFechaNacimiento(usuario.getFechaNacimiento());
         newUsuarios.setActivo(true);
         Usuarios modelUsuario = userRepository.save(newUsuarios);
-
+/*
         // Creación básica del emprendimiento
         Emprendimientos emprendimientoBasico = new Emprendimientos();
         emprendimientoBasico.setNombreComercial(usuario.getNombreComercialEmprendimiento());
@@ -75,6 +72,11 @@ public class AuthServiceImpl implements IAuthService {
         emprendimientoBasico.setTiposEmprendimientos(tiposEmprendimientos);
 
         emprendimientosRepository.save(emprendimientoBasico);
+*/
+        Emprendimientos modelEmprendimiento = emprendimientoService.crearBorradorEmprendimiento(usuario.getEmprendimiento(),modelUsuario);
+
+        //crear datos del rep
+
 
         return modelUsuario;
     }

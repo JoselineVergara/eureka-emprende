@@ -1,5 +1,6 @@
 package com.example.eureka.auth.dto;
 
+import com.example.eureka.entrepreneurship.dto.EmprendimientoDTO;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -22,29 +23,13 @@ public class UsuarioEmprendeDTO {
 
     //datos usuario parte 2
     @NonNull
-    private String correo; //este es el correo corporativo
+    private String correo;
     @NonNull
     private String correoUees;
     @NonNull
     private String identificacion;
     @NonNull
     private String parienteDirecto;
-
-    //datos para emprendimiento
-    @NonNull
-    private String nombreComercialEmprendimiento;
-    @NonNull
-    private Date fechaCreacion;
-    @NonNull
-    private Integer provincia;
-    @NonNull
-    private Integer ciudad;
-    @NonNull
-    private Boolean estadoEmprendimiento;
-    @NonNull
-    private Integer tipoEmprendimiento;
-
-    private Date fechaRegistro;
 
     private Integer idRol;
 
@@ -53,4 +38,6 @@ public class UsuarioEmprendeDTO {
     private String carrera;
 
     private String anioEstudio;
+
+    private EmprendimientoDTO emprendimiento;
 }
