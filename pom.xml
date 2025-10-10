@@ -11,8 +11,8 @@
     <groupId>com.example</groupId>
     <artifactId>eureka-emprende</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>auth</name>
-    <description>auth</description>
+    <name>eureka</name>
+    <description>eureka</description>
     <url/>
     <licenses>
         <license/>

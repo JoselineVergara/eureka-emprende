@@ -22,13 +22,13 @@ public class EmprendimientoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerEmprendimientoPorId(@PathVariable Integer id) {
-        var emprendimiento = emprendimientoService.obtenerEmprendimientoPorId(id);
+        var emprendimiento = emprendimientoService.obtenerEmprendimientoCompletoPorId(id);
         return ResponseEntity.ok(emprendimiento);
     }
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearEmprendimiento(@RequestBody EmprendimientoRequestDTO dto) throws Exception {
-        emprendimientoService.estructuraEmprendimiento(dto);
+        var emprendimiento = emprendimientoService.estructuraEmprendimiento(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

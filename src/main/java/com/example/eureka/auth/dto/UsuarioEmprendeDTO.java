@@ -29,15 +29,21 @@ public class UsuarioEmprendeDTO {
     @NonNull
     private String identificacion;
     @NonNull
-    private String parienteDirecto;
+    private Boolean parienteDirecto;
 
     private Integer idRol;
 
     private String nombrePariente;
 
+    private String areaPariente;
+
     private String carrera;
 
+    private Date fechaGraduacion;
+
     private String anioEstudio;
+
+    private String semestre;
 
     private EmprendimientoDTO emprendimiento;
 }

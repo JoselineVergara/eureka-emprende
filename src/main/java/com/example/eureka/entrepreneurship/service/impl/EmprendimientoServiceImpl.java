@@ -1,5 +1,6 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
+import com.example.eureka.auth.dto.UsuarioEmprendeDTO;
 import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
@@ -41,10 +42,11 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     private final IOpcionesParticipacionComunidadRepository opcionesParticipacionComunidadRepository;
     private final IDeclaracionesFinalesRepository declaracionesFinalesRepository;
     private final ITiposEmprendimientoRepository tiposEmprendimientoRepository;
+    private final IRepresentanteInformacionRepository informacionRepresentanteRepository;
 
     @Override
     @Transactional
-    public void estructuraEmprendimiento(@Valid EmprendimientoRequestDTO emprendimientoRequestDTO) {
+    public Integer estructuraEmprendimiento(@Valid EmprendimientoRequestDTO emprendimientoRequestDTO) {
         log.info("Iniciando creación de estructura de emprendimiento para usuario: {}",
                 emprendimientoRequestDTO.getUsuarioId());
 
@@ -65,20 +67,27 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
                         "Usuario no encontrado con ID: " + emprendimientoRequestDTO.getUsuarioId()));
 
         // Crear emprendimiento principal
-        Emprendimientos emprendimiento = crearEmprendimiento(emprendimientoRequestDTO.getEmprendimiento(), usuario);
+        Emprendimientos emprendimiento = crearEmprendimiento(emprendimientoRequestDTO.getEmprendimiento(), usuario,emprendimientoRequestDTO.getTipoAccion());
 
+//        InformacionRepresentante info = getInformacionRepresentante(usuario, emprendimiento);
+//        if (info != null) {
+//            informacionRepresentanteRepository.save(info);
+//        }
         // Agregar todas las relaciones (si alguna falla, @Transactional hace rollback de TODO)
-        agregarCategoriaEmprendimiento(emprendimiento.getId(), emprendimientoRequestDTO.getCategorias());
-        agregarDescripcionEmprendimiento(emprendimiento, emprendimientoRequestDTO.getDescripciones());
-        agregarMetricasEmprendimiento(emprendimiento, emprendimientoRequestDTO.getMetricas());
-        agregarPresenciaDigitalEmprendimiento(emprendimiento, emprendimientoRequestDTO.getPresenciasDigitales());
-        agregarParticipacionComunidad(emprendimiento, emprendimientoRequestDTO.getParticipacionesComunidad());
-        agregarDeclaracionesFinales(emprendimiento, emprendimientoRequestDTO.getDeclaracionesFinales());
-
+        if (emprendimientoRequestDTO.getTipoAccion().equals("CREAR")){
+            agregarCategoriaEmprendimiento(emprendimiento.getId(), emprendimientoRequestDTO.getCategorias());
+            agregarDescripcionEmprendimiento(emprendimiento, emprendimientoRequestDTO.getDescripciones());
+            agregarMetricasEmprendimiento(emprendimiento, emprendimientoRequestDTO.getMetricas());
+            agregarPresenciaDigitalEmprendimiento(emprendimiento, emprendimientoRequestDTO.getPresenciasDigitales());
+            agregarParticipacionComunidad(emprendimiento, emprendimientoRequestDTO.getParticipacionesComunidad());
+            agregarDeclaracionesFinales(emprendimiento, emprendimientoRequestDTO.getDeclaracionesFinales());
+        }
         log.info("Emprendimiento creado exitosamente con ID: {}", emprendimiento.getId());
+
+        return emprendimiento.getId();
     }
 
-    private Emprendimientos crearEmprendimiento(EmprendimientoDTO emprendimientoDTO, Usuarios usuario) {
+    private Emprendimientos crearEmprendimiento(EmprendimientoDTO emprendimientoDTO, Usuarios usuario,String tipoAccion) {
         log.debug("Creando emprendimiento con nombre: {}", emprendimientoDTO.getNombreComercialEmprendimiento());
 
         // Buscar ciudad
@@ -88,7 +97,7 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
 
         // Buscar tipo de emprendimiento - CORREGIDO
         TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository
-                .findById(emprendimientoDTO.getTipoEmprendimientoId()) // CORREGIDO: usar getTipoEmprendimientoId()
+                .findById(emprendimientoDTO.getTipoEmprendimientoId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tipo de emprendimiento no encontrado con ID: " + emprendimientoDTO.getTipoEmprendimientoId()));
 
@@ -99,7 +108,13 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         emprendimiento.setActivoEmprendimiento(emprendimientoDTO.getEstadoEmpredimiento());
         emprendimiento.setAceptaDatosPublicos(emprendimientoDTO.getDatosPublicos());
         emprendimiento.setFechaCreacion(emprendimientoDTO.getFechaCreacion());
-        emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.BORRADOR));
+
+        if (tipoAccion.equals(String.valueOf(EstadoEmprendimiento.BORRADOR))){
+            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.BORRADOR));
+        }else{
+            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.PENDIENTE_REVISION));
+        }
+
         emprendimiento.setCiudades(ciudad);
         emprendimiento.setUsuarios(usuario);
         emprendimiento.setTiposEmprendimientos(tipoEmprendimiento);
@@ -296,4 +311,42 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
 
         return guardado;
     }
+
+    public InformacionRepresentante getInformacionRepresentante(Usuarios usuario, Emprendimientos modelEmprendimiento) {
+        InformacionRepresentante info = new InformacionRepresentante();
+        info.setNombre(usuario.getNombre());
+        info.setApellido(usuario.getApellido());
+        info.setCorreoPersonal(usuario.getCorreo());
+        info.setCorreoCorporativo(usuario.getCorreo());
+//        info.setIdentificacion(usuario.getIdentificacion());
+//        info.setCarrera(usuario.getCarrera());
+//        info.setSemestre(usuario.getSemestre());
+//        info.setFechaGraduacion(usuario.getFechaGraduacion());
+//        info.setTieneParientesUees(usuario.getParienteDirecto());
+//        info.setNombrePariente(usuario.getNombrePariente());
+//        info.setAreaPariente(usuario.getAreaPariente());
+        info.setEmprendimiento(modelEmprendimiento);
+        return info;
+    }
+
+    @Override
+    @Transactional
+    public EmprendimientoResponseDTO obtenerEmprendimientoCompletoPorId(Integer id) {
+        // Obtener el emprendimiento principal
+        Emprendimientos emprendimiento = emprendimientosRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
+
+        // Cargar todas las relaciones necesarias desde los repositorios
+        List<EmprendimientoCategorias> categorias = emprendimientoCategoriasRepository.findByEmprendimientoId(id);
+        List<TiposDescripcionEmprendimiento> descripciones = emprendimientosDescripcionRepository.findByEmprendimientoId(id);
+        List<TiposPresenciaDigital> presencias = emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(id);
+        List<EmprendimientoMetricas> metricas = emprendimientoMetricaRepository.findByEmprendimientoId(id);
+        List<EmprendimientoDeclaraciones> declaraciones = emprendimientoDeclaracionesRepository.findByEmprendimientoId(id);
+        List<EmprendimientoParticipacion> participaciones = emprendimientoParticicipacionComunidadRepository.findByEmprendimientoId(id);
+        InformacionRepresentante infoRepresentante = (InformacionRepresentante) informacionRepresentanteRepository.findByEmprendimientoId(id);
+
+        return null;
+    }
+
+
 }

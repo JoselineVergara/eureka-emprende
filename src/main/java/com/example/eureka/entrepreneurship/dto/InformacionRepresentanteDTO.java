@@ -1,4 +1,4 @@
-package com.example.eureka.dto;
+package com.example.eureka.entrepreneurship.dto;
 
 import lombok.*;
 import java.util.Date;
@@ -23,5 +23,5 @@ public class InformacionRepresentanteDTO {
     private String nombrePariente;
     private String areaPariente;
     private String integrantesEquipo;
-    private Integer emprendimientoId; 
+    private Integer emprendimientoId;
 }
