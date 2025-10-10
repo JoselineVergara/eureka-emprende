@@ -62,7 +62,15 @@ public class WebSecurityConfig {
                                         "/v1/categorias/",
                                         "/v1/categorias/crear",
                                         "/v1/categorias/actualizar/{id}",
-                                        "/v1/categorias/eliminar/{id}"
+                                        "/v1/categorias/eliminar/{id}",
+                                        "/v1/provincia",
+                                        "/v1/provincia/crear",
+                                        "/v1/provincia/actualizar/{id}",
+                                        "/v1/provincia/eliminar/{id}",
+                                        "/v1/ciudad",
+                                        "/v1/ciudad/crear",
+                                        "/v1/ciudad/actualizar/{id}",
+                                        "/v1/ciudad/eliminar/{id}"
                                 ).permitAll()
 //                        .requestMatchers("/v1/categorias").permitAll()
                                 .anyRequest().authenticated()

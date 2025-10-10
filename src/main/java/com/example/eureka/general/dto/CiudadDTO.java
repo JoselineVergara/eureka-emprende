@@ -3,9 +3,9 @@ package com.example.eureka.general.dto;
 import lombok.Data;
 
 @Data
-public class ProvinciaDTO {
+public class CiudadDTO {
 
     private Integer id;
-    private String nombre;
-    private Boolean activo;
+    private String nombreCiudad;
+    private ProvinciaDTO provincia;
 }
