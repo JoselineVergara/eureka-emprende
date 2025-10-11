@@ -33,8 +33,8 @@ public class EmprendimientoController {
     }
 
     @PutMapping("/actualizar/{id}")
-    public ResponseEntity<?> actualizarEmprendimiento(@RequestBody EmprendimientoRequestDTO dto, @PathVariable String id) throws Exception {
-//        var emprendimiento = emprendimientoService.estructuraEmprendimiento(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> actualizarEmprendimiento(@RequestBody EmprendimientoRequestDTO dto, @PathVariable Integer id) throws Exception {
+        var emprendimientoActualizado = emprendimientoService.actualizarEmprendimiento(id, dto);
+        return ResponseEntity.ok(emprendimientoActualizado);
     }
 }

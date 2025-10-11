@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.mappers;
 
-import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
-import com.example.eureka.model.Emprendimientos;
+import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.model.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,5 +45,74 @@ public class EmprendimientoMapper {
         return emprendimientos.stream()
                 .map(EmprendimientoMapper::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoCategoriaDTO> toCategoriaDTOList(List<EmprendimientoCategorias> categorias) {
+        return categorias.stream().map(cat -> {
+            EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
+            dto.setCategoriaId(cat.getCategoriaId());
+            dto.setEmprendimientoId(cat.getEmprendimientoId());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoDescripcionDTO> toDescripcionDTOList(List<TiposDescripcionEmprendimiento> descripciones) {
+        return descripciones.stream().map(desc -> {
+            EmprendimientoDescripcionDTO dto = new EmprendimientoDescripcionDTO();
+            dto.setTipoDescripcion(desc.getTipoDescripcion());
+            dto.setDescripcion(desc.getDescripcion());
+            dto.setMaxCaracteres(desc.getMaxCaracteres());
+            dto.setObligatorio(desc.getObligatorio());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoPresenciaDigitalDTO> toPresenciaDigitalDTOList(List<TiposPresenciaDigital> presencias) {
+        return presencias.stream().map(p -> {
+            EmprendimientoPresenciaDigitalDTO dto = new EmprendimientoPresenciaDigitalDTO();
+            dto.setPlataforma(p.getPlataforma());
+            dto.setDescripcion(p.getDescripcion());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoMetricasDTO> toMetricasDTOList(List<EmprendimientoMetricas> metricas) {
+        return metricas.stream().map(m -> {
+            EmprendimientoMetricasDTO dto = new EmprendimientoMetricasDTO();
+            dto.setMetricaId(m.getMetrica().getId());
+            dto.setValor(m.getValor());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoDeclaracionesDTO> toDeclaracionesDTOList(List<EmprendimientoDeclaraciones> declaraciones) {
+        return declaraciones.stream().map(d -> {
+            EmprendimientoDeclaracionesDTO dto = new EmprendimientoDeclaracionesDTO();
+            dto.setDeclaracionId(d.getDeclaracion().getId());
+            dto.setAceptada(d.getAceptada());
+            dto.setNombreFirma(d.getNombreFirma());
+            dto.setFechaAceptacion(d.getFechaAceptacion());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static List<EmprendimientoParticipacionDTO> toParticipacionDTOList(List<EmprendimientoParticipacion> participaciones) {
+        return participaciones.stream().map(p -> {
+            EmprendimientoParticipacionDTO dto = new EmprendimientoParticipacionDTO();
+            dto.setOpcionParticipacionId(p.getOpcionParticipacion().getId());
+            dto.setRespuesta(p.getRespuesta());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public static InformacionRepresentanteDTO toRepresentanteDTO(InformacionRepresentante info) {
+        if (info == null) return null;
+        InformacionRepresentanteDTO dto = new InformacionRepresentanteDTO();
+        dto.setNombre(info.getNombre());
+        dto.setApellido(info.getApellido());
+        dto.setCorreoPersonal(info.getCorreoPersonal());
+        dto.setCorreoCorporativo(info.getCorreoCorporativo());
+        // Agrega otros campos según sea necesario
+        return dto;
     }
 }

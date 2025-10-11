@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface IEmprendimientoCategoriasRepository extends JpaRepository<EmprendimientoCategorias, Integer> {
     List<EmprendimientoCategorias> findByEmprendimientoId(Integer emprendimientoId);
+
+    void deleteEmprendimientoCategoriasByEmprendimientoId(Integer emprendimientoId);
 }

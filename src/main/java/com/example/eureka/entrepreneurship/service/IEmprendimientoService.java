@@ -20,4 +20,6 @@ public interface IEmprendimientoService {
     Emprendimientos crearBorradorEmprendimiento(@Valid EmprendimientoDTO emprendimientoDTO, Usuarios usuario);
 
     EmprendimientoResponseDTO obtenerEmprendimientoCompletoPorId(Integer id);
+
+    EmprendimientoResponseDTO actualizarEmprendimiento(Integer id, EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception;
 }
