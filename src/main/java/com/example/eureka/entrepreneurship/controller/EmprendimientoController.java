@@ -22,19 +22,19 @@ public class EmprendimientoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerEmprendimientoPorId(@PathVariable Integer id) {
-        var emprendimiento = emprendimientoService.obtenerEmprendimientoPorId(id);
+        var emprendimiento = emprendimientoService.obtenerEmprendimientoCompletoPorId(id);
         return ResponseEntity.ok(emprendimiento);
     }
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearEmprendimiento(@RequestBody EmprendimientoRequestDTO dto) throws Exception {
-        emprendimientoService.estructuraEmprendimiento(dto);
+        var emprendimiento = emprendimientoService.estructuraEmprendimiento(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/categoria/{categoriaId}")
-    public ResponseEntity<?> obtenerEmprendimientosPorCategoria(@PathVariable Integer categoriaId) {
-        var resultado = emprendimientoService.obtenerEmprendimientosPorCategoria(categoriaId);
-        return ResponseEntity.ok(resultado);
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<?> actualizarEmprendimiento(@RequestBody EmprendimientoRequestDTO dto, @PathVariable Integer id) throws Exception {
+        var emprendimientoActualizado = emprendimientoService.actualizarEmprendimiento(id, dto);
+        return ResponseEntity.ok(emprendimientoActualizado);
     }
 }

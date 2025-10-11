@@ -1,0 +1,86 @@
+package com.example.eureka.general.service.impl;
+
+import com.example.eureka.general.dto.CiudadDTO;
+import com.example.eureka.general.dto.ProvinciaDTO;
+import com.example.eureka.general.repository.ICiudadesRepository;
+import com.example.eureka.general.repository.IProvinciaRepository;
+import com.example.eureka.general.service.ICiudadService;
+import com.example.eureka.model.Ciudades;
+import com.example.eureka.model.Provincias;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CiudadServiceImpl implements ICiudadService {
+
+    private final ICiudadesRepository ciudadRepository;
+    private final IProvinciaRepository provinciaRepository;
+
+    private CiudadDTO mapToDTO(Ciudades ciudad) {
+        Provincias provincia = ciudad.getProvincias();
+        ProvinciaDTO provinciaDTO = new ProvinciaDTO();
+        provinciaDTO.setId(provincia.getId());
+        provinciaDTO.setNombre(provincia.getNombre());
+        provinciaDTO.setActivo(provincia.getActivo());
+
+        CiudadDTO dto = new CiudadDTO();
+        dto.setId(ciudad.getId());
+        dto.setNombreCiudad(ciudad.getNombreCiudad());
+        dto.setProvincia(provinciaDTO);
+        return dto;
+    }
+
+    @Override
+    public List<CiudadDTO> listar() {
+        return ciudadRepository.findAll()
+                .stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CiudadDTO obtenerPorId(Integer id) {
+        Ciudades ciudad = ciudadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
+        return mapToDTO(ciudad);
+    }
+
+    @Override
+    public CiudadDTO guardar(CiudadDTO dto) {
+        Provincias provincia = provinciaRepository.findById(dto.getProvincia().getId())
+                .orElseThrow(() -> new RuntimeException("Provincia no encontrada"));
+
+        Ciudades ciudad = new Ciudades();
+        ciudad.setNombreCiudad(dto.getNombreCiudad());
+        ciudad.setProvincias(provincia);
+
+        Ciudades guardada = ciudadRepository.save(ciudad);
+        return mapToDTO(guardada);
+    }
+
+    @Override
+    public CiudadDTO actualizar(Integer id, CiudadDTO dto) {
+        Ciudades ciudad = ciudadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
+
+        Provincias provincia = provinciaRepository.findById(dto.getProvincia().getId())
+                .orElseThrow(() -> new RuntimeException("Provincia no encontrada"));
+
+        ciudad.setNombreCiudad(dto.getNombreCiudad());
+        ciudad.setProvincias(provincia);
+
+        Ciudades actualizada = ciudadRepository.save(ciudad);
+        return mapToDTO(actualizada);
+    }
+
+    @Override
+    public void eliminar(Integer id) {
+        if (!ciudadRepository.existsById(id)) {
+            throw new RuntimeException("Ciudad no encontrada");
+        }
+        ciudadRepository.deleteById(id);
+    }
+}

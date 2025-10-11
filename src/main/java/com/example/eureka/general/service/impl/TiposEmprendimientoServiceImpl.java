@@ -1,0 +1,80 @@
+package com.example.eureka.general.service.impl;
+
+import com.example.eureka.general.dto.TipoEmprendimientoDTO;
+import com.example.eureka.general.repository.ITipoEmprendimientoRepository;
+import com.example.eureka.general.service.ITiposEmprendimientoService;
+import com.example.eureka.model.TiposEmprendimientos;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class TiposEmprendimientoServiceImpl implements ITiposEmprendimientoService {
+
+    private final ITipoEmprendimientoRepository tipoRepo;
+
+    @Override
+    public List<TipoEmprendimientoDTO> listar() {
+        return tipoRepo.findAll()
+                .stream()
+                .map(entity -> {
+                    TipoEmprendimientoDTO dto = new TipoEmprendimientoDTO();
+                    dto.setId(entity.getId());
+                    dto.setTipo(entity.getTipo());
+                    dto.setSubTipo(entity.getSubTipo());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TipoEmprendimientoDTO obtenerPorId(Integer id) {
+        return tipoRepo.findById(id)
+                .map(entity -> {
+                    TipoEmprendimientoDTO dto = new TipoEmprendimientoDTO();
+                    dto.setId(entity.getId());
+                    dto.setTipo(entity.getTipo());
+                    dto.setSubTipo(entity.getSubTipo());
+                    return dto;
+                })
+                .orElse(null);
+    }
+
+    @Override
+    public TipoEmprendimientoDTO guardar(TipoEmprendimientoDTO dto) {
+        TiposEmprendimientos entity = new TiposEmprendimientos();
+        entity.setTipo(dto.getTipo());
+        entity.setSubTipo(dto.getSubTipo());
+
+        TiposEmprendimientos saved = tipoRepo.save(entity);
+
+        TipoEmprendimientoDTO response = new TipoEmprendimientoDTO();
+        response.setTipo(saved.getTipo());
+        response.setSubTipo(saved.getSubTipo());
+        return response;
+    }
+
+    @Override
+    public TipoEmprendimientoDTO actualizar(Integer id, TipoEmprendimientoDTO dto) {
+        return tipoRepo.findById(id)
+                .map(entity -> {
+                    entity.setTipo(dto.getTipo());
+                    entity.setSubTipo(dto.getSubTipo());
+                    TiposEmprendimientos updated = tipoRepo.save(entity);
+
+                    TipoEmprendimientoDTO response = new TipoEmprendimientoDTO();
+                    response.setTipo(updated.getTipo());
+                    response.setSubTipo(updated.getSubTipo());
+                    return response;
+                })
+                .orElse(null);
+    }
+
+    @Override
+    public void eliminar(Integer id) {
+        tipoRepo.deleteById(id);
+    }
+}

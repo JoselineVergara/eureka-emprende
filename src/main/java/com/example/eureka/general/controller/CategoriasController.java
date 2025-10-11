@@ -1,37 +1,41 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.CategoriasDTO;
-import com.example.eureka.general.repository.ICategoriasRepository;
-import com.example.eureka.model.Categorias;
+import com.example.eureka.general.service.ICategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/v1/categorias")
 @RequiredArgsConstructor
 public class CategoriasController {
 
-    private final ICategoriasRepository categoriasRepository;
+    private final ICategoriaService categoriaService;
 
     @GetMapping
-    public ResponseEntity<?> obtenerCategorias() {
-        List<Categorias> categorias = categoriasRepository.findAll();
-
-        List<CategoriasDTO> categoriasDTOList = categorias.stream().map(categoria -> {
-            CategoriasDTO dto = new CategoriasDTO();
-            dto.setNombre(categoria.getNombre());
-            dto.setDescripcion(categoria.getDescripcion());
-            dto.setUrlImagen(categoria.getMultimedia().getUrlArchivo());
-            return dto;
-        }).toList();
-
-        return ResponseEntity.ok(categoriasDTOList);
+    public ResponseEntity<List<CategoriasDTO>> obtenerCategorias() {
+        List<CategoriasDTO> categorias = categoriaService.obtenerCategorias();
+        return ResponseEntity.ok(categorias);
     }
 
+    @PostMapping("/crear")
+    public ResponseEntity<?> crearCategoria(@RequestBody CategoriasDTO categoriasDTO) {
+        Integer id = categoriaService.crearCategoria(categoriasDTO);
+        return ResponseEntity.ok(id);
+    }
 
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<?> actualizarCategoria(@PathVariable Integer id, @RequestBody CategoriasDTO categoriasDTO) {
+        categoriaService.actualizarCategoria(id, categoriasDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminarCategoria(@PathVariable Integer id) {
+        categoriaService.eliminarCategoria(id);
+        return ResponseEntity.ok().build();
+    }
 }

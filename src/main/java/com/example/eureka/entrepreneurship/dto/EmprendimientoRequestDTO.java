@@ -8,6 +8,9 @@ import java.util.List;
 @Data
 public class EmprendimientoRequestDTO {
 
+    //se usa para saber si se va a crear un borrador, actualizar o una solicitud de emprendimiento completo
+    private String tipoAccion;
+
     private Integer usuarioId;
 
     private EmprendimientoDTO emprendimiento;

@@ -1,3 +1,88 @@
+//package com.example.eureka.security;
+//
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.annotation.Profile;
+//import org.springframework.security.authentication.AuthenticationManager;
+//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+//import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+//import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+//
+//import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+//
+//
+//@Profile(value = {"dev", "qa", "prod"})
+//@Configuration
+//@EnableWebSecurity
+//@EnableMethodSecurity
+//@RequiredArgsConstructor
+//public class WebSecurityConfig {
+//
+//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+//    private final UserDetailsService jwtUserDetailsService;
+//    private final JwtRequestFilter jwtRequestFilter;
+//
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//        return authenticationConfiguration.getAuthenticationManager();
+//    }
+//
+//    @Bean
+//    public static PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+//
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)//e -> e.disable()
+//                .authorizeHttpRequests(req -> req
+//                                .requestMatchers("/v1/auth/register",
+//                                        "/v1/auth/login",
+//                                        "/v1/auth/validateToken",
+//                                        "/v1/categorias",
+//                                        "/v1/roles",
+//                                        "/v1/emprendimientos/crear",
+//                                "/v1/emprendimientos/{id}",
+//                                        "/v1/categorias/",
+//                                        "/v1/categorias/crear",
+//                                        "/v1/categorias/actualizar/{id}",
+//                                        "/v1/categorias/eliminar/{id}",
+//                                        "/v1/provincia",
+//                                        "/v1/provincia/crear",
+//                                        "/v1/provincia/actualizar/{id}",
+//                                        "/v1/provincia/eliminar/{id}",
+//                                        "/v1/ciudad",
+//                                        "/v1/ciudad/crear",
+//                                        "/v1/ciudad/actualizar/{id}",
+//                                        "/v1/ciudad/eliminar/{id}"
+//                                ).permitAll()
+////                        .requestMatchers("/v1/categorias").permitAll()
+//                                .anyRequest().authenticated()
+//                )
+//                .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+//                .formLogin(AbstractHttpConfigurer::disable);
+//
+//        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
+//}
 package com.example.eureka.security;
 
 import lombok.RequiredArgsConstructor;
@@ -17,9 +102,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 
 @Profile(value = {"dev", "qa", "prod"})
 @Configuration
@@ -50,16 +132,16 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)//e -> e.disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/v1/auth/register","/v1/auth/login","/v1/auth/validateToken","/v1/categorias","/v1/roles","/v1/emprendimientos/crear","/v1/emprendimientos/categoria/{categoriaId}","/v1/eventos/crear","/v1/eventos/editar/{idEvento}/{idEmprendimiento}","v1/eventos/listar","/v1/eventos/emprendimiento/{idEmprendimiento}","/v1/eventos/{idEvento}","/v1/eventos/filtrar",
-                                "/v1/eventos/inactivar/{idEvento}","/v1/blog/tags/crear","/v1/blog/tags","/v1/blog/articulos/crear","/v1/blog/articulos/{idArticulo},","/v1/blog/articulos","/v1/blog/articulos/{idArticulo}/archivar","/v1/blog/articulos/tag/{idTag}","/v1/blog/articulos/{idArticulo}/desarchivar","/v1/blog/articulos/{idArticulo}").permitAll()
-//                        .requestMatchers("/v1/categorias").permitAll()
-                        .anyRequest().authenticated()
+                        // 🔓 Permitir todos los endpoints (temporalmente mientras configuras JWT)
+                        .anyRequest().permitAll()
                 )
-                .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .formLogin(AbstractHttpConfigurer::disable);
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
+        // 🔸 Se deja el filtro JWT, pero no afectará mientras todo está permitido
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

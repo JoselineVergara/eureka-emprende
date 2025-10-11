@@ -8,4 +8,5 @@ public class CategoriasDTO {
     private String nombre;
     private String descripcion;
     private String urlImagen;
+    private Integer idMultimedia;
 }

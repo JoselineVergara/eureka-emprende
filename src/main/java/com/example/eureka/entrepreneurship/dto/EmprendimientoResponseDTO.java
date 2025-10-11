@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,4 +30,12 @@ public class EmprendimientoResponseDTO {
 
     private Integer tipoEmprendimientoId;
     private String nombreTipoEmprendimiento;
+
+    private List<EmprendimientoCategoriaDTO> categorias;
+    private List<EmprendimientoDescripcionDTO> descripciones;
+    private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
+    private List<EmprendimientoMetricasDTO> metricas;
+    private List<EmprendimientoDeclaracionesDTO> declaracionesFinales;
+    private List<EmprendimientoParticipacionDTO> participacionesComunidad;
+    private InformacionRepresentanteDTO informacionRepresentante;
 }

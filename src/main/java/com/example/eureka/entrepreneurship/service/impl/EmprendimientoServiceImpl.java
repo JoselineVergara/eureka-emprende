@@ -1,21 +1,30 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
+import com.example.eureka.auth.dto.UsuarioEmprendeDTO;
 import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
+import com.example.eureka.enums.EstadoEmprendimiento;
 import com.example.eureka.general.repository.ICiudadesRepository;
 import com.example.eureka.general.repository.IDeclaracionesFinalesRepository;
 import com.example.eureka.general.repository.IOpcionesParticipacionComunidadRepository;
 import com.example.eureka.general.repository.ITiposMetricasRepository;
 import com.example.eureka.model.*;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmprendimientoServiceImpl implements IEmprendimientoService {
@@ -36,135 +45,230 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
 
 
     // Falta multimedia (pendiente)
+    private final ITiposEmprendimientoRepository tiposEmprendimientoRepository;
+    private final IRepresentanteInformacionRepository informacionRepresentanteRepository;
 
     @Override
-    public void estructuraEmprendimiento(EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception {
+    @Transactional
+    public Integer estructuraEmprendimiento(@Valid EmprendimientoRequestDTO emprendimientoRequestDTO) {
+        log.info("Iniciando creación de estructura de emprendimiento para usuario: {}",
+                emprendimientoRequestDTO.getUsuarioId());
 
-        Usuarios usuario = userRepository.findById(emprendimientoRequestDTO.getUsuarioId())
-                .orElseThrow(() -> new Exception("Usuario no encontrado"));
-
-        Emprendimientos emprendimiento = crearEmprendimiento(emprendimientoRequestDTO.getEmprendimiento());
-
-        if (emprendimiento == null) {
-            throw new Exception("No se pudo crear el emprendimiento");
+        // Validar request
+        if (emprendimientoRequestDTO == null) {
+            throw new IllegalArgumentException("Request no puede ser nulo");
+        }
+        if (emprendimientoRequestDTO.getUsuarioId() == null) {
+            throw new IllegalArgumentException("Usuario ID no puede ser nulo");
+        }
+        if (emprendimientoRequestDTO.getEmprendimiento() == null) {
+            throw new IllegalArgumentException("Datos del emprendimiento no pueden ser nulos");
         }
 
-        agregarCategoriaEmprendimiento(emprendimiento.getId(), emprendimientoRequestDTO.getCategorias());
-        agregarDescripcionEmprendimiento(emprendimiento, emprendimientoRequestDTO.getDescripciones());
-        agregarMetricasEmprendimiento(emprendimiento, emprendimientoRequestDTO.getMetricas());
-        agregarPresenciaDigitalEmprendimiento(emprendimiento, emprendimientoRequestDTO.getPresenciasDigitales());
-        agregarParticipacionComunidad(emprendimiento, emprendimientoRequestDTO.getParticipacionesComunidad());
-        agregarDeclaracionesFinales(emprendimiento, emprendimientoRequestDTO.getDeclaracionesFinales());
+        // Buscar usuario
+        Usuarios usuario = userRepository.findById(emprendimientoRequestDTO.getUsuarioId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuario no encontrado con ID: " + emprendimientoRequestDTO.getUsuarioId()));
+
+        // Crear emprendimiento principal
+        Emprendimientos emprendimiento = crearEmprendimiento(emprendimientoRequestDTO.getEmprendimiento(), usuario,emprendimientoRequestDTO.getTipoAccion());
+
+//        InformacionRepresentante info = getInformacionRepresentante(usuario, emprendimiento);
+//        if (info != null) {
+//            informacionRepresentanteRepository.save(info);
+//        }
+        // Agregar todas las relaciones (si alguna falla, @Transactional hace rollback de TODO)
+        if (emprendimientoRequestDTO.getTipoAccion().equals("CREAR")){
+            agregarCategoriaEmprendimiento(emprendimiento.getId(), emprendimientoRequestDTO.getCategorias());
+            agregarDescripcionEmprendimiento(emprendimiento, emprendimientoRequestDTO.getDescripciones());
+            agregarMetricasEmprendimiento(emprendimiento, emprendimientoRequestDTO.getMetricas());
+            agregarPresenciaDigitalEmprendimiento(emprendimiento, emprendimientoRequestDTO.getPresenciasDigitales());
+            agregarParticipacionComunidad(emprendimiento, emprendimientoRequestDTO.getParticipacionesComunidad());
+            agregarDeclaracionesFinales(emprendimiento, emprendimientoRequestDTO.getDeclaracionesFinales());
+        }
+        log.info("Emprendimiento creado exitosamente con ID: {}", emprendimiento.getId());
+
+        return emprendimiento.getId();
     }
 
-    private Emprendimientos crearEmprendimiento(EmprendimientoDTO emprendimientoDTO) throws Exception {
-        if (emprendimientoDTO == null) {
-            throw new Exception("Datos del emprendimiento vacíos");
-        }
+    private Emprendimientos crearEmprendimiento(EmprendimientoDTO emprendimientoDTO, Usuarios usuario,String tipoAccion) {
+        log.debug("Creando emprendimiento con nombre: {}", emprendimientoDTO.getNombreComercialEmprendimiento());
 
+        // Buscar ciudad
         Ciudades ciudad = ciudadesRepository.findById(emprendimientoDTO.getCiudad())
-                .orElseThrow(() -> new Exception("Ciudad no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Ciudad no encontrada con ID: " + emprendimientoDTO.getCiudad()));
 
+        // Buscar tipo de emprendimiento - CORREGIDO
+        TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository
+                .findById(emprendimientoDTO.getTipoEmprendimientoId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tipo de emprendimiento no encontrado con ID: " + emprendimientoDTO.getTipoEmprendimientoId()));
+
+        // Crear entidad emprendimiento - CORREGIDO
         Emprendimientos emprendimiento = new Emprendimientos();
         emprendimiento.setNombreComercial(emprendimientoDTO.getNombreComercialEmprendimiento());
         emprendimiento.setAnioCreacion(emprendimientoDTO.getFechaCreacion());
         emprendimiento.setActivoEmprendimiento(emprendimientoDTO.getEstadoEmpredimiento());
         emprendimiento.setAceptaDatosPublicos(emprendimientoDTO.getDatosPublicos());
         emprendimiento.setFechaCreacion(emprendimientoDTO.getFechaCreacion());
-        emprendimiento.setEstadoEmprendimiento(emprendimientoDTO.getTipoEmprendimiento());
+
+        if (tipoAccion.equals(String.valueOf(EstadoEmprendimiento.BORRADOR))){
+            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.BORRADOR));
+        }else{
+            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.PENDIENTE_REVISION));
+        }
+
         emprendimiento.setCiudades(ciudad);
+        emprendimiento.setUsuarios(usuario);
+        emprendimiento.setTiposEmprendimientos(tipoEmprendimiento);
 
         return emprendimientosRepository.save(emprendimiento);
     }
 
-    private Boolean agregarCategoriaEmprendimiento(Integer codigoEmprendimiento, List<EmprendimientoCategoriaDTO> lsCategorias) {
-        if (lsCategorias == null || lsCategorias.isEmpty()) return false;
-
-        for (EmprendimientoCategoriaDTO categoriaDTO : lsCategorias) {
-            EmprendimientoCategorias categoria = new EmprendimientoCategorias();
-            categoria.setEmprendimientoId(codigoEmprendimiento);
-            categoria.setCategoriaId(categoriaDTO.getCategoriaId());
-            emprendimientoCategoriasRepository.save(categoria);
+    private void agregarCategoriaEmprendimiento(Integer codigoEmprendimiento, List<EmprendimientoCategoriaDTO> lsCategorias) {
+        if (CollectionUtils.isEmpty(lsCategorias)) {
+            log.debug("No hay categorías para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} categorías al emprendimiento: {}", lsCategorias.size(), codigoEmprendimiento);
+
+        List<EmprendimientoCategorias> categorias = lsCategorias.stream()
+                .map(categoriaDTO -> {
+                    EmprendimientoCategorias categoria = new EmprendimientoCategorias();
+                    categoria.setEmprendimientoId(codigoEmprendimiento);
+                    categoria.setCategoriaId(categoriaDTO.getCategoriaId());
+                    return categoria;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientoCategoriasRepository.saveAll(categorias);
     }
 
-    private Boolean agregarDescripcionEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoDescripcionDTO> lsDescripcion) {
-        if (lsDescripcion == null || lsDescripcion.isEmpty()) return false;
-
-        for (EmprendimientoDescripcionDTO dto : lsDescripcion) {
-            TiposDescripcionEmprendimiento descripcion = new TiposDescripcionEmprendimiento();
-            descripcion.setTipoDescripcion(dto.getTipoDescripcion());
-            descripcion.setDescripcion(dto.getDescripcion());
-            descripcion.setMaxCaracteres(dto.getMaxCaracteres());
-            descripcion.setObligatorio(dto.getObligatorio());
-            descripcion.setEmprendimiento(emprendimiento);
-            emprendimientosDescripcionRepository.save(descripcion);
+    private void agregarDescripcionEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoDescripcionDTO> lsDescripcion) {
+        if (CollectionUtils.isEmpty(lsDescripcion)) {
+            log.debug("No hay descripciones para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} descripciones al emprendimiento: {}", lsDescripcion.size(), emprendimiento.getId());
+
+        List<TiposDescripcionEmprendimiento> descripciones = lsDescripcion.stream()
+                .map(dto -> {
+                    TiposDescripcionEmprendimiento descripcion = new TiposDescripcionEmprendimiento();
+                    descripcion.setTipoDescripcion(dto.getTipoDescripcion());
+                    descripcion.setDescripcion(dto.getDescripcion());
+                    descripcion.setMaxCaracteres(dto.getMaxCaracteres());
+                    descripcion.setObligatorio(dto.getObligatorio());
+                    descripcion.setEmprendimiento(emprendimiento);
+                    return descripcion;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientosDescripcionRepository.saveAll(descripciones);
     }
 
-    private Boolean agregarPresenciaDigitalEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoPresenciaDigitalDTO> lsPresenciaDigital) {
-        if (lsPresenciaDigital == null || lsPresenciaDigital.isEmpty()) return false;
-
-        for (EmprendimientoPresenciaDigitalDTO dto : lsPresenciaDigital) {
-            TiposPresenciaDigital presencia = new TiposPresenciaDigital();
-            presencia.setDescripcion(dto.getDescripcion());
-            presencia.setPlataforma(dto.getPlataforma());
-            presencia.setEmprendimiento(emprendimiento);
-            emprendimientoPresenciaDigitalRepository.save(presencia);
+    private void agregarPresenciaDigitalEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoPresenciaDigitalDTO> lsPresenciaDigital) {
+        if (CollectionUtils.isEmpty(lsPresenciaDigital)) {
+            log.debug("No hay presencia digital para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} presencias digitales al emprendimiento: {}", lsPresenciaDigital.size(), emprendimiento.getId());
+
+        List<TiposPresenciaDigital> presencias = lsPresenciaDigital.stream()
+                .map(dto -> {
+                    TiposPresenciaDigital presencia = new TiposPresenciaDigital();
+                    presencia.setDescripcion(dto.getDescripcion());
+                    presencia.setPlataforma(dto.getPlataforma());
+                    presencia.setEmprendimiento(emprendimiento);
+                    return presencia;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientoPresenciaDigitalRepository.saveAll(presencias);
     }
 
-    private Boolean agregarMetricasEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoMetricasDTO> lsMetricas) throws Exception {
-        if (lsMetricas == null || lsMetricas.isEmpty()) return false;
-
-        for (EmprendimientoMetricasDTO dto : lsMetricas) {
-            MetricasBasicas metrica = tiposMetricasRepository.findById(dto.getMetricaId())
-                    .orElseThrow(() -> new Exception("Métrica no encontrada"));
-
-            EmprendimientoMetricas metricaEmp = new EmprendimientoMetricas();
-            metricaEmp.setMetrica(metrica);
-            metricaEmp.setEmprendimiento(emprendimiento);
-            metricaEmp.setValor(dto.getValor());
-            emprendimientoMetricaRepository.save(metricaEmp);
+    private void agregarMetricasEmprendimiento(Emprendimientos emprendimiento, List<EmprendimientoMetricasDTO> lsMetricas) {
+        if (CollectionUtils.isEmpty(lsMetricas)) {
+            log.debug("No hay métricas para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} métricas al emprendimiento: {}", lsMetricas.size(), emprendimiento.getId());
+
+        List<EmprendimientoMetricas> metricas = lsMetricas.stream()
+                .map(dto -> {
+                    MetricasBasicas metrica = tiposMetricasRepository.findById(dto.getMetricaId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Métrica no encontrada con ID: " + dto.getMetricaId()));
+
+                    EmprendimientoMetricas metricaEmp = new EmprendimientoMetricas();
+                    metricaEmp.setMetrica(metrica);
+                    metricaEmp.setEmprendimiento(emprendimiento);
+                    metricaEmp.setValor(dto.getValor());
+                    return metricaEmp;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientoMetricaRepository.saveAll(metricas);
     }
 
-    private Boolean agregarParticipacionComunidad(Emprendimientos emprendimiento, List<EmprendimientoParticipacionDTO> lsParticipacionComunidad) throws Exception {
-        if (lsParticipacionComunidad == null || lsParticipacionComunidad.isEmpty()) return false;
-
-        for (EmprendimientoParticipacionDTO dto : lsParticipacionComunidad) {
-            OpcionesParticipacionComunidad opcion = opcionesParticipacionComunidadRepository.findById(dto.getOpcionParticipacionId())
-                    .orElseThrow(() -> new Exception("Participación Comunidad no encontrada"));
-
-            EmprendimientoParticipacion participacion = new EmprendimientoParticipacion();
-            participacion.setOpcionParticipacion(opcion);
-            participacion.setEmprendimiento(emprendimiento);
-            participacion.setRespuesta(dto.getRespuesta());
-            emprendimientoParticicipacionComunidadRepository.save(participacion);
+    private void agregarParticipacionComunidad(Emprendimientos emprendimiento, List<EmprendimientoParticipacionDTO> lsParticipacionComunidad) {
+        if (CollectionUtils.isEmpty(lsParticipacionComunidad)) {
+            log.debug("No hay participaciones en comunidad para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} participaciones en comunidad al emprendimiento: {}",
+                lsParticipacionComunidad.size(), emprendimiento.getId());
+
+        List<EmprendimientoParticipacion> participaciones = lsParticipacionComunidad.stream()
+                .map(dto -> {
+                    OpcionesParticipacionComunidad opcion = opcionesParticipacionComunidadRepository
+                            .findById(dto.getOpcionParticipacionId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Opción de participación no encontrada con ID: " + dto.getOpcionParticipacionId()));
+
+                    EmprendimientoParticipacion participacion = new EmprendimientoParticipacion();
+                    participacion.setOpcionParticipacion(opcion);
+                    participacion.setEmprendimiento(emprendimiento);
+                    participacion.setRespuesta(dto.getRespuesta());
+                    return participacion;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientoParticicipacionComunidadRepository.saveAll(participaciones);
     }
 
-    private Boolean agregarDeclaracionesFinales(Emprendimientos emprendimiento, List<EmprendimientoDeclaracionesDTO> lsDeclaracionesFinales) throws Exception {
-        if (lsDeclaracionesFinales == null || lsDeclaracionesFinales.isEmpty()) return false;
-
-        for (EmprendimientoDeclaracionesDTO dto : lsDeclaracionesFinales) {
-            DeclaracionesFinales declaracion = declaracionesFinalesRepository.findById(dto.getDeclaracionId())
-                    .orElseThrow(() -> new Exception("Declaración final no encontrada"));
-
-            EmprendimientoDeclaraciones declaracionEmp = new EmprendimientoDeclaraciones();
-            declaracionEmp.setAceptada(dto.getAceptada());
-            declaracionEmp.setNombreFirma(dto.getNombreFirma());
-            declaracionEmp.setFechaAceptacion(dto.getFechaAceptacion());
-            declaracionEmp.setEmprendimiento(emprendimiento);
-            declaracionEmp.setDeclaracion(declaracion);
-            emprendimientoDeclaracionesRepository.save(declaracionEmp);
+    private void agregarDeclaracionesFinales(Emprendimientos emprendimiento, List<EmprendimientoDeclaracionesDTO> lsDeclaracionesFinales) {
+        if (CollectionUtils.isEmpty(lsDeclaracionesFinales)) {
+            log.debug("No hay declaraciones finales para agregar");
+            return;
         }
-        return true;
+
+        log.debug("Agregando {} declaraciones finales al emprendimiento: {}",
+                lsDeclaracionesFinales.size(), emprendimiento.getId());
+
+        List<EmprendimientoDeclaraciones> declaraciones = lsDeclaracionesFinales.stream()
+                .map(dto -> {
+                    DeclaracionesFinales declaracion = declaracionesFinalesRepository
+                            .findById(dto.getDeclaracionId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Declaración final no encontrada con ID: " + dto.getDeclaracionId()));
+
+                    EmprendimientoDeclaraciones declaracionEmp = new EmprendimientoDeclaraciones();
+                    declaracionEmp.setAceptada(dto.getAceptada());
+                    declaracionEmp.setNombreFirma(dto.getNombreFirma());
+                    declaracionEmp.setFechaAceptacion(dto.getFechaAceptacion());
+                    declaracionEmp.setEmprendimiento(emprendimiento);
+                    declaracionEmp.setDeclaracion(declaracion);
+                    return declaracionEmp;
+                })
+                .collect(Collectors.toList());
+
+        emprendimientoDeclaracionesRepository.saveAll(declaraciones);
     }
 
     @Override
@@ -176,7 +280,7 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     @Override
     public EmprendimientoResponseDTO obtenerEmprendimientoPorId(Integer id) {
         Emprendimientos emp = emprendimientosRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Emprendimiento no encontrado con id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
         return EmprendimientoMapper.toResponseDTO(emp);
     }
 
@@ -205,4 +309,230 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
                 .emprendimientos(emprendimientos)
                 .build();
     }
+    @Transactional
+    public Emprendimientos crearBorradorEmprendimiento(@Valid EmprendimientoDTO emprendimientoDTO, Usuarios usuario) {
+        log.info("Creando borrador de emprendimiento para usuario: {}", usuario.getId());
+
+        // Buscar ciudad
+        Ciudades ciudad = ciudadesRepository.findById(emprendimientoDTO.getCiudad())
+                .orElseThrow(() -> new EntityNotFoundException("Ciudad no encontrada con ID: " + emprendimientoDTO.getCiudad()));
+
+        // Buscar tipo de emprendimiento - CORREGIDO
+        TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository
+                .findById(emprendimientoDTO.getTipoEmprendimientoId()) // CORREGIDO: usar getTipoEmprendimientoId()
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tipo de emprendimiento no encontrado con ID: " + emprendimientoDTO.getTipoEmprendimientoId()));
+
+        // Crear entidad emprendimiento - CORREGIDO
+        Emprendimientos emprendimiento = new Emprendimientos();
+        emprendimiento.setNombreComercial(emprendimientoDTO.getNombreComercialEmprendimiento());
+        emprendimiento.setAnioCreacion(emprendimientoDTO.getFechaCreacion());
+        emprendimiento.setActivoEmprendimiento(emprendimientoDTO.getEstadoEmpredimiento());
+        emprendimiento.setAceptaDatosPublicos(emprendimientoDTO.getDatosPublicos());
+        emprendimiento.setFechaCreacion(emprendimientoDTO.getFechaCreacion());
+        emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.BORRADOR));
+        emprendimiento.setUsuarios(usuario);
+        emprendimiento.setCiudades(ciudad);
+        emprendimiento.setTiposEmprendimientos(tipoEmprendimiento);
+
+        Emprendimientos guardado = emprendimientosRepository.save(emprendimiento);
+        log.info("Borrador creado exitosamente con ID: {}", guardado.getId());
+
+        return guardado;
+    }
+
+    public InformacionRepresentante getInformacionRepresentante(Usuarios usuario, Emprendimientos modelEmprendimiento) {
+        InformacionRepresentante info = new InformacionRepresentante();
+        info.setNombre(usuario.getNombre());
+        info.setApellido(usuario.getApellido());
+        info.setCorreoPersonal(usuario.getCorreo());
+        info.setCorreoCorporativo(usuario.getCorreo());
+//        info.setIdentificacion(usuario.getIdentificacion());
+//        info.setCarrera(usuario.getCarrera());
+//        info.setSemestre(usuario.getSemestre());
+//        info.setFechaGraduacion(usuario.getFechaGraduacion());
+//        info.setTieneParientesUees(usuario.getParienteDirecto());
+//        info.setNombrePariente(usuario.getNombrePariente());
+//        info.setAreaPariente(usuario.getAreaPariente());
+        info.setEmprendimiento(modelEmprendimiento);
+        return info;
+    }
+
+    @Override
+    @Transactional
+    public EmprendimientoResponseDTO obtenerEmprendimientoCompletoPorId(Integer id) {
+        Emprendimientos emprendimiento = emprendimientosRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
+
+        EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emprendimiento);
+        dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(emprendimientoCategoriasRepository.findByEmprendimientoId(id)));
+        dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(emprendimientosDescripcionRepository.findByEmprendimientoId(id)));
+        dto.setPresenciasDigitales(EmprendimientoMapper.toPresenciaDigitalDTOList(emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(id)));
+        dto.setMetricas(EmprendimientoMapper.toMetricasDTOList(emprendimientoMetricaRepository.findByEmprendimientoId(id)));
+        dto.setDeclaracionesFinales(EmprendimientoMapper.toDeclaracionesDTOList(emprendimientoDeclaracionesRepository.findByEmprendimientoId(id)));
+        dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(emprendimientoParticicipacionComunidadRepository.findByEmprendimientoId(id)));
+        dto.setInformacionRepresentante(EmprendimientoMapper.toRepresentanteDTO(informacionRepresentanteRepository.findFirstByEmprendimientoId(id)));
+        return dto;
+    }
+
+    @Override
+    @Transactional
+    public EmprendimientoResponseDTO actualizarEmprendimiento(Integer id, EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception {
+        Emprendimientos emprendimiento = emprendimientosRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con ID: " + id));
+
+        // Actualizar campos principales
+        EmprendimientoDTO dto = emprendimientoRequestDTO.getEmprendimiento();
+        if (dto != null) {
+            emprendimiento.setNombreComercial(dto.getNombreComercialEmprendimiento());
+            emprendimiento.setAnioCreacion(dto.getFechaCreacion());
+            emprendimiento.setActivoEmprendimiento(dto.getEstadoEmpredimiento());
+            emprendimiento.setAceptaDatosPublicos(dto.getDatosPublicos());
+            emprendimiento.setFechaCreacion(dto.getFechaCreacion());
+            // Actualizar ciudad y tipo de emprendimiento si corresponde
+            if (dto.getCiudad() != null) {
+                Ciudades ciudad = ciudadesRepository.findById(dto.getCiudad())
+                        .orElseThrow(() -> new EntityNotFoundException("Ciudad no encontrada con ID: " + dto.getCiudad()));
+                emprendimiento.setCiudades(ciudad);
+            }
+            if (dto.getTipoEmprendimientoId() != null) {
+                TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository.findById(dto.getTipoEmprendimientoId())
+                        .orElseThrow(() -> new EntityNotFoundException("Tipo de emprendimiento no encontrado con ID: " + dto.getTipoEmprendimientoId()));
+                emprendimiento.setTiposEmprendimientos(tipoEmprendimiento);
+            }
+        }
+        emprendimientosRepository.save(emprendimiento);
+
+        // Actualizar relaciones (eliminar y volver a agregar)
+        emprendimientoCategoriasRepository.deleteEmprendimientoCategoriasByEmprendimientoId((id));
+        agregarCategoriaEmprendimiento(id, emprendimientoRequestDTO.getCategorias());
+
+        // Actualizar descripciones
+        List<TiposDescripcionEmprendimiento> actualesDescripciones = emprendimientosDescripcionRepository.findByEmprendimientoId(id);
+        List<EmprendimientoDescripcionDTO> nuevasDescripciones = emprendimientoRequestDTO.getDescripciones() != null ? emprendimientoRequestDTO.getDescripciones() : List.of();
+        for (TiposDescripcionEmprendimiento actual : actualesDescripciones) {
+            boolean existe = nuevasDescripciones.stream().anyMatch(d -> d.getTipoDescripcion().equals(actual.getTipoDescripcion()));
+            if (!existe) {
+                emprendimientosDescripcionRepository.delete(actual);
+            }
+        }
+        for (EmprendimientoDescripcionDTO nueva : nuevasDescripciones) {
+            TiposDescripcionEmprendimiento actual = actualesDescripciones.stream().filter(d -> d.getTipoDescripcion().equals(nueva.getTipoDescripcion())).findFirst().orElse(null);
+            if (actual != null) {
+                actual.setDescripcion(nueva.getDescripcion());
+                actual.setMaxCaracteres(nueva.getMaxCaracteres());
+                actual.setObligatorio(nueva.getObligatorio());
+                emprendimientosDescripcionRepository.save(actual);
+            } else {
+                TiposDescripcionEmprendimiento nuevaDesc = new TiposDescripcionEmprendimiento();
+                nuevaDesc.setTipoDescripcion(nueva.getTipoDescripcion());
+                nuevaDesc.setDescripcion(nueva.getDescripcion());
+                nuevaDesc.setMaxCaracteres(nueva.getMaxCaracteres());
+                nuevaDesc.setObligatorio(nueva.getObligatorio());
+                nuevaDesc.setEmprendimiento(emprendimiento);
+                emprendimientosDescripcionRepository.save(nuevaDesc);
+            }
+        }
+        // Actualizar métricas
+        List<EmprendimientoMetricas> actualesMetricas = emprendimientoMetricaRepository.findByEmprendimientoId(id);
+        List<EmprendimientoMetricasDTO> nuevasMetricas = emprendimientoRequestDTO.getMetricas() != null ? emprendimientoRequestDTO.getMetricas() : List.of();
+        for (EmprendimientoMetricas actual : actualesMetricas) {
+            boolean existe = nuevasMetricas.stream().anyMatch(m -> m.getMetricaId().equals(actual.getMetrica().getId()));
+            if (!existe) {
+                emprendimientoMetricaRepository.delete(actual);
+            }
+        }
+        for (EmprendimientoMetricasDTO nueva : nuevasMetricas) {
+            EmprendimientoMetricas actual = actualesMetricas.stream().filter(m -> m.getMetrica().getId().equals(nueva.getMetricaId())).findFirst().orElse(null);
+            if (actual != null) {
+                actual.setValor(nueva.getValor());
+                emprendimientoMetricaRepository.save(actual);
+            } else {
+                MetricasBasicas metrica = tiposMetricasRepository.findById(nueva.getMetricaId()).orElseThrow();
+                EmprendimientoMetricas nuevaMetrica = new EmprendimientoMetricas();
+                nuevaMetrica.setMetrica(metrica);
+                nuevaMetrica.setEmprendimiento(emprendimiento);
+                nuevaMetrica.setValor(nueva.getValor());
+                emprendimientoMetricaRepository.save(nuevaMetrica);
+            }
+        }
+        // Actualizar presencia digital
+        List<TiposPresenciaDigital> actualesPresencias = emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(id);
+        List<EmprendimientoPresenciaDigitalDTO> nuevasPresencias = emprendimientoRequestDTO.getPresenciasDigitales() != null ? emprendimientoRequestDTO.getPresenciasDigitales() : List.of();
+        for (TiposPresenciaDigital actual : actualesPresencias) {
+            boolean existe = nuevasPresencias.stream().anyMatch(p -> p.getPlataforma().equals(actual.getPlataforma()));
+            if (!existe) {
+                emprendimientoPresenciaDigitalRepository.delete(actual);
+            }
+        }
+        for (EmprendimientoPresenciaDigitalDTO nueva : nuevasPresencias) {
+            TiposPresenciaDigital actual = actualesPresencias.stream().filter(p -> p.getPlataforma().equals(nueva.getPlataforma())).findFirst().orElse(null);
+            if (actual != null) {
+                actual.setDescripcion(nueva.getDescripcion());
+                emprendimientoPresenciaDigitalRepository.save(actual);
+            } else {
+                TiposPresenciaDigital nuevaPres = new TiposPresenciaDigital();
+                nuevaPres.setPlataforma(nueva.getPlataforma());
+                nuevaPres.setDescripcion(nueva.getDescripcion());
+                nuevaPres.setEmprendimiento(emprendimiento);
+                emprendimientoPresenciaDigitalRepository.save(nuevaPres);
+            }
+        }
+        // Actualizar participación comunidad
+        List<EmprendimientoParticipacion> actualesParticipaciones = emprendimientoParticicipacionComunidadRepository.findByEmprendimientoId(id);
+        List<EmprendimientoParticipacionDTO> nuevasParticipaciones = emprendimientoRequestDTO.getParticipacionesComunidad() != null ? emprendimientoRequestDTO.getParticipacionesComunidad() : List.of();
+        for (EmprendimientoParticipacion actual : actualesParticipaciones) {
+            boolean existe = nuevasParticipaciones.stream().anyMatch(p -> p.getOpcionParticipacionId().equals(actual.getOpcionParticipacion().getId()));
+            if (!existe) {
+                emprendimientoParticicipacionComunidadRepository.delete(actual);
+            }
+        }
+        for (EmprendimientoParticipacionDTO nueva : nuevasParticipaciones) {
+            EmprendimientoParticipacion actual = actualesParticipaciones.stream().filter(p -> p.getOpcionParticipacion().getId().equals(nueva.getOpcionParticipacionId())).findFirst().orElse(null);
+            if (actual != null) {
+                actual.setRespuesta(nueva.getRespuesta());
+                emprendimientoParticicipacionComunidadRepository.save(actual);
+            } else {
+                OpcionesParticipacionComunidad opcion = opcionesParticipacionComunidadRepository.findById(nueva.getOpcionParticipacionId()).orElseThrow();
+                EmprendimientoParticipacion nuevaPart = new EmprendimientoParticipacion();
+                nuevaPart.setOpcionParticipacion(opcion);
+                nuevaPart.setEmprendimiento(emprendimiento);
+                nuevaPart.setRespuesta(nueva.getRespuesta());
+                emprendimientoParticicipacionComunidadRepository.save(nuevaPart);
+            }
+        }
+        // Actualizar declaraciones finales
+        List<EmprendimientoDeclaraciones> actualesDeclaraciones = emprendimientoDeclaracionesRepository.findByEmprendimientoId(id);
+        List<EmprendimientoDeclaracionesDTO> nuevasDeclaraciones = emprendimientoRequestDTO.getDeclaracionesFinales() != null ? emprendimientoRequestDTO.getDeclaracionesFinales() : List.of();
+        for (EmprendimientoDeclaraciones actual : actualesDeclaraciones) {
+            boolean existe = nuevasDeclaraciones.stream().anyMatch(d -> d.getDeclaracionId().equals(actual.getDeclaracion().getId()));
+            if (!existe) {
+                emprendimientoDeclaracionesRepository.delete(actual);
+            }
+        }
+        for (EmprendimientoDeclaracionesDTO nueva : nuevasDeclaraciones) {
+            EmprendimientoDeclaraciones actual = actualesDeclaraciones.stream().filter(d -> d.getDeclaracion().getId().equals(nueva.getDeclaracionId())).findFirst().orElse(null);
+            if (actual != null) {
+                actual.setAceptada(nueva.getAceptada());
+                actual.setNombreFirma(nueva.getNombreFirma());
+                actual.setFechaAceptacion(nueva.getFechaAceptacion());
+                emprendimientoDeclaracionesRepository.save(actual);
+            } else {
+                DeclaracionesFinales declaracion = declaracionesFinalesRepository.findById(nueva.getDeclaracionId()).orElseThrow();
+                EmprendimientoDeclaraciones nuevaDecl = new EmprendimientoDeclaraciones();
+                nuevaDecl.setDeclaracion(declaracion);
+                nuevaDecl.setEmprendimiento(emprendimiento);
+                nuevaDecl.setAceptada(nueva.getAceptada());
+                nuevaDecl.setNombreFirma(nueva.getNombreFirma());
+                nuevaDecl.setFechaAceptacion(nueva.getFechaAceptacion());
+                emprendimientoDeclaracionesRepository.save(nuevaDecl);
+            }
+        }
+
+        // Devolver el emprendimiento actualizado
+        return obtenerEmprendimientoCompletoPorId(id);
+    }
+
+
 }
+
