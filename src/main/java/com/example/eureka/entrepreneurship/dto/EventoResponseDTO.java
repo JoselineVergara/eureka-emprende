@@ -29,5 +29,5 @@ public class EventoResponseDTO {
     private Integer idEmprendimiento;
     private String nombreEmprendimiento;
     private Integer idMultimedia;
-    private String urlMultimedia;
+    //private String urlMultimedia;
 }

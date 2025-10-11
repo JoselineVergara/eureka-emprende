@@ -26,16 +26,13 @@ public class EventoRequestDTO {
     @NotBlank(message = "El lugar es obligatorio")
     private String lugar;
 
-    @NotBlank(message = "El tipo de evento es obligatorio")
+    @NotNull(message = "El tipo de evento es obligatorio")
     private TipoEvento tipoEvento; // presencial o virtual
 
     private String linkInscripcion;
 
     private String direccion;
 
-    @NotNull(message = "El ID del emprendimiento es obligatorio")
-    private Integer idEmprendimiento;
-
     @NotNull(message = "El ID de multimedia es obligatorio")
-    private Integer idMultimedia;
+    Integer idMultimedia;
 }

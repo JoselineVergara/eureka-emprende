@@ -5,6 +5,7 @@ import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.service.IEventosService;
+import com.example.eureka.enums.EstadoEmprendimiento;
 import com.example.eureka.enums.EstadoEvento;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.model.Emprendimientos;
@@ -28,9 +29,9 @@ public class EventosServiceImpl implements IEventosService {
     private final IMultimediaRepository multimediaRepository;
 
     @Transactional
-    public EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idUsuario) {
+    public EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idEmprendimiento) {
         // Validar que el emprendimiento existe y está aprobado
-        Emprendimientos emprendimiento = validarEmprendimientoAprobado(request.getIdEmprendimiento(), idUsuario);
+        Emprendimientos emprendimiento = validarEmprendimientoAprobado(idEmprendimiento);
 
         // Validar que la multimedia existe
         Multimedia multimedia = multimediaRepository.findById(request.getIdMultimedia())
@@ -47,10 +48,10 @@ public class EventosServiceImpl implements IEventosService {
         evento.setDescripcion(request.getDescripcion());
         evento.setFechaEvento(request.getFechaEvento());
         evento.setLugar(request.getLugar());
-        evento.setTipoEvento(request.getTipoEvento()); // CAMBIO: ya es TipoEvento
+        evento.setTipoEvento(request.getTipoEvento());
         evento.setLinkInscripcion(request.getLinkInscripcion());
         evento.setDireccion(request.getDireccion());
-        evento.setEstadoEvento(EstadoEvento.PROGRAMADO); // CAMBIO: usar ENUM
+        evento.setEstadoEvento(EstadoEvento.programado);
         evento.setFechaCreacion(LocalDateTime.now());
         evento.setEmprendimiento(emprendimiento);
         evento.setMultimedia(multimedia);
@@ -61,27 +62,20 @@ public class EventosServiceImpl implements IEventosService {
     }
 
     @Transactional
-    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idUsuario) {
+    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idEmprendimiento) {
         Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        validarEmprendimientoAprobado(evento.getEmprendimiento().getId(), idUsuario);
+        // Validar que el evento pertenece al emprendimiento indicado
+        if (!evento.getEmprendimiento().getId().equals(idEmprendimiento)) {
+            throw new BusinessException("El evento no pertenece a este emprendimiento");
+        }
 
-        // CAMBIO: usar ENUM
-        if (evento.getEstadoEvento() == EstadoEvento.CANCELADO ||
-                evento.getEstadoEvento() == EstadoEvento.TERMINADO) {
+        validarEmprendimientoAprobado(idEmprendimiento);
+
+        if (evento.getEstadoEvento() == EstadoEvento.cancelado ||
+                evento.getEstadoEvento() == EstadoEvento.terminado) {
             throw new BusinessException("No se puede editar un evento cancelado o terminado");
-        }
-
-        if (!evento.getEmprendimiento().getId().equals(request.getIdEmprendimiento())) {
-            Emprendimientos nuevoEmprendimiento = validarEmprendimientoAprobado(request.getIdEmprendimiento(), idUsuario);
-            evento.setEmprendimiento(nuevoEmprendimiento);
-        }
-
-        if (!evento.getMultimedia().getId().equals(request.getIdMultimedia())) {
-            Multimedia multimedia = multimediaRepository.findById(request.getIdMultimedia())
-                    .orElseThrow(() -> new BusinessException("Multimedia no encontrada"));
-            evento.setMultimedia(multimedia);
         }
 
         if (request.getFechaEvento().isBefore(LocalDateTime.now())) {
@@ -103,34 +97,24 @@ public class EventosServiceImpl implements IEventosService {
     }
 
     @Transactional
-    public void inactivarEvento(Integer idEvento, Integer idUsuario) {
+    public void inactivarEvento(Integer idEvento) {
         Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        validarEmprendimientoAprobado(evento.getEmprendimiento().getId(), idUsuario);
+        validarEmprendimientoAprobado(evento.getEmprendimiento().getId());
 
-        // CAMBIO: usar ENUM
-        if (evento.getEstadoEvento() == EstadoEvento.CANCELADO) {
+        if (evento.getEstadoEvento() == EstadoEvento.cancelado) {
             throw new BusinessException("El evento ya está cancelado");
         }
-        if (evento.getEstadoEvento() == EstadoEvento.TERMINADO) {
+        if (evento.getEstadoEvento() == EstadoEvento.terminado) {
             throw new BusinessException("No se puede cancelar un evento terminado");
         }
 
-        evento.setEstadoEvento(EstadoEvento.CANCELADO); // CAMBIO: usar ENUM
+        evento.setEstadoEvento(EstadoEvento.cancelado);
         evento.setFechaModificacion(LocalDateTime.now());
 
         IEventosRepository.save(evento);
     }
-
-    @Transactional(readOnly = true)
-    public List<EventoResponseDTO> obtenerTodosLosEventos() {
-        List<Eventos> eventos = IEventosRepository.findAll();
-        return eventos.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
-    }
-
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerEventosPorEmprendimiento(Integer idEmprendimiento) {
         List<Eventos> eventos = IEventosRepository.findByEmprendimientoId(idEmprendimiento);
@@ -154,17 +138,54 @@ public class EventosServiceImpl implements IEventosService {
         return convertirADTO(evento);
     }
 
-    private Emprendimientos validarEmprendimientoAprobado(Integer idEmprendimiento, Integer idUsuario) {
+    // ===== MÉTODO UNIFICADO CON FILTROS OPCIONALES =====
+    @Transactional(readOnly = true)
+    public List<EventoResponseDTO> obtenerEventosFiltrados(
+            EstadoEvento estadoEvento,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin) {
+
+        List<Eventos> eventos;
+
+        // Validar fechas si ambas están presentes
+        if (fechaInicio != null && fechaFin != null && fechaInicio.isAfter(fechaFin)) {
+            throw new BusinessException("La fecha de inicio debe ser anterior a la fecha de fin");
+        }
+
+        // Caso 1: Solo estado
+        if (estadoEvento != null && fechaInicio == null && fechaFin == null) {
+            eventos = IEventosRepository.findByEstadoEvento(estadoEvento);
+        }
+        // Caso 2: Solo rango de fechas (ambas deben estar presentes)
+        else if (estadoEvento == null && fechaInicio != null && fechaFin != null) {
+            eventos = IEventosRepository.findByFechaEventoBetween(fechaInicio, fechaFin);
+        }
+        // Caso 3: Estado y rango de fechas
+        else if (estadoEvento != null && fechaInicio != null && fechaFin != null) {
+            eventos = IEventosRepository.findByEstadoEventoAndFechaEventoBetween(
+                    estadoEvento, fechaInicio, fechaFin);
+        }
+        // Caso 4: Sin filtros (traer todos)
+        else if (estadoEvento == null && fechaInicio == null && fechaFin == null) {
+            eventos = IEventosRepository.findAll();
+        }
+        // Caso 5: Solo una fecha (no válido)
+        else {
+            throw new BusinessException(
+                    "Para filtrar por fecha, debe proporcionar tanto fechaInicio como fechaFin");
+        }
+
+        return eventos.stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    private Emprendimientos validarEmprendimientoAprobado(Integer idEmprendimiento) {
         Emprendimientos emprendimiento = emprendimientosRepository.findById(idEmprendimiento)
                 .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado"));
 
-        // Validar que el emprendimiento pertenece al usuario
-        if (!emprendimiento.getUsuarios().getId().equals(idUsuario)) {
-            throw new BusinessException("El emprendimiento no pertenece al usuario");
-        }
-
         // Validar que el emprendimiento está aprobado
-        if (!emprendimiento.getEstadoEmprendimiento().equalsIgnoreCase("aprobado")) {
+        if (!emprendimiento.getEstadoEmprendimiento().equalsIgnoreCase("APROBADO")) {
             throw new BusinessException("El emprendimiento debe estar aprobado para crear eventos");
         }
 
@@ -187,7 +208,7 @@ public class EventosServiceImpl implements IEventosService {
                 .idEmprendimiento(evento.getEmprendimiento().getId())
                 .nombreEmprendimiento(evento.getEmprendimiento().getNombreComercial())
                 .idMultimedia(evento.getMultimedia().getId())
-                .urlMultimedia(evento.getMultimedia().getUrlArchivo())
+                // .urlMultimedia(evento.getMultimedia().getUrlArchivo())
                 .build();
     }
 }
