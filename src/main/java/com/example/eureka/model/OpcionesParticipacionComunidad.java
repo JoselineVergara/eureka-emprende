@@ -17,7 +17,7 @@ public class OpcionesParticipacionComunidad {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "opcion", nullable = false)
     private String opcion;

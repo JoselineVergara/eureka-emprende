@@ -7,6 +7,8 @@ import java.util.Date;
 @Data
 public class EmprendimientoDTO {
 
+    private Integer id;
+
     private String correoComercial;
 
     private String correoUees;
