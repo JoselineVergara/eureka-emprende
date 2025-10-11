@@ -3,6 +3,7 @@ package com.example.eureka.model;
 import com.example.eureka.enums.EstadoEvento;
 import com.example.eureka.enums.TipoEvento;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,7 +37,7 @@ public class Eventos {
     private String lugar;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_evento", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "tipo_evento")
     private TipoEvento tipoEvento;
 
     @Column(name = "link_inscripcion")
@@ -46,7 +47,7 @@ public class Eventos {
     private String direccion;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado_evento", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "estado_evento")
     private EstadoEvento estadoEvento;
 
     @Column(name = "fecha_creacion", nullable = false)
