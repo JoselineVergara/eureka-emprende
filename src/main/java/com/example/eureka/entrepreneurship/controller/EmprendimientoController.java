@@ -31,4 +31,10 @@ public class EmprendimientoController {
         var emprendimiento = emprendimientoService.estructuraEmprendimiento(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<?> actualizarEmprendimiento(@RequestBody EmprendimientoRequestDTO dto, @PathVariable String id) throws Exception {
+//        var emprendimiento = emprendimientoService.estructuraEmprendimiento(dto);
+        return ResponseEntity.ok().build();
+    }
 }
