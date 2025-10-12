@@ -1,6 +1,8 @@
 package com.example.eureka.entrepreneurship.dto;
 
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -18,7 +20,7 @@ public class InformacionRepresentanteDTO {
     private String identificacion;
     private String carrera;
     private String semestre;
-    private Date fechaGraduacion;
+    private LocalDateTime fechaGraduacion;
     private Boolean tieneParientesUees;
     private String nombrePariente;
     private String areaPariente;

@@ -48,6 +48,33 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     private final ITiposEmprendimientoRepository tiposEmprendimientoRepository;
     private final IRepresentanteInformacionRepository informacionRepresentanteRepository;
 
+    // Agregar estas dependencias al inicio de la clase
+    private final SolicitudAprobacionService solicitudAprobacionService;
+
+    /**
+     * Enviar emprendimiento para aprobación (desde BORRADOR o PUBLICADO)
+     */
+    @Override
+    @Transactional
+    public SolicitudAprobacion enviarParaAprobacion(Integer emprendimientoId, Usuarios usuario) {
+        log.info("Enviando emprendimiento {} para aprobación", emprendimientoId);
+
+        // Capturar estado completo actual
+        EmprendimientoCompletoDTO datosCompletos = solicitudAprobacionService
+                .capturarEstadoCompleto(emprendimientoId);
+
+        // Crear solicitud
+        return solicitudAprobacionService.crearSolicitud(emprendimientoId, datosCompletos, usuario);
+    }
+
+    /**
+     * Obtener vista para el emprendedor con datos actuales y pendientes
+     */
+    @Override
+    public VistaEmprendedorDTO obtenerVistaEmprendedor(Integer emprendimientoId) {
+        return solicitudAprobacionService.obtenerVistaEmprendedor(emprendimientoId);
+    }
+
     @Override
     @Transactional
     public Integer estructuraEmprendimiento(@Valid EmprendimientoRequestDTO emprendimientoRequestDTO) {
@@ -116,7 +143,7 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         if (tipoAccion.equals(String.valueOf(EstadoEmprendimiento.BORRADOR))){
             emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.BORRADOR));
         }else{
-            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.PENDIENTE_REVISION));
+            emprendimiento.setEstadoEmprendimiento(String.valueOf(EstadoEmprendimiento.PENDIENTE_APROBACION));
         }
 
         emprendimiento.setCiudades(ciudad);

@@ -2,6 +2,7 @@ package com.example.eureka.entrepreneurship.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,7 +20,7 @@ public class EmprendimientoDTO {
 
     private String nombreComercialEmprendimiento;
 
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     private Integer ciudad;
 

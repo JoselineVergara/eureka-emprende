@@ -16,6 +16,8 @@ import org.springframework.expression.ExpressionException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -48,7 +50,7 @@ public class AuthServiceImpl implements IAuthService {
         newUsuario.setCorreo(usuario.getCorreo().toLowerCase());
         newUsuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
         newUsuario.setGenero(usuario.getGenero());
-        newUsuario.setFechaRegistro(new Date());
+        newUsuario.setFechaRegistro(LocalDateTime.now());
         newUsuario.setFechaNacimiento(usuario.getFechaNacimiento());
         newUsuario.setActivo(true);
         newUsuario.setRol(rol);

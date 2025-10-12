@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,35 +9,32 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * DTO que contiene TODOS los datos del emprendimiento y sus relaciones
+ * Se usa para guardar en JSONB en solicitudes_aprobacion
+ */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmprendimientoResponseDTO {
+public class EmprendimientoCompletoDTO {
 
-    private Integer id;
+    // Datos básicos del emprendimiento
     private String nombreComercial;
     private LocalDateTime anioCreacion;
     private Boolean activoEmprendimiento;
     private Boolean aceptaDatosPublicos;
-    private LocalDateTime fechaCreacion;
-    private LocalDateTime fechaActualizacion;
-    private String estadoEmprendimiento;
-
-    // Relaciones simplificadas (solo nombres o identificadores)
-    private Integer usuarioId;
-    private String nombreUsuario;
-
-    private Integer ciudadId;
-    private String nombreCiudad;
-
     private Integer tipoEmprendimientoId;
-    private String nombreTipoEmprendimiento;
+    private Integer ciudadId;
 
+    // Información del representante (si existe)
+    private InformacionRepresentanteDTO informacionRepresentante;
+
+    // Relaciones
     private List<EmprendimientoCategoriaDTO> categorias;
     private List<EmprendimientoDescripcionDTO> descripciones;
-    private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
     private List<EmprendimientoMetricasDTO> metricas;
+    private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
     private List<EmprendimientoDeclaracionesDTO> declaracionesFinales;
     private List<EmprendimientoParticipacionDTO> participacionesComunidad;
-    private InformacionRepresentanteDTO informacionRepresentante;
 }

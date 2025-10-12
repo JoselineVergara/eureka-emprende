@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -37,10 +38,10 @@ public class Usuarios {
     private String contrasena;
 
     @Column(name = "fecha_registro", nullable = false)
-    private Date fechaRegistro;
+    private LocalDateTime fechaRegistro;
 
     @Column(name = "fecha_nacimiento", nullable = true)
-    private Date fechaNacimiento;
+    private LocalDateTime fechaNacimiento;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;

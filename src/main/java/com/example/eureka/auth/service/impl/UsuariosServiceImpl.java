@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -20,7 +21,7 @@ public class UsuariosServiceImpl implements IUsuariosService {
     @Override
     public Usuarios crearUsuario(Usuarios usuario) {
         usuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
-        usuario.setFechaRegistro(new java.util.Date());
+        usuario.setFechaRegistro(LocalDateTime.now());
         usuario.setActivo(true);
         return usuariosRepository.save(usuario);
     }
