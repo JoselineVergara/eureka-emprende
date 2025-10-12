@@ -201,7 +201,7 @@ public class BlogServiceImpl implements IBlogService {
         articulo.setFechaModificacion(LocalDateTime.now());
         articuloRepository.save(articulo);
     }
-    
+
 
     @Transactional(readOnly = true)
     @Override

@@ -15,6 +15,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,5 +66,25 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
+    }
+
+    @GetMapping("/test-bcrypt")
+    public ResponseEntity<String> testBcrypt() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        String passwordPlano = "clave123";
+        String passwordHasheadaEnBD = "$2a$10$Is/iczB4Pr5eN0E4ll6e2.eAlbdL1uMu/Xq05w1BwK78R4xZYvGLO";
+
+        boolean matches = encoder.matches(passwordPlano, passwordHasheadaEnBD);
+
+        return ResponseEntity.ok("¿Contraseña coincide? " + matches);
+    }
+
+    @PostMapping("/rehash-password")
+    public ResponseEntity<String> rehashPassword(@RequestParam String email, @RequestParam String plainPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String newHash = encoder.encode(plainPassword);
+
+        return ResponseEntity.ok("Nueva contraseña hasheada: " + newHash);
     }
 }
