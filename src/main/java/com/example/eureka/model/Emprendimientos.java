@@ -42,6 +42,9 @@ public class Emprendimientos {
     @Column(name = "estado_emprendimiento",nullable = false)
     private String estadoEmprendimiento;
 
+    @Column(name = "estatus_emprendimiento")
+    private Boolean estatusEmprendimiento;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuarios usuarios;
@@ -53,6 +56,5 @@ public class Emprendimientos {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_emprendimiento", nullable = false)
     private TiposEmprendimientos tiposEmprendimientos;
-
 
 }

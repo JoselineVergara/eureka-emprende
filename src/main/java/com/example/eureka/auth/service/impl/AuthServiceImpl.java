@@ -16,8 +16,6 @@ import org.springframework.expression.ExpressionException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.util.Date;
 
 @Service
