@@ -5,11 +5,13 @@ import com.example.eureka.entrepreneurship.dto.TagDTO;
 import com.example.eureka.entrepreneurship.dto.TagRequestDTO;
 import com.example.eureka.entrepreneurship.service.IBlogService;
 import com.example.eureka.enums.EstadoArticulo;
+import com.example.eureka.utilities.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -20,40 +22,44 @@ import java.time.LocalDateTime;
 public class BlogController {
 
     private final IBlogService blogService;
+    private final SecurityUtils securityUtils;  // ← Inyectar SecurityUtils
 
     @PostMapping("/articulos/crear")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")  // ← Solo administradores
     public ResponseEntity<?> crearArticulo(
-            @Valid @RequestBody ArticuloRequestDTO request,
-            @RequestParam Integer idUsuario) {
+            @Valid @RequestBody ArticuloRequestDTO request) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         var articulo = blogService.crearArticulo(request, idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(articulo);
     }
 
     @PutMapping("/articulos/{idArticulo}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> editarArticulo(
             @PathVariable Integer idArticulo,
-            @Valid @RequestBody ArticuloRequestDTO request,
-            @RequestParam Integer idUsuario) {
+            @Valid @RequestBody ArticuloRequestDTO request) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         var articulo = blogService.editarArticulo(idArticulo, request, idUsuario);
         return ResponseEntity.ok(articulo);
     }
 
     @PutMapping("/articulos/{idArticulo}/archivar")
-    public ResponseEntity<?> archivarArticulo(
-            @PathVariable Integer idArticulo,
-            @RequestParam Integer idUsuario) {
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> archivarArticulo(@PathVariable Integer idArticulo) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         blogService.archivarArticulo(idArticulo, idUsuario);
         return ResponseEntity.ok("Artículo archivado exitosamente");
     }
 
     @PutMapping("/articulos/{idArticulo}/desarchivar")
-    public ResponseEntity<?> desarchivarArticulo(
-            @PathVariable Integer idArticulo,
-            @RequestParam Integer idUsuario) {
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> desarchivarArticulo(@PathVariable Integer idArticulo) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         blogService.desarchivarArticulo(idArticulo, idUsuario);
         return ResponseEntity.ok("Artículo desarchivado exitosamente");
     }
 
+    // 🔓 Endpoints públicos (sin @PreAuthorize, sin autenticación)
     @GetMapping("/articulos")
     public ResponseEntity<?> obtenerArticulos(
             @RequestParam(required = false) EstadoArticulo estado,
@@ -82,9 +88,10 @@ public class BlogController {
     }
 
     @PostMapping("/tags/crear")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")  // ← Solo administradores
     public ResponseEntity<?> crearTag(
-            @Valid @RequestBody TagRequestDTO request,
-            @RequestParam Integer idUsuario) {
+            @Valid @RequestBody TagRequestDTO request) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         var tag = blogService.crearTag(request.getNombre(), idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(tag);
     }
