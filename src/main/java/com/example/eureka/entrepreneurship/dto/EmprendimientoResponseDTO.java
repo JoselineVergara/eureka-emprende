@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class EmprendimientoResponseDTO {
 
     private Integer id;

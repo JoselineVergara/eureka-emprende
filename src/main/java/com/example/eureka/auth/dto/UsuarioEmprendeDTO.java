@@ -11,25 +11,16 @@ import java.util.Date;
 public class UsuarioEmprendeDTO {
 
     //datos usuario parte 1
-    @NonNull
     private String nombre;
-    @NonNull
     private String apellido;
-    @NonNull
     private LocalDateTime fechaNacimiento; //falta
-    @NonNull
     private String genero;
-    @NonNull
     private String contrasena;
 
     //datos usuario parte 2
-    @NonNull
     private String correo;
-    @NonNull
     private String correoUees;
-    @NonNull
     private String identificacion;
-    @NonNull
     private Boolean parienteDirecto;
 
     private Integer idRol;
