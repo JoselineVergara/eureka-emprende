@@ -5,6 +5,7 @@ import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.auth.service.IAuthService;
 import com.example.eureka.entrepreneurship.repository.IRepresentanteInformacionRepository;
 import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
+import com.example.eureka.enums.Genero;
 import com.example.eureka.general.repository.IRolesRepository;
 import com.example.eureka.model.Emprendimientos;
 import com.example.eureka.model.InformacionRepresentante;
@@ -49,7 +50,7 @@ public class AuthServiceImpl implements IAuthService {
         newUsuario.setApellido(usuario.getApellido());
         newUsuario.setCorreo(usuario.getCorreo().toLowerCase());
         newUsuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
-        newUsuario.setGenero(usuario.getGenero());
+        newUsuario.setGenero(Genero.valueOf(usuario.getGenero()));
         newUsuario.setFechaRegistro(LocalDateTime.now());
         newUsuario.setFechaNacimiento(usuario.getFechaNacimiento());
         newUsuario.setActivo(true);

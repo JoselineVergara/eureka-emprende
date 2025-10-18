@@ -11,4 +11,3 @@ public class EmprendimientoMetricasDTO {
 
     private String valor;
 }
-
