@@ -7,6 +7,7 @@ import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository
 import com.example.eureka.entrepreneurship.service.IEventosService;
 import com.example.eureka.enums.EstadoEmprendimiento;
 import com.example.eureka.enums.EstadoEvento;
+import com.example.eureka.enums.TipoEvento;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.model.Emprendimientos;
 import com.example.eureka.model.Eventos;
@@ -30,19 +31,15 @@ public class EventosServiceImpl implements IEventosService {
 
     @Transactional
     public EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idEmprendimiento) {
-        // Validar que el emprendimiento existe y está aprobado
         Emprendimientos emprendimiento = validarEmprendimientoAprobado(idEmprendimiento);
 
-        // Validar que la multimedia existe
         Multimedia multimedia = multimediaRepository.findById(request.getIdMultimedia())
                 .orElseThrow(() -> new BusinessException("Multimedia no encontrada"));
 
-        // Validar fecha del evento (debe ser futura)
         if (request.getFechaEvento().isBefore(LocalDateTime.now())) {
             throw new BusinessException("La fecha del evento debe ser futura");
         }
 
-        // Crear el evento
         Eventos evento = new Eventos();
         evento.setTitulo(request.getTitulo());
         evento.setDescripcion(request.getDescripcion());
@@ -53,6 +50,7 @@ public class EventosServiceImpl implements IEventosService {
         evento.setDireccion(request.getDireccion());
         evento.setEstadoEvento(EstadoEvento.programado);
         evento.setFechaCreacion(LocalDateTime.now());
+        evento.setActivo(true);
         evento.setEmprendimiento(emprendimiento);
         evento.setMultimedia(multimedia);
 
@@ -66,7 +64,6 @@ public class EventosServiceImpl implements IEventosService {
         Eventos evento = IEventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        // Validar que el evento pertenece al emprendimiento indicado
         if (!evento.getEmprendimiento().getId().equals(idEmprendimiento)) {
             throw new BusinessException("El evento no pertenece a este emprendimiento");
         }
@@ -115,6 +112,37 @@ public class EventosServiceImpl implements IEventosService {
 
         IEventosRepository.save(evento);
     }
+
+    @Transactional
+    public void activarEvento(Integer idEvento) {
+        Eventos evento = IEventosRepository.findById(idEvento)
+                .orElseThrow(() -> new BusinessException("Evento no encontrado"));
+
+        if (evento.isActivo()) {
+            throw new BusinessException("El evento ya está activado");
+        }
+
+        evento.setActivo(true);
+        evento.setFechaModificacion(LocalDateTime.now());
+
+        IEventosRepository.save(evento);
+    }
+
+    @Transactional
+    public void desactivarEvento(Integer idEvento) {
+        Eventos evento = IEventosRepository.findById(idEvento)
+                .orElseThrow(() -> new BusinessException("Evento no encontrado"));
+
+        if (!evento.isActivo()) {
+            throw new BusinessException("El evento ya está desactivado");
+        }
+
+        evento.setActivo(false);
+        evento.setFechaModificacion(LocalDateTime.now());
+
+        IEventosRepository.save(evento);
+    }
+
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerEventosPorEmprendimiento(Integer idEmprendimiento) {
         List<Eventos> eventos = IEventosRepository.findByEmprendimientoId(idEmprendimiento);
@@ -124,8 +152,22 @@ public class EventosServiceImpl implements IEventosService {
     }
 
     @Transactional(readOnly = true)
-    public List<EventoResponseDTO> obtenerEventosPorUsuario(Integer idUsuario) {
+    public List<EventoResponseDTO> obtenerEventosPorUsuario(Integer idUsuario, TipoEvento tipoEvento, Integer idEmprendimiento) {
         List<Eventos> eventos = IEventosRepository.findByEmprendimiento_Usuarios_Id(idUsuario);
+
+        // Aplicar filtros opcionales
+        if (tipoEvento != null) {
+            eventos = eventos.stream()
+                    .filter(e -> e.getTipoEvento() == tipoEvento)
+                    .collect(Collectors.toList());
+        }
+
+        if (idEmprendimiento != null) {
+            eventos = eventos.stream()
+                    .filter(e -> e.getEmprendimiento().getId().equals(idEmprendimiento))
+                    .collect(Collectors.toList());
+        }
+
         return eventos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -138,41 +180,51 @@ public class EventosServiceImpl implements IEventosService {
         return convertirADTO(evento);
     }
 
-    // ===== MÉTODO UNIFICADO CON FILTROS OPCIONALES =====
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> obtenerEventosFiltrados(
             EstadoEvento estadoEvento,
+            TipoEvento tipoEvento,
+            Integer idEmprendimiento,
             LocalDateTime fechaInicio,
             LocalDateTime fechaFin) {
-
-        List<Eventos> eventos;
 
         // Validar fechas si ambas están presentes
         if (fechaInicio != null && fechaFin != null && fechaInicio.isAfter(fechaFin)) {
             throw new BusinessException("La fecha de inicio debe ser anterior a la fecha de fin");
         }
 
-        // Caso 1: Solo estado
-        if (estadoEvento != null && fechaInicio == null && fechaFin == null) {
-            eventos = IEventosRepository.findByEstadoEvento(estadoEvento);
+        // Validar que si hay una fecha, estén ambas
+        if ((fechaInicio != null && fechaFin == null) || (fechaInicio == null && fechaFin != null)) {
+            throw new BusinessException("Para filtrar por fecha, debe proporcionar tanto fechaInicio como fechaFin");
         }
-        // Caso 2: Solo rango de fechas (ambas deben estar presentes)
-        else if (estadoEvento == null && fechaInicio != null && fechaFin != null) {
-            eventos = IEventosRepository.findByFechaEventoBetween(fechaInicio, fechaFin);
+
+        // Obtener todos los eventos y aplicar filtros
+        List<Eventos> eventos = IEventosRepository.findAll();
+
+        // Aplicar filtros progresivamente
+        if (estadoEvento != null) {
+            eventos = eventos.stream()
+                    .filter(e -> e.getEstadoEvento() == estadoEvento)
+                    .collect(Collectors.toList());
         }
-        // Caso 3: Estado y rango de fechas
-        else if (estadoEvento != null && fechaInicio != null && fechaFin != null) {
-            eventos = IEventosRepository.findByEstadoEventoAndFechaEventoBetween(
-                    estadoEvento, fechaInicio, fechaFin);
+
+        if (tipoEvento != null) {
+            eventos = eventos.stream()
+                    .filter(e -> e.getTipoEvento() == tipoEvento)
+                    .collect(Collectors.toList());
         }
-        // Caso 4: Sin filtros (traer todos)
-        else if (estadoEvento == null && fechaInicio == null && fechaFin == null) {
-            eventos = IEventosRepository.findAll();
+
+        if (idEmprendimiento != null) {
+            eventos = eventos.stream()
+                    .filter(e -> e.getEmprendimiento().getId().equals(idEmprendimiento))
+                    .collect(Collectors.toList());
         }
-        // Caso 5: Solo una fecha (no válido)
-        else {
-            throw new BusinessException(
-                    "Para filtrar por fecha, debe proporcionar tanto fechaInicio como fechaFin");
+
+        if (fechaInicio != null && fechaFin != null) {
+            eventos = eventos.stream()
+                    .filter(e -> !e.getFechaEvento().isBefore(fechaInicio)
+                            && !e.getFechaEvento().isAfter(fechaFin))
+                    .collect(Collectors.toList());
         }
 
         return eventos.stream()
@@ -184,7 +236,6 @@ public class EventosServiceImpl implements IEventosService {
         Emprendimientos emprendimiento = emprendimientosRepository.findById(idEmprendimiento)
                 .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado"));
 
-        // Validar que el emprendimiento está aprobado
         if (!emprendimiento.getEstadoEmprendimiento().equalsIgnoreCase("APROBADO")) {
             throw new BusinessException("El emprendimiento debe estar aprobado para crear eventos");
         }
@@ -205,10 +256,10 @@ public class EventosServiceImpl implements IEventosService {
                 .estadoEvento(evento.getEstadoEvento())
                 .fechaCreacion(evento.getFechaCreacion())
                 .fechaModificacion(evento.getFechaModificacion())
+                .activo(evento.isActivo())
                 .idEmprendimiento(evento.getEmprendimiento().getId())
                 .nombreEmprendimiento(evento.getEmprendimiento().getNombreComercial())
                 .idMultimedia(evento.getMultimedia().getId())
-                // .urlMultimedia(evento.getMultimedia().getUrlArchivo())
                 .build();
     }
 }

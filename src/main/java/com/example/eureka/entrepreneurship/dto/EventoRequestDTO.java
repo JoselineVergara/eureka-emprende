@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.dto;
 
 import com.example.eureka.enums.TipoEvento;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ public class EventoRequestDTO {
 
     @NotNull(message = "El tipo de evento es obligatorio")
     private TipoEvento tipoEvento; // presencial o virtual
+
+    private boolean activo;
 
     private String linkInscripcion;
 

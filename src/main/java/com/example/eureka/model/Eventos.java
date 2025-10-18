@@ -56,6 +56,9 @@ public class Eventos {
     @Column(name = "fecha_modificacion")
     private LocalDateTime fechaModificacion;
 
+    @Column(name = "activo", nullable = false)
+    private boolean activo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_emprendimiento", nullable = false)
     private Emprendimientos emprendimiento;

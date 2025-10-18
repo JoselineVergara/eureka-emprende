@@ -12,15 +12,7 @@ import java.util.List;
 @Repository
 public interface IArticuloRepository extends JpaRepository<ArticulosBlog, Integer> {
 
-    List<ArticulosBlog> findByEstado(EstadoArticulo estado);
-
-    List<ArticulosBlog> findByUsuarioId(Integer idUsuario);
-
     @Query("SELECT a FROM ArticulosBlog a JOIN a.tags t WHERE t.idTag = :idTag")
     List<ArticulosBlog> findByTagId(@Param("idTag") Integer idTag);
 
-    @Query("SELECT a FROM ArticulosBlog a WHERE a.estado = :estado ORDER BY a.fechaCreacion DESC")
-    List<ArticulosBlog> findByEstadoOrderByFechaCreacion(
-            @Param("estado") EstadoArticulo estado
-    );
 }
