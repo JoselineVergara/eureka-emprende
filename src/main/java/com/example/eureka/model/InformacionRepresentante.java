@@ -2,6 +2,8 @@ package com.example.eureka.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Date;
 
@@ -44,7 +46,7 @@ public class InformacionRepresentante {
     private String semestre;
 
     @Column(name = "fecha_graduacion")
-    private Date fechaGraduacion;
+    private LocalDateTime fechaGraduacion;
 
     @Column(name = "tiene_parientes_uees")
     private Boolean tieneParientesUees;

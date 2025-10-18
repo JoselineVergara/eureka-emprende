@@ -4,6 +4,7 @@ import com.example.eureka.entrepreneurship.dto.EmprendimientoDTO;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -15,7 +16,7 @@ public class UsuarioEmprendeDTO {
     @NonNull
     private String apellido;
     @NonNull
-    private Date fechaNacimiento; //falta
+    private LocalDateTime fechaNacimiento; //falta
     @NonNull
     private String genero;
     @NonNull
@@ -39,7 +40,7 @@ public class UsuarioEmprendeDTO {
 
     private String carrera;
 
-    private Date fechaGraduacion;
+    private LocalDateTime fechaGraduacion;
 
     private String anioEstudio;
 

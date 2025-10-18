@@ -1,10 +1,8 @@
 package com.example.eureka.entrepreneurship.service;
 
-import com.example.eureka.entrepreneurship.dto.EmprendimientoPorCategoriaDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoRequestDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.model.Emprendimientos;
+import com.example.eureka.model.SolicitudAprobacion;
 import com.example.eureka.model.Usuarios;
 import jakarta.validation.Valid;
 
@@ -25,4 +23,8 @@ public interface IEmprendimientoService {
     EmprendimientoResponseDTO obtenerEmprendimientoCompletoPorId(Integer id);
 
     EmprendimientoResponseDTO actualizarEmprendimiento(Integer id, EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception;
+
+    // Nuevos métodos para sistema de aprobación
+    SolicitudAprobacion enviarParaAprobacion(Integer emprendimientoId, Usuarios usuario);
+    VistaEmprendedorDTO obtenerVistaEmprendedor(Integer emprendimientoId);
 }

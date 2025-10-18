@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,7 +26,7 @@ public class Emprendimientos {
     private String nombreComercial;
 
     @Column(name = "anio_creacion", nullable = false)
-    private Date anioCreacion;
+    private LocalDateTime anioCreacion;
 
     @Column(name = "activo_emprendimiento", nullable = false)
     private Boolean activoEmprendimiento;
@@ -34,13 +35,16 @@ public class Emprendimientos {
     private Boolean aceptaDatosPublicos;
 
     @Column(name = "fecha_creacion", nullable = false)
-    private Date fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_actualizacion", nullable = true)
-    private Date fechaActualizacion;
+    private LocalDateTime fechaActualizacion;
 
     @Column(name = "estado_emprendimiento",nullable = false)
     private String estadoEmprendimiento;
+
+    @Column(name = "estatus_emprendimiento")
+    private Boolean estatusEmprendimiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
@@ -53,6 +57,5 @@ public class Emprendimientos {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_emprendimiento", nullable = false)
     private TiposEmprendimientos tiposEmprendimientos;
-
 
 }
