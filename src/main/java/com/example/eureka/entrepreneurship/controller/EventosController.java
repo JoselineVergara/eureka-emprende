@@ -4,6 +4,7 @@ import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
 import com.example.eureka.entrepreneurship.service.IEventosService;
 import com.example.eureka.enums.EstadoEvento;
+import com.example.eureka.enums.TipoEvento;
 import com.example.eureka.utilities.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class EventosController {
     private final SecurityUtils securityUtils;
 
     @PostMapping("/crear")
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('EMPRENDEDOR')")  // ← Admin o Emprendedor
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('EMPRENDEDOR')")
     public ResponseEntity<EventoResponseDTO> crearEvento(
             @Valid @RequestBody EventoRequestDTO eventoRequest,
             @RequestParam Integer idEmprendimiento) {
@@ -45,7 +46,7 @@ public class EventosController {
         return ResponseEntity.ok(evento);
     }
 
-    @PutMapping("/inactivar/{idEvento}")
+    @PutMapping("/cancelar/{idEvento}")
     @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('EMPRENDEDOR')")
     public ResponseEntity<String> inactivarEvento(
             @PathVariable Integer idEvento) {
@@ -54,7 +55,22 @@ public class EventosController {
         return ResponseEntity.ok("Evento cancelado exitosamente");
     }
 
-    // 🔓 Endpoints públicos (sin @PreAuthorize)
+    @PutMapping("/activar/{idEvento}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<String> activarEvento(
+            @PathVariable Integer idEvento) {
+        eventosServiceImpl.activarEvento(idEvento);
+        return ResponseEntity.ok("Evento activado exitosamente");
+    }
+
+    @PutMapping("/inactivar/{idEvento}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<String> desactivarEvento(
+            @PathVariable Integer idEvento) {
+        eventosServiceImpl.desactivarEvento(idEvento);
+        return ResponseEntity.ok("Evento desactivado exitosamente");
+    }
+
     @GetMapping("/emprendimiento/{idEmprendimiento}")
     public ResponseEntity<List<EventoResponseDTO>> obtenerEventosPorEmprendimiento(
             @PathVariable Integer idEmprendimiento) {
@@ -62,10 +78,20 @@ public class EventosController {
         return ResponseEntity.ok(eventos);
     }
 
-    @GetMapping("/usuario/{idUsuario}")
+    /**
+     * Obtiene eventos del usuario autenticado con filtros opcionales
+     *
+     * @param tipoEvento (Opcional) Tipo de evento: presencial o virtual
+     * @param idEmprendimiento (Opcional) ID del emprendimiento para filtrar
+     * @return Lista de eventos del usuario autenticado filtrados según los criterios
+     */
+    @GetMapping("/usuario")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<EventoResponseDTO>> obtenerEventosPorUsuario(
-            @PathVariable Integer idUsuario) {
-        List<EventoResponseDTO> eventos = eventosServiceImpl.obtenerEventosPorUsuario(idUsuario);
+            @RequestParam(required = false) TipoEvento tipoEvento,
+            @RequestParam(required = false) Integer idEmprendimiento) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
+        List<EventoResponseDTO> eventos = eventosServiceImpl.obtenerEventosPorUsuario(idUsuario, tipoEvento, idEmprendimiento);
         return ResponseEntity.ok(eventos);
     }
 
@@ -75,13 +101,26 @@ public class EventosController {
         return ResponseEntity.ok(evento);
     }
 
+    /**
+     * Endpoint para filtrar eventos con múltiples criterios (uso general/admin)
+     *
+     * @param estado (Opcional) Estado del evento: programado, en_curso, terminado, cancelado
+     * @param tipoEvento (Opcional) Tipo de evento: presencial o virtual
+     * @param idEmprendimiento (Opcional) ID del emprendimiento
+     * @param fechaInicio (Opcional) Fecha de inicio del rango - requerida junto con fechaFin
+     * @param fechaFin (Opcional) Fecha de fin del rango - requerida junto con fechaInicio
+     * @return Lista de eventos filtrados según los criterios especificados
+     */
     @GetMapping("/filtrar")
     public ResponseEntity<List<EventoResponseDTO>> obtenerEventosFiltrados(
             @RequestParam(required = false) EstadoEvento estado,
+            @RequestParam(required = false) TipoEvento tipoEvento,
+            @RequestParam(required = false) Integer idEmprendimiento,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+
         List<EventoResponseDTO> eventos = eventosServiceImpl.obtenerEventosFiltrados(
-                estado, fechaInicio, fechaFin);
+                estado, tipoEvento, idEmprendimiento, fechaInicio, fechaFin);
         return ResponseEntity.ok(eventos);
     }
 }
