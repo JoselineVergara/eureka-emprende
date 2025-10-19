@@ -12,5 +12,5 @@ public interface IHistorialRevisionRepository extends JpaRepository<HistorialRev
 
     List<HistorialRevision> findBySolicitudOrderByFechaAccionDesc(SolicitudAprobacion solicitud);
 
-    List<HistorialRevision> findBySolicitudIdOrderByFechaAccionDesc(Long solicitudId);
+    List<HistorialRevision> findBySolicitudIdOrderByFechaAccionDesc(Integer solicitudId);
 }

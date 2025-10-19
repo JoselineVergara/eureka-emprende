@@ -18,5 +18,5 @@ public class VistaEmprendedorDTO {
     private String observaciones;
     private String motivoRechazo;
     private Boolean tieneSolicitudActiva;
-    private Long solicitudId;
+    private Integer solicitudId;
 }

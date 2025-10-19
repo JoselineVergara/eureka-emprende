@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SolicitudAprobacionDTO {
-    private Long id;
+    private Integer id;
     private Integer emprendimientoId;
     private String nombreEmprendimiento;
     private SolicitudAprobacion.TipoSolicitud tipoSolicitud;

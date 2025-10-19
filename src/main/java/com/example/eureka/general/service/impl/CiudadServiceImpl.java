@@ -48,6 +48,11 @@ public class CiudadServiceImpl implements ICiudadService {
         return mapToDTO(ciudad);
     }
 
+    public List<CiudadDTO> obtenerCiudadPorProvinciaId(Integer id) {
+        return ciudadRepository.findByProvincias_Id(id).stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public CiudadDTO guardar(CiudadDTO dto) {
         Provincias provincia = provinciaRepository.findById(dto.getProvincia().getId())

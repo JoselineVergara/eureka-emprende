@@ -52,6 +52,10 @@ public class EmprendimientoMapper {
             EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
             dto.setCategoriaId(cat.getCategoriaId());
             dto.setEmprendimientoId(cat.getEmprendimientoId());
+            if (cat.getCategoria() != null) {
+                dto.setEmprendimientoId(cat.getEmprendimientoId());
+                dto.setNombreCategoria(cat.getCategoria().getNombre());
+            }
             return dto;
         }).collect(Collectors.toList());
     }
@@ -105,6 +109,10 @@ public class EmprendimientoMapper {
             dto.setOpcionParticipacionId(p.getOpcionParticipacion().getId());
             dto.setRespuesta(p.getRespuesta());
             dto.setEmprendimientoId(p.getEmprendimiento().getId());
+            if (p.getOpcionParticipacion() != null) {
+                dto.setEmprendimientoId(p.getEmprendimiento().getId());
+                dto.setNombreOpcionParticipacion(p.getOpcionParticipacion().getOpcion());
+            }
             return dto;
         }).collect(Collectors.toList());
     }

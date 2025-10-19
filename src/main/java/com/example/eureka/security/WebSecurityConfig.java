@@ -65,7 +65,7 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/v1/auth/login", "/v1/auth/register", "/api/public/**",
-                                "/v1/auth/test-bcrypt", "/v1/auth/rehash-password")
+                                "/v1/auth/test-bcrypt", "/v1/auth/rehash-password","/v1/provincia", "/v1/ciudad/provincia/{id}")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

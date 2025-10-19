@@ -48,7 +48,7 @@ public class AuthServiceImpl implements IAuthService {
         Usuarios newUsuario = new Usuarios();
         newUsuario.setNombre(usuario.getNombre());
         newUsuario.setApellido(usuario.getApellido());
-        newUsuario.setCorreo(usuario.getCorreo().toLowerCase());
+        newUsuario.setCorreo(usuario.getCorreo());
         newUsuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
         newUsuario.setGenero(Genero.valueOf(usuario.getGenero()));
         newUsuario.setFechaRegistro(LocalDateTime.now());

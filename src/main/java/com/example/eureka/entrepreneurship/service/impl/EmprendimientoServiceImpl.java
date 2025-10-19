@@ -113,7 +113,7 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
             agregarParticipacionComunidad(emprendimiento, emprendimientoRequestDTO.getParticipacionesComunidad());
             agregarDeclaracionesFinales(emprendimiento, emprendimientoRequestDTO.getDeclaracionesFinales());
         }
-        log.info("Emprendimiento creado exitosamente con ID: {}", emprendimiento.getId());
+        log.info("Emprendimiento creado exitosamente with ID: {}", emprendimiento.getId());
 
         return emprendimiento.getId();
     }
@@ -392,12 +392,16 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
                 .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
 
         EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emprendimiento);
-        dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(emprendimientoCategoriasRepository.findByEmprendimientoId(id)));
+        dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(
+            emprendimientoCategoriasRepository.findEmprendimientosPorCategoria(id)
+        ));
         dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(emprendimientosDescripcionRepository.findByEmprendimientoId(id)));
         dto.setPresenciasDigitales(EmprendimientoMapper.toPresenciaDigitalDTOList(emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(id)));
         dto.setMetricas(EmprendimientoMapper.toMetricasDTOList(emprendimientoMetricaRepository.findByEmprendimientoId(id)));
         dto.setDeclaracionesFinales(EmprendimientoMapper.toDeclaracionesDTOList(emprendimientoDeclaracionesRepository.findByEmprendimientoId(id)));
-        dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(emprendimientoParticicipacionComunidadRepository.findByEmprendimientoId(id)));
+        dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(
+            emprendimientoParticicipacionComunidadRepository.findByEmprendimientoIdFetchOpcion(id)
+        ));
         dto.setInformacionRepresentante(EmprendimientoMapper.toRepresentanteDTO(informacionRepresentanteRepository.findFirstByEmprendimientoId(id)));
         return dto;
     }

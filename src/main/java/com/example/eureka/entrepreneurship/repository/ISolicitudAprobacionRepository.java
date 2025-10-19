@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ISolicitudAprobacionRepository extends JpaRepository<SolicitudAprobacion, Long> {
+public interface ISolicitudAprobacionRepository extends JpaRepository<SolicitudAprobacion, Integer> {
 
     List<SolicitudAprobacion> findByEstadoSolicitudOrderByFechaSolicitudAsc(
             SolicitudAprobacion.EstadoSolicitud estado
@@ -33,7 +33,7 @@ public interface ISolicitudAprobacionRepository extends JpaRepository<SolicitudA
             Usuarios usuario
     );
 
-    long countByEstadoSolicitud(SolicitudAprobacion.EstadoSolicitud estado);
+    Integer countByEstadoSolicitud(SolicitudAprobacion.EstadoSolicitud estado);
 
     @Query("SELECT s FROM SolicitudAprobacion s " +
             "WHERE s.estadoSolicitud = :estado " +

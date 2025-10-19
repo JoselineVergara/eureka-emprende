@@ -1,6 +1,7 @@
 package com.example.eureka.model;
 
 import com.example.eureka.enums.Genero;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class Usuarios {
     @Column(name = "correo", nullable = false)
     private String correo;
 
+    @JsonIgnore
     @Column(name = "contrasena", nullable = false)
     private String contrasena;
 

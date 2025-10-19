@@ -8,4 +8,6 @@ public class EmprendimientoCategoriaDTO {
     private Integer emprendimientoId;
 
     private Integer categoriaId;
+
+    private String nombreCategoria;
 }

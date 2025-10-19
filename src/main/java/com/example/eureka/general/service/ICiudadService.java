@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ICiudadService {
     List<CiudadDTO> listar();
+    List<CiudadDTO> obtenerCiudadPorProvinciaId(Integer id);
     CiudadDTO obtenerPorId(Integer id);
     CiudadDTO guardar(CiudadDTO dto);
     CiudadDTO actualizar(Integer id, CiudadDTO dto);
