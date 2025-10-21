@@ -14,10 +14,11 @@ public interface IBlogService {
 
     ArticuloResponseDTO editarArticulo(Integer idArticulo, ArticuloRequestDTO request, Integer idUsuario);
 
-    List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, LocalDateTime fechaInicio, LocalDateTime fechaFin);
-
+    // ← ACTUALIZADO: ahora incluye el parámetro idTag
+    List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, Integer idTag, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
     void archivarArticulo(Integer idArticulo, Integer idUsuario);
+
     void desarchivarArticulo(Integer idArticulo, Integer idUsuario);
 
     List<ArticuloResponseDTO> obtenerArticulosPorTag(Integer idTag);
@@ -27,9 +28,4 @@ public interface IBlogService {
     List<TagDTO> obtenerTodosTags();
 
     TagDTO crearTag(String nombre, Integer idUsuario);
-
-    // NUEVO: Validar si usuario es administrador
-    private void validarAdministrador(Integer idUsuario) {
-
-    }
 }
