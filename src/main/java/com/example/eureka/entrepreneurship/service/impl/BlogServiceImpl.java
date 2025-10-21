@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,6 @@ public class BlogServiceImpl implements IBlogService {
     @Transactional
     @Override
     public ArticuloResponseDTO crearArticulo(ArticuloRequestDTO request, Integer idUsuario) {
-        // Validar que solo administrador puede crear artículos
         validarAdministrador(idUsuario);
 
         Usuarios usuario = userRepository.findById(idUsuario.intValue())
@@ -48,15 +46,11 @@ public class BlogServiceImpl implements IBlogService {
         articulo.setTitulo(request.getTitulo());
         articulo.setDescripcionCorta(request.getDescripcionCorta());
         articulo.setContenido(request.getContenido());
-
-        // NUEVO: Usar el estado recibido en el request, si no viene asumimos BORRADOR
         articulo.setEstado(request.getEstado() != null ? request.getEstado() : EstadoArticulo.BORRADOR);
-
         articulo.setFechaCreacion(LocalDateTime.now());
         articulo.setImagen(imagen);
         articulo.setUsuario(usuario);
 
-        // Agregar tags existentes
         if (request.getIdsTags() != null && !request.getIdsTags().isEmpty()) {
             for (Integer idTag : request.getIdsTags()) {
                 TagsBlog tag = tagRepository.findById(idTag)
@@ -65,7 +59,6 @@ public class BlogServiceImpl implements IBlogService {
             }
         }
 
-        // Crear nuevos tags si es necesario
         if (request.getNombresTags() != null && !request.getNombresTags().isEmpty()) {
             for (String nombreTag : request.getNombresTags()) {
                 TagsBlog tag = tagRepository.findByNombre(nombreTag)
@@ -97,17 +90,15 @@ public class BlogServiceImpl implements IBlogService {
         articulo.setTitulo(request.getTitulo());
         articulo.setDescripcionCorta(request.getDescripcionCorta());
         articulo.setContenido(request.getContenido());
-        articulo.setEstado(request.getEstado()); // AGREGAR ESTA LÍNEA
+        articulo.setEstado(request.getEstado());
         articulo.setFechaModificacion(LocalDateTime.now());
 
-        // Actualizar imagen si es diferente
         if (!articulo.getImagen().getId().equals(request.getIdImagen())) {
             Multimedia imagen = multimediaRepository.findById(request.getIdImagen())
                     .orElseThrow(() -> new BusinessException("Imagen no encontrada"));
             articulo.setImagen(imagen);
         }
 
-        // Actualizar tags
         articulo.getTags().clear();
 
         if (request.getIdsTags() != null && !request.getIdsTags().isEmpty()) {
@@ -135,9 +126,17 @@ public class BlogServiceImpl implements IBlogService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, LocalDateTime fechaInicio,
-                                                      LocalDateTime fechaFin) {
-        List<ArticulosBlog> articulos = articuloRepository.findAll();
+    @Override
+    public List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, Integer idTag,
+                                                      LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        List<ArticulosBlog> articulos;
+
+        // ← NUEVO: Si viene idTag, buscar por tag, sino buscar todos
+        if (idTag != null) {
+            articulos = articuloRepository.findByTagId(idTag);
+        } else {
+            articulos = articuloRepository.findAll();
+        }
 
         // Filtrar por estado
         if (estado != null) {
@@ -170,11 +169,9 @@ public class BlogServiceImpl implements IBlogService {
                 .collect(Collectors.toList());
     }
 
-
     @Transactional
     @Override
     public void archivarArticulo(Integer idArticulo, Integer idUsuario) {
-        // Validar que solo administrador puede archivar artículos
         validarAdministrador(idUsuario);
 
         ArticulosBlog articulo = articuloRepository.findById(idArticulo)
@@ -202,7 +199,6 @@ public class BlogServiceImpl implements IBlogService {
         articuloRepository.save(articulo);
     }
 
-
     @Transactional(readOnly = true)
     @Override
     public List<ArticuloResponseDTO> obtenerArticulosPorTag(Integer idTag) {
@@ -221,7 +217,6 @@ public class BlogServiceImpl implements IBlogService {
         return convertirADTO(articulo);
     }
 
-
     @Transactional(readOnly = true)
     @Override
     public List<TagDTO> obtenerTodosTags() {
@@ -237,7 +232,6 @@ public class BlogServiceImpl implements IBlogService {
     @Transactional
     @Override
     public TagDTO crearTag(String nombre, Integer idUsuario) {
-        // Validar que solo administrador puede crear tags
         validarAdministrador(idUsuario);
 
         if (tagRepository.findByNombre(nombre).isPresent()) {
@@ -254,7 +248,6 @@ public class BlogServiceImpl implements IBlogService {
                 .build();
     }
 
-    // NUEVO: Método para validar rol de administrador
     private void validarAdministrador(Integer idUsuario) {
         if (idUsuario == null) {
             throw new BusinessException("Usuario no especificado");
@@ -263,7 +256,6 @@ public class BlogServiceImpl implements IBlogService {
         Usuarios usuario = userRepository.findById(idUsuario.intValue())
                 .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
 
-        // Validar que el rol sea Administrador
         if (usuario.getRol() == null || !usuario.getRol().getNombre().equalsIgnoreCase("Administrador")) {
             throw new BusinessException("Solo los administradores pueden realizar esta acción");
         }

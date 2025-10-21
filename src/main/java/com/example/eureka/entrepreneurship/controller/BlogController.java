@@ -59,13 +59,13 @@ public class BlogController {
         return ResponseEntity.ok("Artículo desarchivado exitosamente");
     }
 
-    // 🔓 Endpoints públicos (sin @PreAuthorize, sin autenticación)
     @GetMapping("/articulos")
     public ResponseEntity<?> obtenerArticulos(
             @RequestParam(required = false) EstadoArticulo estado,
+            @RequestParam(required = false) Integer idTag,  // ← NUEVO parámetro
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
-        var articulos = blogService.obtenerArticulos(estado, fechaInicio, fechaFin);
+        var articulos = blogService.obtenerArticulos(estado, idTag, fechaInicio, fechaFin);
         return ResponseEntity.ok(articulos);
     }
 
