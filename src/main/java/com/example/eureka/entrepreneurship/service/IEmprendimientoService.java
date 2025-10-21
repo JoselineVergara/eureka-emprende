@@ -29,4 +29,9 @@ public interface IEmprendimientoService {
     VistaEmprendedorDTO obtenerVistaEmprendedor(Integer emprendimientoId);
 
     List<EmprendimientoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario);
+
+    /**
+     * Obtener todos los emprendimientos, filtrando por nombre y tipo si se especifica
+     */
+    List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo);
 }

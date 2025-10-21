@@ -1,13 +1,15 @@
 package com.example.eureka.entrepreneurship.dto;
 
+import com.example.eureka.general.dto.CategoriasDTO;
+
 import lombok.Data;
 
 @Data
 public class EmprendimientoCategoriaDTO {
 
-    private Integer emprendimientoId;
+    private EmprendimientoDTO emprendimiento;
 
-    private Integer categoriaId;
+    private CategoriasDTO categoria;
 
     private String nombreCategoria;
 }

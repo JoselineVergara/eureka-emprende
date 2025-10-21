@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -12,30 +13,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "emprendimiento_categorias")
-@IdClass(EmprendimientoCategorias.EmprendimientoCategoriasId.class)
 public class EmprendimientoCategorias {
 
-    @Id
-    @Column(name = "emprendimiento_id", nullable = false)
-    private Integer emprendimientoId;
-
-    @Id
-    @Column(name = "categoria_id", nullable = false)
-    private Integer categoriaId;
+    @EmbeddedId
+    private EmprendimientoCategoriasId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "emprendimiento_id", insertable = false, updatable = false)
+    @MapsId("emprendimientoId")
+    @JoinColumn(name = "emprendimiento_id")
     private Emprendimientos emprendimiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id", insertable = false, updatable = false)
+    @MapsId("categoriaId")
+    @JoinColumn(name = "categoria_id")
     private Categorias categoria;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class EmprendimientoCategoriasId implements Serializable {
-        private Integer emprendimientoId;
-        private Integer categoriaId;
-    }
 }

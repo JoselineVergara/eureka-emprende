@@ -4,10 +4,8 @@ import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.enums.EstadoEmprendimiento;
-import com.example.eureka.general.repository.ICiudadesRepository;
-import com.example.eureka.general.repository.IDeclaracionesFinalesRepository;
-import com.example.eureka.general.repository.IOpcionesParticipacionComunidadRepository;
-import com.example.eureka.general.repository.ITiposMetricasRepository;
+import com.example.eureka.general.dto.CategoriasDTO;
+import com.example.eureka.general.repository.*;
 import com.example.eureka.model.*;
 import com.example.eureka.notificacion.service.NotificacionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +30,7 @@ public class SolicitudAprobacionService {
     private final ISolicitudAprobacionRepository solicitudRepository;
     private final IHistorialRevisionRepository historialRepository;
     private final IEmprendimientosRepository emprendimientosRepository;
+    private final ICategoriasRepository categoriasRepository;
     private final IEmprendimientoCategoriasRepository emprendimientoCategoriasRepository;
     private final IEmprendimientosDescripcionRepository emprendimientosDescripcionRepository;
     private final IEmprendimientoPresenciaDigitalRepository emprendimientoPresenciaDigitalRepository;
@@ -491,14 +490,26 @@ public class SolicitudAprobacionService {
             informacionRepresentanteRepository.save(rep);
         }
 
-        // 3. Actualizar categorías (reemplazar todas)
         if (datos.getCategorias() != null) {
             emprendimientoCategoriasRepository.deleteEmprendimientoCategoriasByEmprendimientoId(empId);
 
             datos.getCategorias().forEach(catDTO -> {
+                Categorias categoria = categoriasRepository.findById(catDTO.getCategoria().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Categoría no encontrada"));
+
                 EmprendimientoCategorias cat = new EmprendimientoCategorias();
-                cat.setEmprendimientoId(empId);
-                cat.setCategoriaId(catDTO.getCategoriaId());
+
+                // Crear y asignar la clave compuesta
+                EmprendimientoCategoriasId id = new EmprendimientoCategoriasId(
+                                emprendimiento.getId(),
+                                categoria.getId()
+                        );
+                cat.setId(id);
+
+                // Asignar las relaciones
+                cat.setEmprendimiento(emprendimiento);
+                cat.setCategoria(categoria); // ← Entidad, NO DTO
+
                 emprendimientoCategoriasRepository.save(cat);
             });
         }
@@ -877,9 +888,44 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoCategoriaDTO mapCategoriaToDTO(EmprendimientoCategorias cat) {
         EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
-        dto.setEmprendimientoId(cat.getEmprendimientoId());
-        dto.setNombreCategoria(cat.getCategoria().getNombre());
-        dto.setCategoriaId(cat.getCategoriaId());
+
+        // Mapear emprendimiento a DTO
+        if (cat.getEmprendimiento() != null) {
+            EmprendimientoDTO empDTO = new EmprendimientoDTO();
+            empDTO.setId(cat.getEmprendimiento().getId());
+            empDTO.setNombreComercialEmprendimiento(cat.getEmprendimiento().getNombreComercial());
+            empDTO.setFechaCreacion(cat.getEmprendimiento().getFechaCreacion());
+            empDTO.setEstadoEmpredimiento(cat.getEmprendimiento().getEstatusEmprendimiento());
+            empDTO.setDatosPublicos(cat.getEmprendimiento().getAceptaDatosPublicos());
+
+            // Mapear ciudad si existe
+            if (cat.getEmprendimiento().getCiudades() != null) {
+                empDTO.setCiudad(cat.getEmprendimiento().getCiudades().getId());
+                empDTO.setProvinia(cat.getEmprendimiento().getCiudades().getProvincias().getId());
+            }
+
+            // Mapear tipo de emprendimiento si existe
+            if (cat.getEmprendimiento().getTiposEmprendimientos() != null) {
+                empDTO.setTipoEmprendimientoId(cat.getEmprendimiento().getTiposEmprendimientos().getId());
+                empDTO.setTipoEmprendimiento(cat.getEmprendimiento().getTiposEmprendimientos().getSubTipo());
+            }
+
+            dto.setEmprendimiento(empDTO);
+        }
+
+        // Mapear categoría a DTO
+        if (cat.getCategoria() != null) {
+            CategoriasDTO catDTO = new CategoriasDTO();
+            catDTO.setId(cat.getCategoria().getId());
+            catDTO.setNombre(cat.getCategoria().getNombre());
+            catDTO.setDescripcion(cat.getCategoria().getDescripcion());
+            catDTO.setUrlImagen(cat.getCategoria().getMultimedia().getUrlArchivo());
+            catDTO.setIdMultimedia(cat.getCategoria().getMultimedia().getId());
+
+            dto.setCategoria(catDTO);
+            dto.setNombreCategoria(cat.getCategoria().getNombre());
+        }
+
         return dto;
     }
 

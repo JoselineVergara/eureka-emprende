@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.mappers;
 
 import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.general.dto.CategoriasDTO;
 import com.example.eureka.model.*;
 
 import java.util.List;
@@ -50,12 +51,28 @@ public class EmprendimientoMapper {
     public static List<EmprendimientoCategoriaDTO> toCategoriaDTOList(List<EmprendimientoCategorias> categorias) {
         return categorias.stream().map(cat -> {
             EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
-            dto.setCategoriaId(cat.getCategoriaId());
-            dto.setEmprendimientoId(cat.getEmprendimientoId());
+
+            // Mapear emprendimiento (solo info básica)
+            if (cat.getEmprendimiento() != null) {
+                EmprendimientoDTO empDTO = new EmprendimientoDTO();
+                empDTO.setId(cat.getEmprendimiento().getId());
+                empDTO.setNombreComercialEmprendimiento(cat.getEmprendimiento().getNombreComercial());
+                dto.setEmprendimiento(empDTO);
+            }
+
+            // Mapear categoría completa
             if (cat.getCategoria() != null) {
-                dto.setEmprendimientoId(cat.getEmprendimientoId());
+                CategoriasDTO catDTO = new CategoriasDTO();
+                catDTO.setId(cat.getCategoria().getId());
+                catDTO.setNombre(cat.getCategoria().getNombre());
+                catDTO.setDescripcion(cat.getCategoria().getDescripcion());
+                catDTO.setUrlImagen(cat.getCategoria().getMultimedia().getUrlArchivo());
+                catDTO.setIdMultimedia(cat.getCategoria().getMultimedia().getId());
+
+                dto.setCategoria(catDTO);
                 dto.setNombreCategoria(cat.getCategoria().getNombre());
             }
+
             return dto;
         }).collect(Collectors.toList());
     }
@@ -132,6 +149,18 @@ public class EmprendimientoMapper {
         dto.setTieneParientesUees(info.getTieneParientesUees());
         dto.setNombrePariente(info.getNombrePariente());
 
+        return dto;
+    }
+
+    public static CategoriaDTO toCategoriaDTO(Categorias categoria) {
+        if (categoria == null) return null;
+        CategoriaDTO dto = new CategoriaDTO();
+        dto.setId(categoria.getId());
+        dto.setNombre(categoria.getNombre());
+        dto.setDescripcion(categoria.getDescripcion());
+        if (categoria.getMultimedia() != null) {
+            dto.setMultimediaId(categoria.getMultimedia().getId());
+        }
         return dto;
     }
 }

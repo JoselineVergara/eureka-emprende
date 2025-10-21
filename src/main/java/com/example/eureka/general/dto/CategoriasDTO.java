@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CategoriasDTO {
 
+    private Integer id;
     private String nombre;
     private String descripcion;
     private String urlImagen;
