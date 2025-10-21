@@ -5,6 +5,7 @@ import com.example.eureka.general.dto.CategoriasDTO;
 import com.example.eureka.model.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EmprendimientoMapper {
@@ -48,33 +49,26 @@ public class EmprendimientoMapper {
                 .collect(Collectors.toList());
     }
 
-    public static List<EmprendimientoCategoriaDTO> toCategoriaDTOList(List<EmprendimientoCategorias> categorias) {
-        return categorias.stream().map(cat -> {
-            EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
+    public static List<CategoriaDTO> toCategoriaDTOList(List<EmprendimientoCategorias> categorias) {
+        return categorias.stream()
+                .map(cat -> {
+                    if (cat.getCategoria() != null) {
+                        CategoriaDTO dto = new CategoriaDTO();
+                        dto.setId(cat.getCategoria().getId());
+                        dto.setNombre(cat.getCategoria().getNombre());
+                        dto.setDescripcion(cat.getCategoria().getDescripcion());
 
-            // Mapear emprendimiento (solo info básica)
-            if (cat.getEmprendimiento() != null) {
-                EmprendimientoDTO empDTO = new EmprendimientoDTO();
-                empDTO.setId(cat.getEmprendimiento().getId());
-                empDTO.setNombreComercialEmprendimiento(cat.getEmprendimiento().getNombreComercial());
-                dto.setEmprendimiento(empDTO);
-            }
+                        // Validar que multimedia existe antes de acceder
+                        if (cat.getCategoria().getMultimedia() != null) {
+                            dto.setMultimediaId(cat.getCategoria().getMultimedia().getId());
+                        }
 
-            // Mapear categoría completa
-            if (cat.getCategoria() != null) {
-                CategoriasDTO catDTO = new CategoriasDTO();
-                catDTO.setId(cat.getCategoria().getId());
-                catDTO.setNombre(cat.getCategoria().getNombre());
-                catDTO.setDescripcion(cat.getCategoria().getDescripcion());
-                catDTO.setUrlImagen(cat.getCategoria().getMultimedia().getUrlArchivo());
-                catDTO.setIdMultimedia(cat.getCategoria().getMultimedia().getId());
-
-                dto.setCategoria(catDTO);
-                dto.setNombreCategoria(cat.getCategoria().getNombre());
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
+                        return dto;
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull) // Filtrar nulls por si alguna categoría es null
+                .collect(Collectors.toList());
     }
 
     public static List<EmprendimientoDescripcionDTO> toDescripcionDTOList(List<TiposDescripcionEmprendimiento> descripciones) {

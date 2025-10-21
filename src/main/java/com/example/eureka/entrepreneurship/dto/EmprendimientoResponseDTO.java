@@ -30,7 +30,7 @@ public class EmprendimientoResponseDTO {
     private Integer tipoEmprendimientoId;
     private String nombreTipoEmprendimiento;
 
-    private List<EmprendimientoCategoriaDTO> categorias;
+    private List<CategoriaDTO> categorias;
     private List<EmprendimientoDescripcionDTO> descripciones;
     private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
     private List<EmprendimientoMetricasDTO> metricas;

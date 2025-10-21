@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface IEmprendimientoDeclaracionesRepository extends JpaRepository<EmprendimientoDeclaraciones, Integer> {
     List<EmprendimientoDeclaraciones> findByEmprendimientoId(Integer emprendimientoId);
+    List<EmprendimientoDeclaraciones> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
+
 }

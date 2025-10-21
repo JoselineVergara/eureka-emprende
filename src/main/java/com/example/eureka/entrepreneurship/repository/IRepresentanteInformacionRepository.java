@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface IRepresentanteInformacionRepository extends JpaRepository<InformacionRepresentante,Integer> {
     List<InformacionRepresentante> findByEmprendimientoId(Integer emprendimientoId);
-
+    List<InformacionRepresentante> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
     InformacionRepresentante findFirstByEmprendimientoId(Integer emprendimientoId);
 }

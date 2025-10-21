@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +41,7 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     private final IEmprendimientoDeclaracionesRepository emprendimientoDeclaracionesRepository;
     private final IEmprendimientoParticicipacionComunidadRepository emprendimientoParticicipacionComunidadRepository;
     private final ITiposMetricasRepository tiposMetricasRepository;
+    private final IRepresentanteInformacionRepository representanteInformacionRepository;
     private final IOpcionesParticipacionComunidadRepository opcionesParticipacionComunidadRepository;
     private final IDeclaracionesFinalesRepository declaracionesFinalesRepository;
     private final ICategoriaRepository categoriaRepository; // NUEVO
@@ -599,11 +602,15 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
 
     @Override
     public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo) {
+        // 1. Obtener emprendimientos base
         List<Emprendimientos> lista;
         boolean tieneNombre = nombre != null && !nombre.trim().isEmpty();
         boolean tieneTipo = tipo != null && !tipo.trim().isEmpty();
+
         if (tieneNombre && tieneTipo) {
-            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_SubTipoContainingIgnoreCase(nombre.trim(), tipo.trim());
+            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_SubTipoContainingIgnoreCase(
+                    nombre.trim(), tipo.trim()
+            );
         } else if (tieneNombre) {
             lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCase(nombre.trim());
         } else if (tieneTipo) {
@@ -611,29 +618,71 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         } else {
             lista = emprendimientosRepository.findAll();
         }
+
+        if (lista.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. Obtener IDs de emprendimientos
+        List<Integer> empIds = lista.stream()
+                .map(Emprendimientos::getId)
+                .collect(Collectors.toList());
+
+        // 3. Cargar TODAS las relaciones en BATCH (una sola query por tipo)
+        Map<Integer, List<EmprendimientoCategorias>> categoriasMap =
+                emprendimientoCategoriasRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(ec -> ec.getEmprendimiento().getId()));
+
+        Map<Integer, List<TiposDescripcionEmprendimiento>> descripcionesMap =
+                emprendimientosDescripcionRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(d -> d.getEmprendimiento().getId()));
+
+        Map<Integer, List<TiposPresenciaDigital>> presenciasMap =
+                emprendimientoPresenciaDigitalRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(p -> p.getEmprendimiento().getId()));
+
+        Map<Integer, List<EmprendimientoMetricas>> metricasMap =
+                emprendimientoMetricaRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(m -> m.getEmprendimiento().getId()));
+
+        Map<Integer, List<EmprendimientoDeclaraciones>> declaracionesMap =
+                emprendimientoDeclaracionesRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(d -> d.getEmprendimiento().getId()));
+
+        Map<Integer, List<EmprendimientoParticipacion>> participacionesMap =
+                emprendimientoParticicipacionComunidadRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.groupingBy(p -> p.getEmprendimiento().getId()));
+
+        Map<Integer, InformacionRepresentante> representantesMap =
+                informacionRepresentanteRepository.findByEmprendimientoIdIn(empIds).stream()
+                        .collect(Collectors.toMap(r -> r.getEmprendimiento().getId(), r -> r));
+
+        // 4. Mapear todo usando los Maps precargados
         return lista.stream().map(emp -> {
             EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emp);
+
             dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(
-                emprendimientoCategoriasRepository.findEmprendimientosPorCategoria(emp.getId())
+                    categoriasMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(
-                emprendimientosDescripcionRepository.findByEmprendimientoId(emp.getId())
+                    descripcionesMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setPresenciasDigitales(EmprendimientoMapper.toPresenciaDigitalDTOList(
-                emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(emp.getId())
+                    presenciasMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setMetricas(EmprendimientoMapper.toMetricasDTOList(
-                emprendimientoMetricaRepository.findByEmprendimientoId(emp.getId())
+                    metricasMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setDeclaracionesFinales(EmprendimientoMapper.toDeclaracionesDTOList(
-                emprendimientoDeclaracionesRepository.findByEmprendimientoId(emp.getId())
+                    declaracionesMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(
-                emprendimientoParticicipacionComunidadRepository.findByEmprendimientoIdFetchOpcion(emp.getId())
+                    participacionesMap.getOrDefault(emp.getId(), Collections.emptyList())
             ));
             dto.setInformacionRepresentante(EmprendimientoMapper.toRepresentanteDTO(
-                informacionRepresentanteRepository.findFirstByEmprendimientoId(emp.getId())
+                    representantesMap.get(emp.getId())
             ));
+
             return dto;
         }).collect(Collectors.toList());
     }

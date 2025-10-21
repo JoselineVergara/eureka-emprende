@@ -17,6 +17,6 @@ public interface IEmprendimientoCategoriasRepository extends JpaRepository<Empre
             "WHERE ec.categoria.id = :categoriaId")
     List<EmprendimientoCategorias> findEmprendimientosPorCategoria(@Param("categoriaId") Integer categoriaId);
     List<EmprendimientoCategorias> findByEmprendimientoId(Integer emprendimientoId);
-
+    List<EmprendimientoCategorias> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
     void deleteEmprendimientoCategoriasByEmprendimientoId(Integer emprendimientoId);
 }

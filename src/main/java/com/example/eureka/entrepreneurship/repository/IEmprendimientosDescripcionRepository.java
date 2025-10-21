@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface IEmprendimientosDescripcionRepository extends JpaRepository<TiposDescripcionEmprendimiento, Integer> {
 
+    List<TiposDescripcionEmprendimiento> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
+
     List<TiposDescripcionEmprendimiento> findByEmprendimientoId(Integer emprendimientoId);
 }

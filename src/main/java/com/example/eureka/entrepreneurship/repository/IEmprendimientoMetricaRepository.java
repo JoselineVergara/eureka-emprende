@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface IEmprendimientoMetricaRepository extends JpaRepository<EmprendimientoMetricas,Integer> {
     List<EmprendimientoMetricas> findByEmprendimientoId(Integer emprendimientoId);
+    List<EmprendimientoMetricas> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
+
 }

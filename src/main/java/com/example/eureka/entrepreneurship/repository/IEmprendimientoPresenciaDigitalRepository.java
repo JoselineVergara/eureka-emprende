@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface IEmprendimientoPresenciaDigitalRepository extends JpaRepository<TiposPresenciaDigital, Integer> {
     List<TiposPresenciaDigital> findByEmprendimientoId(Integer emprendimientoId);
+    List<TiposPresenciaDigital> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
+
 }
