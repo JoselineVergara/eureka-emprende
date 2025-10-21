@@ -11,6 +11,8 @@ import java.util.List;
 public interface IEmprendimientosRepository extends JpaRepository<Emprendimientos, Integer> {
     List<Emprendimientos> findByUsuarios(Usuarios usuarios);
     List<Emprendimientos> findByNombreComercialContainingIgnoreCase(String nombre);
-    List<Emprendimientos> findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_SubTipoContainingIgnoreCase(String nombre, String subTipo);
     List<Emprendimientos> findByTiposEmprendimientos_SubTipo(String tiposEmprendimientosSubTipo);
+    List<Emprendimientos> findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_TipoContainingIgnoreCase(String nombreComercial, String tiposEmprendimientosTipo);
+
+    List<Emprendimientos> findByTiposEmprendimientos_Tipo(String tiposEmprendimientosTipo);
 }

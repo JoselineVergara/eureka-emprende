@@ -608,13 +608,11 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         boolean tieneTipo = tipo != null && !tipo.trim().isEmpty();
 
         if (tieneNombre && tieneTipo) {
-            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_SubTipoContainingIgnoreCase(
-                    nombre.trim(), tipo.trim()
-            );
+            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_TipoContainingIgnoreCase(nombre.trim(), tipo.trim());
         } else if (tieneNombre) {
             lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCase(nombre.trim());
         } else if (tieneTipo) {
-            lista = emprendimientosRepository.findByTiposEmprendimientos_SubTipo(tipo.trim());
+            lista = emprendimientosRepository.findByTiposEmprendimientos_Tipo(tipo.trim());
         } else {
             lista = emprendimientosRepository.findAll();
         }

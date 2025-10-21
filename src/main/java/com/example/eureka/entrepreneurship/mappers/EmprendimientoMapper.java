@@ -67,7 +67,7 @@ public class EmprendimientoMapper {
                     }
                     return null;
                 })
-                .filter(Objects::nonNull) // Filtrar nulls por si alguna categoría es null
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
