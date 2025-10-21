@@ -140,4 +140,20 @@ public class EmprendimientoController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    /**
+     * Obtener todos los emprendimientos de un usuario autenticado
+     */
+    @GetMapping("/mis-emprendimientos")
+    public ResponseEntity<?> obtenerEmprendimientosPorUsuario(@AuthenticationPrincipal Usuarios usuario) {
+        try {
+            List<EmprendimientoResponseDTO> emprendimientos = emprendimientoService.obtenerEmprendimientosPorUsuario(usuario);
+            return ResponseEntity.ok(emprendimientos);
+        } catch (Exception e) {
+            log.error("Error al obtener emprendimientos del usuario: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

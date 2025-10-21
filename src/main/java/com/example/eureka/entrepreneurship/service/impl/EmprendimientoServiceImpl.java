@@ -564,6 +564,35 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
         return obtenerEmprendimientoCompletoPorId(id);
     }
 
+    @Override
+    public List<EmprendimientoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario) {
+        List<Emprendimientos> lista = emprendimientosRepository.findByUsuarios(usuario);
+        return lista.stream().map(emp -> {
+            EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emp);
+            dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(
+                emprendimientoCategoriasRepository.findEmprendimientosPorCategoria(emp.getId())
+            ));
+            dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(
+                emprendimientosDescripcionRepository.findByEmprendimientoId(emp.getId())
+            ));
+            dto.setPresenciasDigitales(EmprendimientoMapper.toPresenciaDigitalDTOList(
+                emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(emp.getId())
+            ));
+            dto.setMetricas(EmprendimientoMapper.toMetricasDTOList(
+                emprendimientoMetricaRepository.findByEmprendimientoId(emp.getId())
+            ));
+            dto.setDeclaracionesFinales(EmprendimientoMapper.toDeclaracionesDTOList(
+                emprendimientoDeclaracionesRepository.findByEmprendimientoId(emp.getId())
+            ));
+            dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(
+                emprendimientoParticicipacionComunidadRepository.findByEmprendimientoIdFetchOpcion(emp.getId())
+            ));
+            dto.setInformacionRepresentante(EmprendimientoMapper.toRepresentanteDTO(
+                informacionRepresentanteRepository.findFirstByEmprendimientoId(emp.getId())
+            ));
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 
 }
-

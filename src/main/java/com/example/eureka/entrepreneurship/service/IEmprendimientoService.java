@@ -27,4 +27,6 @@ public interface IEmprendimientoService {
     // Nuevos métodos para sistema de aprobación
     SolicitudAprobacion enviarParaAprobacion(Integer emprendimientoId, Usuarios usuario);
     VistaEmprendedorDTO obtenerVistaEmprendedor(Integer emprendimientoId);
+
+    List<EmprendimientoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario);
 }
