@@ -1,5 +1,6 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
+import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.enums.EstadoEmprendimiento;
@@ -8,6 +9,7 @@ import com.example.eureka.general.repository.IDeclaracionesFinalesRepository;
 import com.example.eureka.general.repository.IOpcionesParticipacionComunidadRepository;
 import com.example.eureka.general.repository.ITiposMetricasRepository;
 import com.example.eureka.model.*;
+import com.example.eureka.notificacion.service.NotificacionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -43,7 +45,8 @@ public class SolicitudAprobacionService {
     private final IOpcionesParticipacionComunidadRepository opcionesParticipacionComunidadRepository;
     private final IDeclaracionesFinalesRepository declaracionesFinalesRepository;
     private final ObjectMapper objectMapper;
-
+    private final NotificacionService notificacionService;
+    private final IUserRepository userRepository;
     /**
      * Captura el estado completo actual del emprendimiento (todas las relaciones)
      */
@@ -188,6 +191,13 @@ public class SolicitudAprobacionService {
         registrarHistorial(solicitud, HistorialRevision.AccionRevision.ENVIO,
                 "Solicitud enviada para revisión", usuario);
 
+        if (tipoSolicitud == SolicitudAprobacion.TipoSolicitud.CREACION) {
+            notificarAdminsNuevaSolicitud(emprendimiento, usuario, solicitud.getId());
+        } else {
+            notificarAdminsActualizacion(emprendimiento, usuario, solicitud.getId());
+        }
+
+
         log.info("Solicitud creada exitosamente con ID: {}", solicitud.getId());
         return solicitud;
     }
@@ -241,7 +251,7 @@ public class SolicitudAprobacionService {
      * Aprobar solicitud y aplicar cambios
      */
     @Transactional
-    public void aprobarSolicitud(Long solicitudId, Usuarios admin) {
+    public void aprobarSolicitud(Integer solicitudId, Usuarios admin) {
         log.info("Aprobando solicitud: {}", solicitudId);
 
         SolicitudAprobacion solicitud = solicitudRepository.findById(solicitudId)
@@ -273,7 +283,17 @@ public class SolicitudAprobacionService {
 
             // Registrar en historial
             registrarHistorial(solicitud, HistorialRevision.AccionRevision.APROBACION,
+
                     "Emprendimiento aprobado", admin);
+// Notificar al emprendedor
+            notificacionService.crearNotificacion(
+                    emprendimiento.getUsuarios().getId(),
+                    "SOLICITUD_APROBADA",
+                    Map.of("nombreEmprendimiento", emprendimiento.getNombreComercial()),
+                    "/emprendimientos/" + emprendimiento.getId() + "/mi-emprendimiento",
+                    emprendimiento.getId(),
+                    solicitudId
+            );
 
             log.info("Solicitud aprobada exitosamente");
 
@@ -287,7 +307,7 @@ public class SolicitudAprobacionService {
      * Rechazar solicitud
      */
     @Transactional
-    public void rechazarSolicitud(Long solicitudId, String motivo, Usuarios admin) {
+    public void rechazarSolicitud(Integer solicitudId, String motivo, Usuarios admin) {
         log.info("Rechazando solicitud: {}", solicitudId);
 
         if (motivo == null || motivo.isBlank()) {
@@ -314,6 +334,18 @@ public class SolicitudAprobacionService {
         // Registrar en historial
         registrarHistorial(solicitud, HistorialRevision.AccionRevision.RECHAZO, motivo, admin);
 
+        notificacionService.crearNotificacion(
+                solicitud.getEmprendimiento().getUsuarios().getId(),
+                "SOLICITUD_RECHAZADA",
+                Map.of(
+                        "nombreEmprendimiento", solicitud.getEmprendimiento().getNombreComercial(),
+                        "motivo", motivo
+                ),
+                "/emprendimientos/" + solicitud.getEmprendimiento().getId() + "/mi-emprendimiento",
+                solicitud.getEmprendimiento().getId(),
+                solicitudId
+        );
+
         log.info("Solicitud rechazada exitosamente");
     }
 
@@ -321,7 +353,7 @@ public class SolicitudAprobacionService {
      * Enviar observaciones para que el emprendedor modifique
      */
     @Transactional
-    public void enviarObservaciones(Long solicitudId, String observaciones, Usuarios admin) {
+    public void enviarObservaciones(Integer solicitudId, String observaciones, Usuarios admin) {
         log.info("Enviando observaciones para solicitud: {}", solicitudId);
 
         if (observaciones == null || observaciones.isBlank()) {
@@ -346,6 +378,16 @@ public class SolicitudAprobacionService {
         registrarHistorial(solicitud, HistorialRevision.AccionRevision.OBSERVACIONES,
                 observaciones, admin);
 
+        // Notificar al emprendedor
+        notificacionService.crearNotificacion(
+                emp.getUsuarios().getId(),
+                "SOLICITUD_OBSERVACIONES",
+                Map.of("nombreEmprendimiento", emp.getNombreComercial()),
+                "/solicitudes/" + solicitudId + "/modificar",
+                emp.getId(),
+                solicitudId
+        );
+
         log.info("Observaciones enviadas exitosamente");
     }
 
@@ -353,7 +395,7 @@ public class SolicitudAprobacionService {
      * Modificar datos propuestos y reenviar
      */
     @Transactional
-    public void modificarYReenviar(Long solicitudId, EmprendimientoCompletoDTO datosActualizados, Usuarios usuario) {
+    public void modificarYReenviar(Integer solicitudId, EmprendimientoCompletoDTO datosActualizados, Usuarios usuario) {
         log.info("Modificando y reenviando solicitud: {}", solicitudId);
 
         SolicitudAprobacion solicitud = solicitudRepository.findById(solicitudId)
@@ -382,6 +424,9 @@ public class SolicitudAprobacionService {
             // Registrar en historial
             registrarHistorial(solicitud, HistorialRevision.AccionRevision.MODIFICACION,
                     "Datos modificados según observaciones", usuario);
+
+            // Notificar a admins
+            notificarAdminsModificacion(emp, usuario, solicitudId);
 
             log.info("Solicitud modificada y reenviada exitosamente");
 
@@ -653,7 +698,7 @@ public class SolicitudAprobacionService {
     /**
      * Obtener detalle de solicitud con comparación
      */
-    public Map<String, Object> obtenerDetalleConComparacion(Long solicitudId) {
+    public Map<String, Object> obtenerDetalleConComparacion(Integer solicitudId) {
         SolicitudAprobacion solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
 
@@ -675,7 +720,7 @@ public class SolicitudAprobacionService {
     /**
      * Obtener historial de una solicitud
      */
-    public List<Map<String, Object>> obtenerHistorial(Long solicitudId) {
+    public List<Map<String, Object>> obtenerHistorial(Integer solicitudId) {
         List<HistorialRevision> historial = historialRepository
                 .findBySolicitudIdOrderByFechaAccionDesc(solicitudId);
 
@@ -732,6 +777,85 @@ public class SolicitudAprobacionService {
         return diferencias;
     }
 
+    /**
+     * Notificar a todos los administradores sobre nueva solicitud
+     */
+    private void notificarAdminsNuevaSolicitud(Emprendimientos emprendimiento, Usuarios usuario, Integer solicitudId) {
+        try {
+            List<Usuarios> admins = userRepository.findAllByRol_Nombre(("ADMIN"));
+
+            for (Usuarios admin : admins) {
+                notificacionService.crearNotificacion(
+                        admin.getId(),
+                        "NUEVA_SOLICITUD",
+                        Map.of(
+                                "nombreUsuario", usuario.getNombre() + " " + usuario.getApellido(),
+                                "nombreEmprendimiento", emprendimiento.getNombreComercial()
+                        ),
+                        "/admin/solicitudes/" + solicitudId,
+                        emprendimiento.getId(),
+                        solicitudId
+                );
+            }
+
+            log.info("Notificaciones enviadas a {} administradores", admins.size());
+        } catch (Exception e) {
+            log.error("Error al enviar notificaciones a admins: {}", e.getMessage());
+            // No lanzar excepción para no afectar el flujo principal
+        }
+    }
+
+    /**
+     * Notificar a administradores sobre solicitud de actualización
+     */
+    private void notificarAdminsActualizacion(Emprendimientos emprendimiento, Usuarios usuario, Integer solicitudId) {
+        try {
+            List<Usuarios> admins = userRepository.findAllByRol_Nombre(("ADMIN"));
+
+            for (Usuarios admin : admins) {
+                notificacionService.crearNotificacion(
+                        admin.getId(),
+                        "ACTUALIZACION_SOLICITADA",
+                        Map.of("nombreEmprendimiento", emprendimiento.getNombreComercial()),
+                        "/admin/solicitudes/" + solicitudId,
+                        emprendimiento.getId(),
+                        solicitudId
+                );
+            }
+
+            log.info("Notificaciones de actualización enviadas a {} administradores", admins.size());
+        } catch (Exception e) {
+            log.error("Error al enviar notificaciones de actualización: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Notificar a administradores sobre solicitud modificada
+     */
+    private void notificarAdminsModificacion(Emprendimientos emprendimiento, Usuarios usuario, Integer solicitudId) {
+        try {
+            List<Usuarios> admins = userRepository.findAllByRol_Nombre(("ADMIN"));
+
+            for (Usuarios admin : admins) {
+                notificacionService.crearNotificacion(
+                        admin.getId(),
+                        "SOLICITUD_MODIFICADA",
+                        Map.of(
+                                "nombreUsuario", usuario.getNombre() + " " + usuario.getApellido(),
+                                "nombreEmprendimiento", emprendimiento.getNombreComercial()
+                        ),
+                        "/admin/solicitudes/" + solicitudId,
+                        emprendimiento.getId(),
+                        solicitudId
+                );
+            }
+
+            log.info("Notificaciones de modificación enviadas a {} administradores", admins.size());
+        } catch (Exception e) {
+            log.error("Error al enviar notificaciones de modificación: {}", e.getMessage());
+        }
+    }
+
     // Métodos de mapeo DTO
 
     private InformacionRepresentanteDTO mapRepresentanteToDTO(InformacionRepresentante rep) {
@@ -753,12 +877,15 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoCategoriaDTO mapCategoriaToDTO(EmprendimientoCategorias cat) {
         EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
+        dto.setEmprendimientoId(cat.getEmprendimientoId());
+        dto.setNombreCategoria(cat.getCategoria().getNombre());
         dto.setCategoriaId(cat.getCategoriaId());
         return dto;
     }
 
     private EmprendimientoDescripcionDTO mapDescripcionToDTO(TiposDescripcionEmprendimiento desc) {
         EmprendimientoDescripcionDTO dto = new EmprendimientoDescripcionDTO();
+        dto.setEmprendimientoId(desc.getEmprendimiento().getId());
         dto.setTipoDescripcion(desc.getTipoDescripcion());
         dto.setDescripcion(desc.getDescripcion());
         dto.setMaxCaracteres(desc.getMaxCaracteres());
@@ -768,6 +895,7 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoMetricasDTO mapMetricaToDTO(EmprendimientoMetricas metrica) {
         EmprendimientoMetricasDTO dto = new EmprendimientoMetricasDTO();
+        dto.setEmprendimientoId(metrica.getEmprendimiento().getId());
         dto.setMetricaId(metrica.getMetrica().getId());
         dto.setValor(metrica.getValor());
         return dto;
@@ -775,6 +903,7 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoPresenciaDigitalDTO mapPresenciaDigitalToDTO(TiposPresenciaDigital pd) {
         EmprendimientoPresenciaDigitalDTO dto = new EmprendimientoPresenciaDigitalDTO();
+        dto.setEmprendimientoId(pd.getEmprendimiento().getId());
         dto.setPlataforma(pd.getPlataforma());
         dto.setDescripcion(pd.getDescripcion());
         return dto;
@@ -782,6 +911,7 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoDeclaracionesDTO mapDeclaracionToDTO(EmprendimientoDeclaraciones decl) {
         EmprendimientoDeclaracionesDTO dto = new EmprendimientoDeclaracionesDTO();
+        dto.setEmprendimientoId(decl.getEmprendimiento().getId());
         dto.setDeclaracionId(decl.getDeclaracion().getId());
         dto.setAceptada(decl.getAceptada());
         dto.setNombreFirma(decl.getNombreFirma());
@@ -791,6 +921,7 @@ public class SolicitudAprobacionService {
 
     private EmprendimientoParticipacionDTO mapParticipacionToDTO(EmprendimientoParticipacion part) {
         EmprendimientoParticipacionDTO dto = new EmprendimientoParticipacionDTO();
+        dto.setEmprendimientoId(part.getEmprendimiento().getId());
         dto.setOpcionParticipacionId(part.getOpcionParticipacion().getId());
         dto.setRespuesta(part.getRespuesta());
         return dto;

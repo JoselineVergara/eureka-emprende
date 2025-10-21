@@ -52,6 +52,10 @@ public class EmprendimientoMapper {
             EmprendimientoCategoriaDTO dto = new EmprendimientoCategoriaDTO();
             dto.setCategoriaId(cat.getCategoriaId());
             dto.setEmprendimientoId(cat.getEmprendimientoId());
+            if (cat.getCategoria() != null) {
+                dto.setEmprendimientoId(cat.getEmprendimientoId());
+                dto.setNombreCategoria(cat.getCategoria().getNombre());
+            }
             return dto;
         }).collect(Collectors.toList());
     }
@@ -63,6 +67,7 @@ public class EmprendimientoMapper {
             dto.setDescripcion(desc.getDescripcion());
             dto.setMaxCaracteres(desc.getMaxCaracteres());
             dto.setObligatorio(desc.getObligatorio());
+            dto.setEmprendimientoId(desc.getEmprendimiento().getId());
             return dto;
         }).collect(Collectors.toList());
     }
@@ -81,6 +86,7 @@ public class EmprendimientoMapper {
             EmprendimientoMetricasDTO dto = new EmprendimientoMetricasDTO();
             dto.setMetricaId(m.getMetrica().getId());
             dto.setValor(m.getValor());
+            dto.setEmprendimientoId(m.getEmprendimiento().getId());
             return dto;
         }).collect(Collectors.toList());
     }
@@ -92,6 +98,7 @@ public class EmprendimientoMapper {
             dto.setAceptada(d.getAceptada());
             dto.setNombreFirma(d.getNombreFirma());
             dto.setFechaAceptacion(d.getFechaAceptacion());
+            dto.setEmprendimientoId(d.getEmprendimiento().getId());
             return dto;
         }).collect(Collectors.toList());
     }
@@ -101,6 +108,11 @@ public class EmprendimientoMapper {
             EmprendimientoParticipacionDTO dto = new EmprendimientoParticipacionDTO();
             dto.setOpcionParticipacionId(p.getOpcionParticipacion().getId());
             dto.setRespuesta(p.getRespuesta());
+            dto.setEmprendimientoId(p.getEmprendimiento().getId());
+            if (p.getOpcionParticipacion() != null) {
+                dto.setEmprendimientoId(p.getEmprendimiento().getId());
+                dto.setNombreOpcionParticipacion(p.getOpcionParticipacion().getOpcion());
+            }
             return dto;
         }).collect(Collectors.toList());
     }
@@ -112,7 +124,14 @@ public class EmprendimientoMapper {
         dto.setApellido(info.getApellido());
         dto.setCorreoPersonal(info.getCorreoPersonal());
         dto.setCorreoCorporativo(info.getCorreoCorporativo());
-        // Agrega otros campos según sea necesario
+        dto.setIdentificacion(info.getIdentificacion());
+        dto.setCarrera(info.getCarrera());
+        dto.setAreaPariente(info.getAreaPariente());
+        dto.setSemestre(info.getSemestre());
+        dto.setFechaGraduacion(info.getFechaGraduacion());
+        dto.setTieneParientesUees(info.getTieneParientesUees());
+        dto.setNombrePariente(info.getNombrePariente());
+
         return dto;
     }
 }

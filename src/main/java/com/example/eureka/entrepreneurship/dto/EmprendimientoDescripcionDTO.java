@@ -14,4 +14,6 @@ public class EmprendimientoDescripcionDTO {
     private Boolean obligatorio;
 
     private Integer idEmprendimiento;
+
+    private Integer emprendimientoId;
 }

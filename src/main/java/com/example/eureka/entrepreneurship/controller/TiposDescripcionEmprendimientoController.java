@@ -3,6 +3,7 @@ package com.example.eureka.entrepreneurship.controller;
 import com.example.eureka.entrepreneurship.dto.TipoDescripcionEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.service.ITipoDescripcionEmprendimientoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/tipos-descripcion-emprendimiento")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('EMPRENDEDOR')")
 public class TiposDescripcionEmprendimientoController {
 
     private final ITipoDescripcionEmprendimientoService service;

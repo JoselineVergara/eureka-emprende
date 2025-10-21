@@ -3,6 +3,7 @@ package com.example.eureka.auth.controller;
 import com.example.eureka.auth.dto.UserDTO;
 import com.example.eureka.auth.dto.UsuarioEmprendeDTO;
 import com.example.eureka.auth.service.IAuthService;
+import com.example.eureka.model.Usuarios;
 import com.example.eureka.security.JwtRequest;
 import com.example.eureka.security.JwtResponse;
 import com.example.eureka.security.JwtTokenUtil;
@@ -18,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -46,9 +50,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UsuarioEmprendeDTO usuario) throws Exception {
-        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
-        authService.createUser(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Usuarios user = authService.createUser(usuario);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Usuario registrado correctamente");
+        response.put("usuario", user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/validateToken")

@@ -3,7 +3,7 @@ services:
     image: 'mongodb/mongodb-community-server:7.0.0-ubuntu2204'
     environment:
       - MONGO_INITDB_ROOT_USERNAME=develop
-      - MONGO_INITDB_ROOT_PASSWORD=xavier123
+      - MONGO_INITDB_ROOT_PASSWORD=temporal123
       - MONGO_INITDB_DATABASE=authCoffe
     ports:
       - "27017:27017"

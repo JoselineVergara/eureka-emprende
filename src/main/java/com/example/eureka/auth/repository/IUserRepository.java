@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IUserRepository extends JpaRepository<Usuarios, Integer> {
 
@@ -16,4 +18,6 @@ public interface IUserRepository extends JpaRepository<Usuarios, Integer> {
     Integer obtenerIdPorCorreo(@Param("correo") String correo);
 
     Usuarios findByCorreo(String correo);
+
+    List<Usuarios> findAllByRol_Nombre(String rolNombre);
 }

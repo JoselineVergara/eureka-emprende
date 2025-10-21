@@ -10,4 +10,6 @@ public class EmprendimientoParticipacionDTO {
     private Integer opcionParticipacionId;
 
     private Boolean respuesta;
+
+    private String nombreOpcionParticipacion;
 }

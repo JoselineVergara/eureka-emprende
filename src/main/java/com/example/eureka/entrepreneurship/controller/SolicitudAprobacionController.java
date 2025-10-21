@@ -68,7 +68,7 @@ public class SolicitudAprobacionController {
      */
     @PutMapping("/{solicitudId}/modificar-reenviar")
     public ResponseEntity<?> modificarYReenviar(
-            @PathVariable Long solicitudId,
+            @PathVariable Integer solicitudId,
             @RequestBody EmprendimientoCompletoDTO datosActualizados,
             @AuthenticationPrincipal Usuarios usuario) {
 
@@ -105,7 +105,7 @@ public class SolicitudAprobacionController {
      */
     @GetMapping("/admin/{solicitudId}/detalle")
     public ResponseEntity<Map<String, Object>> obtenerDetalleSolicitud(
-            @PathVariable Long solicitudId) {
+            @PathVariable Integer solicitudId) {
 
         log.info("Obteniendo detalle de solicitud: {}", solicitudId);
         Map<String, Object> detalle = solicitudService.obtenerDetalleConComparacion(solicitudId);
@@ -117,7 +117,7 @@ public class SolicitudAprobacionController {
      */
     @GetMapping("/admin/{solicitudId}/historial")
     public ResponseEntity<List<Map<String, Object>>> obtenerHistorial(
-            @PathVariable Long solicitudId) {
+            @PathVariable Integer solicitudId) {
 
         log.info("Obteniendo historial de solicitud: {}", solicitudId);
         List<Map<String, Object>> historial = solicitudService.obtenerHistorial(solicitudId);
@@ -129,7 +129,7 @@ public class SolicitudAprobacionController {
      */
     @PostMapping("/admin/{solicitudId}/aprobar")
     public ResponseEntity<?> aprobarSolicitud(
-            @PathVariable Long solicitudId,
+            @PathVariable Integer solicitudId,
             @AuthenticationPrincipal Usuarios admin) {
 
         try {
@@ -152,7 +152,7 @@ public class SolicitudAprobacionController {
      */
     @PostMapping("/admin/{solicitudId}/rechazar")
     public ResponseEntity<?> rechazarSolicitud(
-            @PathVariable Long solicitudId,
+            @PathVariable Integer solicitudId,
             @RequestBody Map<String, String> body,
             @AuthenticationPrincipal Usuarios admin) {
 
@@ -182,7 +182,7 @@ public class SolicitudAprobacionController {
      */
     @PostMapping("/admin/{solicitudId}/observaciones")
     public ResponseEntity<?> enviarObservaciones(
-            @PathVariable Long solicitudId,
+            @PathVariable Integer solicitudId,
             @RequestBody Map<String, String> body,
             @AuthenticationPrincipal Usuarios admin) {
 

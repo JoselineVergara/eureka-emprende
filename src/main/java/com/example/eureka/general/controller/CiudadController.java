@@ -24,6 +24,11 @@ public class CiudadController {
         return ciudadService.obtenerPorId(id);
     }
 
+    @GetMapping("/provincia/{id}")
+    public List<CiudadDTO> obtenerCiudadPorProvinciaId(@PathVariable Integer id) {
+        return ciudadService.obtenerCiudadPorProvinciaId(id);
+    }
+
     @PostMapping("/crear")
     public CiudadDTO guardar(@RequestBody CiudadDTO dto) {
         return ciudadService.guardar(dto);
