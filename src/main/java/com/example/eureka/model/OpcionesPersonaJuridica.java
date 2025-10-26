@@ -10,22 +10,18 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tipos_personeria_juridica")
-public class TiposPersoneriaJuridica {
+@Table(name = "opciones_persona_juridica")
+public class OpcionesPersonaJuridica {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "tipo", nullable = false)
-    private String tipo;
-
-    @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "descripcion", nullable = false)
     private String descripcion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_emprendimiento", nullable = false)
-    private TiposEmprendimientos tipoEmprendimiento;
+    @Column(name = "estado", nullable = false)
+    private Boolean estado;
 }
