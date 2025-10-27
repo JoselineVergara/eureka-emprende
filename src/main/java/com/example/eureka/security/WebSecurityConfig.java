@@ -69,7 +69,22 @@ public class WebSecurityConfig {
                                 "/api/public/**",
                                 "/v1/categorias",
                                 "/v1/categorias/{id}",
-                                "/v1/auth/test-bcrypt", "/v1/auth/rehash-password","/v1/provincia", "/v1/ciudad/provincia/{id}","/api/emprendimientos/filtrar")
+                                "/v1/auth/test-bcrypt",
+                                "/v1/auth/rehash-password",
+                                "/v1/provincia",
+                                "/v1/ciudad/provincia/{id}",
+                                "/v1/eventos/emprendimiento/{idEmprendimiento}",
+                                "/v1/eventos/{idEvento}",
+                                "/v1/eventos/filtrar",
+                                "/v1/blog/articulos",
+                                "/v1/blog/articulos/tag/{idTag}",
+                                "/v1/blog/articulos/{idArticulo}",
+                                "/v1/blog/tags",
+                                "/v1/emprendimientos",
+                                "/v1/emprendimientos/categoria/{categoriaId}",
+                                "/v1/emprendimientos",
+                                "/v1/emprendimientos/{id}/publico",
+                                "/v1/emprendimientos/filtrar")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
