@@ -22,8 +22,14 @@ public class CategoriasController {
         return ResponseEntity.ok(categorias);
     }
 
-    @PostMapping("/crear")
-    public ResponseEntity<?> crearCategoria(@RequestBody CategoriaRequestDTO categoriasDTO) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerCategoriasPorId(@PathVariable Integer id) {
+        CategoriasDTO categoria = categoriaService.obtenerCategoriaPorId(id);
+        return ResponseEntity.ok(categoria);
+    }
+
+    @PostMapping(value = "/crear", consumes = "multipart/form-data")
+    public ResponseEntity<?> crearCategoria(@ModelAttribute CategoriaRequestDTO categoriasDTO) {
         CategoriasDTO dto = categoriaService.crearCategoria(categoriasDTO);
         return ResponseEntity.ok(dto);
     }
