@@ -157,15 +157,17 @@ public class EmprendimientoController {
     }
 
     /**
-     * Obtener todos los emprendimientos, filtrando por nombre si se especifica
+     * Obtener todos los emprendimientos con filtros opcionales
      */
     @GetMapping("/filtrar")
     public ResponseEntity<List<EmprendimientoResponseDTO>> obtenerEmprendimientosFiltrado(
             @RequestParam(value = "nombre", required = false) String nombre,
-            @RequestParam(value = "tipo", required = false) String tipo) {
-        List<EmprendimientoResponseDTO> emprendimientos = emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo);
+            @RequestParam(value = "tipo", required = false) String tipo,
+            @RequestParam(value = "categoria", required = false) String categoria,
+            @RequestParam(value = "ciudad", required = false) String ciudad) {
+        List<EmprendimientoResponseDTO> emprendimientos =
+                emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo, categoria, ciudad);
         return ResponseEntity.ok(emprendimientos);
     }
-
 
 }

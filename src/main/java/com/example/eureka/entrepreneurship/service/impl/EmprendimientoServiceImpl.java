@@ -601,18 +601,22 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
     }
 
     @Override
-    public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo) {
+    public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad) {
         // 1. Obtener emprendimientos base
         List<Emprendimientos> lista;
         boolean tieneNombre = nombre != null && !nombre.trim().isEmpty();
         boolean tieneTipo = tipo != null && !tipo.trim().isEmpty();
+        boolean tieneCategoria = categoria != null && !categoria.trim().isEmpty();
+        boolean tieneCiudad = ciudad != null && !ciudad.trim().isEmpty();
 
-        if (tieneNombre && tieneTipo) {
-            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCaseAndTiposEmprendimientos_TipoContainingIgnoreCase(nombre.trim(), tipo.trim());
-        } else if (tieneNombre) {
-            lista = emprendimientosRepository.findByNombreComercialContainingIgnoreCase(nombre.trim());
-        } else if (tieneTipo) {
-            lista = emprendimientosRepository.findByTiposEmprendimientos_Tipo(tipo.trim());
+        // Construir la query según los filtros activos
+        if (tieneNombre || tieneTipo || tieneCategoria || tieneCiudad) {
+            lista = emprendimientosRepository.findByFiltros(
+                    tieneNombre ? nombre.trim() : null,
+                    tieneTipo ? tipo.trim() : null,
+                    tieneCategoria ? categoria.trim() : null,
+                    tieneCiudad ? ciudad.trim() : null
+            );
         } else {
             lista = emprendimientosRepository.findAll();
         }
@@ -684,6 +688,5 @@ public class EmprendimientoServiceImpl implements IEmprendimientoService {
             return dto;
         }).collect(Collectors.toList());
     }
-
 
 }

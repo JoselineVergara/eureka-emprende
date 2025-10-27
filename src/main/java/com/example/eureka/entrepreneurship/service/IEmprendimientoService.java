@@ -31,7 +31,12 @@ public interface IEmprendimientoService {
     List<EmprendimientoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario);
 
     /**
-     * Obtener todos los emprendimientos, filtrando por nombre y tipo si se especifica
+     * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad
+     * @param nombre
+     * @param tipo
+     * @param categoria
+     * @param ciudad
+     * @return
      */
-    List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo);
+    List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad);
 }
