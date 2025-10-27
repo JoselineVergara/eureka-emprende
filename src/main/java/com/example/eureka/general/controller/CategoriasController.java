@@ -1,5 +1,6 @@
 package com.example.eureka.general.controller;
 
+import com.example.eureka.general.dto.CategoriaRequestDTO;
 import com.example.eureka.general.dto.CategoriasDTO;
 import com.example.eureka.general.service.ICategoriaService;
 import lombok.RequiredArgsConstructor;
@@ -17,19 +18,19 @@ public class CategoriasController {
 
     @GetMapping
     public ResponseEntity<List<CategoriasDTO>> obtenerCategorias() {
-        List<CategoriasDTO> categorias = categoriaService.obtenerCategorias();
+        List<CategoriasDTO> categorias = categoriaService.listarCategoaria();
         return ResponseEntity.ok(categorias);
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<?> crearCategoria(@RequestBody CategoriasDTO categoriasDTO) {
-        Integer id = categoriaService.crearCategoria(categoriasDTO);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<?> crearCategoria(@RequestBody CategoriaRequestDTO categoriasDTO) {
+        CategoriasDTO dto = categoriaService.crearCategoria(categoriasDTO);
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/actualizar/{id}")
-    public ResponseEntity<?> actualizarCategoria(@PathVariable Integer id, @RequestBody CategoriasDTO categoriasDTO) {
-        categoriaService.actualizarCategoria(id, categoriasDTO);
+    public ResponseEntity<?> actualizarCategoria(@PathVariable Integer id, @RequestBody CategoriaRequestDTO categoriasDTO) {
+        categoriaService.actualizarCategoaria(id, categoriasDTO);
         return ResponseEntity.ok().build();
     }
 

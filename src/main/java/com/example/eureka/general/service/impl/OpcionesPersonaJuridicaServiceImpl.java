@@ -4,7 +4,6 @@ import com.example.eureka.general.dto.converter.OpcionesPersonaJuridicaDtoConver
 import com.example.eureka.general.dto.OpcionesPersonaJuridicaDTO;
 import com.example.eureka.general.repository.IOpcionesPersonaJuridicaRepository;
 import com.example.eureka.general.service.IOpcionesPersonaJuridicaService;
-import com.example.eureka.model.OpcionRespuesta;
 import com.example.eureka.model.OpcionesPersonaJuridica;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
