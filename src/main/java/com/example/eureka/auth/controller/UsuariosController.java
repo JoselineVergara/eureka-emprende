@@ -1,16 +1,19 @@
 package com.example.eureka.auth.controller;
 
+import com.example.eureka.auth.dto.UsuarioPerfilDTO;
 import com.example.eureka.auth.service.IUsuariosService;
 import com.example.eureka.model.Usuarios;
 import com.example.eureka.auth.service.impl.UsuariosServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/v1/usuarios")
 @RequiredArgsConstructor
 public class UsuariosController {
 
@@ -21,9 +24,11 @@ public class UsuariosController {
         return usuariosServiceImpl.crearUsuario(usuario);
     }
 
-    @GetMapping("/{id}")
-    public Optional<Usuarios> getUsuario(@PathVariable Integer id) {
-        return usuariosServiceImpl.obtenerUsuarioPorId(id);
+    @GetMapping("/perfil")
+    public ResponseEntity<UsuarioPerfilDTO> obtenerPerfilUsuario(Authentication authentication) {
+        String email = authentication.getName();
+        UsuarioPerfilDTO perfil = usuariosServiceImpl.obtenerUsuarioPorEmail(email);
+        return ResponseEntity.ok(perfil);
     }
 
     @PutMapping("/{id}")

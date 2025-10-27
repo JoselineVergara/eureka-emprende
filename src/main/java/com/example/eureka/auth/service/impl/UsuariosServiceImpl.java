@@ -1,5 +1,7 @@
 package com.example.eureka.auth.service.impl;
 
+import com.example.eureka.auth.dto.UsuarioPerfilDTO;
+import com.example.eureka.auth.dto.converter.UsuarioConverter;
 import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.auth.service.IUsuariosService;
 import com.example.eureka.model.Usuarios;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class UsuariosServiceImpl implements IUsuariosService {
 
     private final IUserRepository usuariosRepository;
+    private final UsuarioConverter usuarioConverter;
 
     @Override
     public Usuarios crearUsuario(Usuarios usuario) {
@@ -24,6 +27,13 @@ public class UsuariosServiceImpl implements IUsuariosService {
         usuario.setFechaRegistro(LocalDateTime.now());
         usuario.setActivo(true);
         return usuariosRepository.save(usuario);
+    }
+    @Transactional(readOnly = true)
+    public UsuarioPerfilDTO obtenerUsuarioPorEmail(String email) {
+        Usuarios usuario = usuariosRepository.findByCorreo(email);
+//                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
+
+        return usuarioConverter.toPerfilDTO(usuario);
     }
 
     @Override
