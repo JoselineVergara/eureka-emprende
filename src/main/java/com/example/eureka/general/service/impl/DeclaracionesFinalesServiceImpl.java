@@ -6,6 +6,7 @@ import com.example.eureka.general.service.IDeclaracionesFinalesService;
 import com.example.eureka.model.DeclaracionesFinales;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class DeclaracionesFinalesServiceImpl implements IDeclaracionesFinalesSer
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public DeclaracionesFinalesDTO guardar(DeclaracionesFinalesDTO dto) {
         DeclaracionesFinales entity = mapToEntity(dto);
         DeclaracionesFinales guardada = repository.save(entity);
@@ -56,6 +58,7 @@ public class DeclaracionesFinalesServiceImpl implements IDeclaracionesFinalesSer
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public DeclaracionesFinalesDTO actualizar(Integer id, DeclaracionesFinalesDTO dto) {
         DeclaracionesFinales existente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Declaración final no encontrada"));
@@ -68,6 +71,7 @@ public class DeclaracionesFinalesServiceImpl implements IDeclaracionesFinalesSer
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Integer id) {
         if (!repository.existsById(id)) {
             throw new RuntimeException("Declaración final no encontrada");

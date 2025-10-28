@@ -5,9 +5,10 @@ import com.example.eureka.general.repository.IProvinciaRepository;
 import com.example.eureka.general.service.IProvinciaService;
 import com.example.eureka.model.Provincias;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ProvinciaServiceImpl implements IProvinciaService {
     private final IProvinciaRepository provinciaRepository;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Integer crearProvincia(ProvinciaDTO provinciaDTO) {
         if (provinciaDTO == null) {
             throw new IllegalArgumentException("El DTO de provincia no puede ser nulo");
@@ -33,7 +34,7 @@ public class ProvinciaServiceImpl implements IProvinciaService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Integer actualizarProvincia(Integer id, ProvinciaDTO provinciaDTO) {
         Provincias provincia = provinciaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Provincia no encontrada con ID: " + id));
@@ -46,7 +47,7 @@ public class ProvinciaServiceImpl implements IProvinciaService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void eliminarProvincia(Integer id) {
         if (!provinciaRepository.existsById(id)) {
             throw new EntityNotFoundException("No existe una provincia con el ID: " + id);

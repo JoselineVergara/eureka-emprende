@@ -9,6 +9,7 @@ import com.example.eureka.model.Ciudades;
 import com.example.eureka.model.Provincias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,7 @@ public class CiudadServiceImpl implements ICiudadService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CiudadDTO guardar(CiudadDTO dto) {
         Provincias provincia = provinciaRepository.findById(dto.getProvincia().getId())
                 .orElseThrow(() -> new RuntimeException("Provincia no encontrada"));
@@ -67,6 +69,7 @@ public class CiudadServiceImpl implements ICiudadService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CiudadDTO actualizar(Integer id, CiudadDTO dto) {
         Ciudades ciudad = ciudadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
@@ -82,6 +85,7 @@ public class CiudadServiceImpl implements ICiudadService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Integer id) {
         if (!ciudadRepository.existsById(id)) {
             throw new RuntimeException("Ciudad no encontrada");

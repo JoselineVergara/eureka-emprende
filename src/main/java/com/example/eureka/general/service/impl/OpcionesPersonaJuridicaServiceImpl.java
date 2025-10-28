@@ -71,6 +71,7 @@ public class OpcionesPersonaJuridicaServiceImpl implements IOpcionesPersonaJurid
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void eliminarOpcionPersonaJuridica(Integer id) {
         opcionesPersonaJuridicaRepository.deleteById(id);
     }

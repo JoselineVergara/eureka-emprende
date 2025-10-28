@@ -6,6 +6,7 @@ import com.example.eureka.general.service.ITiposEmprendimientoService;
 import com.example.eureka.model.TiposEmprendimientos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ public class TiposEmprendimientoServiceImpl implements ITiposEmprendimientoServi
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public TipoEmprendimientoDTO guardar(TipoEmprendimientoDTO dto) {
         TiposEmprendimientos entity = new TiposEmprendimientos();
         entity.setTipo(dto.getTipo());
@@ -58,6 +60,7 @@ public class TiposEmprendimientoServiceImpl implements ITiposEmprendimientoServi
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public TipoEmprendimientoDTO actualizar(Integer id, TipoEmprendimientoDTO dto) {
         return tipoRepo.findById(id)
                 .map(entity -> {
@@ -74,6 +77,7 @@ public class TiposEmprendimientoServiceImpl implements ITiposEmprendimientoServi
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Integer id) {
         tipoRepo.deleteById(id);
     }

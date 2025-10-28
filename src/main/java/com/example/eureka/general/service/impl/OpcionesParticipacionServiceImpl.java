@@ -6,6 +6,7 @@ import com.example.eureka.general.service.IOpcionesParticipacionComunidadService
 import com.example.eureka.model.OpcionesParticipacionComunidad;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class OpcionesParticipacionServiceImpl implements IOpcionesParticipacionC
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OpcionesParticipacionComunidadDTO guardar(OpcionesParticipacionComunidadDTO dto) {
         OpcionesParticipacionComunidad entity = new OpcionesParticipacionComunidad();
         entity.setOpcion(dto.getOpcion());
@@ -55,6 +57,7 @@ public class OpcionesParticipacionServiceImpl implements IOpcionesParticipacionC
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OpcionesParticipacionComunidadDTO actualizar(Integer id, OpcionesParticipacionComunidadDTO dto) {
         return repository.findById(id)
                 .map(entity -> {
@@ -70,6 +73,7 @@ public class OpcionesParticipacionServiceImpl implements IOpcionesParticipacionC
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Integer id) {
         repository.deleteById(id);
     }
