@@ -5,10 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmprendimientoResponseDTO {
 
     private Integer id;
@@ -30,6 +31,7 @@ public class EmprendimientoResponseDTO {
     private Integer tipoEmprendimientoId;
     private String nombreTipoEmprendimiento;
 
+    // Colecciones relacionadas
     private List<CategoriaDTO> categorias;
     private List<EmprendimientoDescripcionDTO> descripciones;
     private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
@@ -37,4 +39,7 @@ public class EmprendimientoResponseDTO {
     private List<EmprendimientoDeclaracionesDTO> declaracionesFinales;
     private List<EmprendimientoParticipacionDTO> participacionesComunidad;
     private InformacionRepresentanteDTO informacionRepresentante;
+
+    // NUEVO: Multimedia del emprendimiento
+    private List<MultimediaDTO> multimedia;
 }
