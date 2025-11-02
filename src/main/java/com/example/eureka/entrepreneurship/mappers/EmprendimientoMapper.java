@@ -157,4 +157,29 @@ public class EmprendimientoMapper {
         }
         return dto;
     }
+
+    // En EmprendimientoMapper.java
+    public static List<MultimediaDTO> toMultimediaDTOList(List<EmprendimientoMultimedia> multimediaList) {
+        if (multimediaList == null) {
+            return null;
+        }
+        return multimediaList.stream()
+                .map(EmprendimientoMapper::toMultimediaDTO)
+                .collect(Collectors.toList());
+    }
+
+    public static MultimediaDTO toMultimediaDTO(EmprendimientoMultimedia empMultimedia) {
+        if (empMultimedia == null || empMultimedia.getMultimedia() == null) {
+            return null;
+        }
+
+        Multimedia multimedia = empMultimedia.getMultimedia();
+
+        return MultimediaDTO.builder()
+                .id(multimedia.getId())
+                .urlArchivo(multimedia.getUrlArchivo())
+                .nombreActivo(multimedia.getNombreActivo())
+                .tipo(empMultimedia.getTipo())
+                .build();
+    }
 }
