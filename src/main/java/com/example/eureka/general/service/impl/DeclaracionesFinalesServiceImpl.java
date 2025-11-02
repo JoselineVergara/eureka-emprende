@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.DeclaracionesFinalesDTO;
 import com.example.eureka.general.repository.IDeclaracionesFinalesRepository;
 import com.example.eureka.general.service.IDeclaracionesFinalesService;
-import com.example.eureka.model.DeclaracionesFinales;
+import com.example.eureka.domain.model.DeclaracionesFinales;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

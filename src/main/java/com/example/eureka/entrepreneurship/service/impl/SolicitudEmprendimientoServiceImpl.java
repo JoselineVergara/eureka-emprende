@@ -3,13 +3,12 @@ package com.example.eureka.entrepreneurship.service.impl;
 import com.example.eureka.entrepreneurship.dto.SolicitudEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.service.ISolicitudEmprendimientoService;
 import com.example.eureka.entrepreneurship.repository.ISolicitudesEmprendimientoRepository;
-import com.example.eureka.model.SolicitudEmprendimiento;
-import com.example.eureka.model.Emprendimientos;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.SolicitudEmprendimiento;
+import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.auth.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

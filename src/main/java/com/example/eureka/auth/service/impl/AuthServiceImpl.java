@@ -5,12 +5,12 @@ import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.auth.service.IAuthService;
 import com.example.eureka.entrepreneurship.repository.IRepresentanteInformacionRepository;
 import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
-import com.example.eureka.enums.Genero;
+import com.example.eureka.domain.enums.Genero;
 import com.example.eureka.general.repository.IRolesRepository;
-import com.example.eureka.model.Emprendimientos;
-import com.example.eureka.model.InformacionRepresentante;
-import com.example.eureka.model.Roles;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.InformacionRepresentante;
+import com.example.eureka.domain.model.Roles;
+import com.example.eureka.domain.model.Usuarios;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.expression.ExpressionException;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor

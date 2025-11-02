@@ -1,6 +1,6 @@
 package com.example.eureka.notificacion.dto;
 
-import com.example.eureka.enums.Prioridad;
+import com.example.eureka.domain.enums.Prioridad;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

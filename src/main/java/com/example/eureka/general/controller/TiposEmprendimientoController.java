@@ -1,6 +1,5 @@
 package com.example.eureka.general.controller;
 
-import com.example.eureka.general.dto.DeclaracionesFinalesDTO;
 import com.example.eureka.general.dto.TipoEmprendimientoDTO;
 import com.example.eureka.general.service.ITiposEmprendimientoService;
 import lombok.RequiredArgsConstructor;

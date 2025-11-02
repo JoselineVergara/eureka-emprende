@@ -2,10 +2,8 @@ package com.example.eureka.auth.dto;
 
 import com.example.eureka.entrepreneurship.dto.EmprendimientoDTO;
 import lombok.Data;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 public class UsuarioEmprendeDTO {

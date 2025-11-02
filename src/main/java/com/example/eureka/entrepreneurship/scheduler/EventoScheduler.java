@@ -1,9 +1,8 @@
 package com.example.eureka.entrepreneurship.scheduler;
 
 import com.example.eureka.entrepreneurship.repository.IEventosRepository;
-import com.example.eureka.entrepreneurship.specification.EventoSpecification;
-import com.example.eureka.enums.EstadoEvento;
-import com.example.eureka.model.Eventos;
+import com.example.eureka.domain.enums.EstadoEvento;
+import com.example.eureka.domain.model.Eventos;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;

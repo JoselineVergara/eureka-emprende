@@ -1,14 +1,13 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.entrepreneurship.dto.EmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.TipoDescripcionEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosDescripcionRepository;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.service.ITipoDescripcionEmprendimientoService;
-import com.example.eureka.model.Emprendimientos;
-import com.example.eureka.model.TiposDescripcionEmprendimiento;
+import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.TiposDescripcionEmprendimiento;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

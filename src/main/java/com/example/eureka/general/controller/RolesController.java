@@ -2,10 +2,9 @@ package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.RolesDTO;
 import com.example.eureka.general.repository.IRolesRepository;
-import com.example.eureka.model.Roles;
+import com.example.eureka.domain.model.Roles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

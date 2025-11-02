@@ -1,14 +1,14 @@
 package com.example.eureka.general.service.impl;
 
-import com.example.eureka.config.s3.FileStorageService;
+import com.example.eureka.infrastructure.storage.FileStorageService;
 import com.example.eureka.general.dto.CategoriaRequestDTO;
 import com.example.eureka.general.dto.CategoriasDTO;
 import com.example.eureka.general.dto.converter.CategoriaDtoConverter;
 import com.example.eureka.general.repository.ICategoriasRepository;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.general.service.ICategoriaService;
-import com.example.eureka.model.Categorias;
-import com.example.eureka.model.Multimedia;
+import com.example.eureka.domain.model.Categorias;
+import com.example.eureka.domain.model.Multimedia;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

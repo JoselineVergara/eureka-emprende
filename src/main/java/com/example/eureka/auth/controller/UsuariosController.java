@@ -2,15 +2,11 @@ package com.example.eureka.auth.controller;
 
 import com.example.eureka.auth.dto.UsuarioPerfilDTO;
 import com.example.eureka.auth.service.IUsuariosService;
-import com.example.eureka.model.Usuarios;
-import com.example.eureka.auth.service.impl.UsuariosServiceImpl;
+import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/usuarios")

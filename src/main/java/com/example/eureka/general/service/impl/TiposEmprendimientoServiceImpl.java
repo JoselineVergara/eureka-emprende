@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.TipoEmprendimientoDTO;
 import com.example.eureka.general.repository.ITipoEmprendimientoRepository;
 import com.example.eureka.general.service.ITiposEmprendimientoService;
-import com.example.eureka.model.TiposEmprendimientos;
+import com.example.eureka.domain.model.TiposEmprendimientos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

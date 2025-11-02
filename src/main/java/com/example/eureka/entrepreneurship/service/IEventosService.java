@@ -5,8 +5,8 @@ import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
 import com.example.eureka.entrepreneurship.dto.EventoAdminDTO;
 import com.example.eureka.entrepreneurship.dto.EventoEmprendedorDTO;
 import com.example.eureka.entrepreneurship.dto.EventoPublicoDTO;
-import com.example.eureka.enums.EstadoEvento;
-import com.example.eureka.enums.TipoEvento;
+import com.example.eureka.domain.enums.EstadoEvento;
+import com.example.eureka.domain.enums.TipoEvento;
 import com.example.eureka.entrepreneurship.dto.PageResponseDTO;
 import org.springframework.data.domain.Pageable;
 

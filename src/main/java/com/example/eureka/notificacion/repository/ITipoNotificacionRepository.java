@@ -1,6 +1,6 @@
 package com.example.eureka.notificacion.repository;
 
-import com.example.eureka.model.TipoNotificacion;
+import com.example.eureka.domain.model.TipoNotificacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

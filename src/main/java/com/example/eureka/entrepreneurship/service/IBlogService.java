@@ -1,7 +1,8 @@
 package com.example.eureka.entrepreneurship.service;
 
+import com.example.eureka.controllers.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.dto.*;
-import com.example.eureka.enums.EstadoArticulo;
+import com.example.eureka.domain.enums.EstadoArticulo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

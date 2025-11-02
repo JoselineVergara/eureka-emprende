@@ -1,7 +1,7 @@
 package com.example.eureka.general.dto.converter;
 
 import com.example.eureka.general.dto.OpcionesPersonaJuridicaDTO;
-import com.example.eureka.model.OpcionesPersonaJuridica;
+import com.example.eureka.domain.model.OpcionesPersonaJuridica;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

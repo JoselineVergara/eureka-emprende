@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.dto;
 
-import com.example.eureka.model.SolicitudAprobacion;
+import com.example.eureka.domain.model.SolicitudAprobacion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

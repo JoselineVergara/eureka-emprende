@@ -4,7 +4,7 @@ import com.example.eureka.auth.dto.UsuarioPerfilDTO;
 import com.example.eureka.auth.dto.converter.UsuarioConverter;
 import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.auth.service.IUsuariosService;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;

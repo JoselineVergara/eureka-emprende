@@ -1,14 +1,17 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.auth.repository.IUserRepository;
-import com.example.eureka.config.s3.FileStorageService;
+import com.example.eureka.controllers.entrepreneurship.dto.*;
+import com.example.eureka.controllers.entrepreneurship.repository.*;
+import com.example.eureka.controllers.general.repository.*;
+import com.example.eureka.general.repository.*;
+import com.example.eureka.infrastructure.storage.FileStorageService;
+import com.example.eureka.domain.model.*;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
-import com.example.eureka.enums.EstadoEmprendimiento;
-import com.example.eureka.general.repository.*;
-import com.example.eureka.model.*;
+import com.example.eureka.domain.enums.EstadoEmprendimiento;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -19,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

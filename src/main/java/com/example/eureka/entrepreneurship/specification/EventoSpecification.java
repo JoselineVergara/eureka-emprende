@@ -1,8 +1,8 @@
 package com.example.eureka.entrepreneurship.specification;
 
-import com.example.eureka.enums.EstadoEvento;
-import com.example.eureka.enums.TipoEvento;
-import com.example.eureka.model.Eventos;
+import com.example.eureka.domain.enums.EstadoEvento;
+import com.example.eureka.domain.enums.TipoEvento;
+import com.example.eureka.domain.model.Eventos;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

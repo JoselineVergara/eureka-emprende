@@ -3,7 +3,6 @@ package com.example.eureka.entrepreneurship.controller;
 import com.example.eureka.entrepreneurship.dto.SolicitudEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.service.ISolicitudEmprendimientoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.example.eureka.general.dto.converter;
 
 import com.example.eureka.general.dto.CategoriasDTO;
-import com.example.eureka.model.Categorias;
+import com.example.eureka.domain.model.Categorias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

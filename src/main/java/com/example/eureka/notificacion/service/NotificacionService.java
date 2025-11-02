@@ -1,9 +1,11 @@
 package com.example.eureka.notificacion.service;
 
 import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.domain.model.Notificacion;
+import com.example.eureka.domain.model.TipoNotificacion;
+import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.repository.ISolicitudAprobacionRepository;
-import com.example.eureka.model.*;
 import com.example.eureka.notificacion.dto.NotificacionDTO;
 import com.example.eureka.notificacion.repository.INotificacionRepository;
 import com.example.eureka.notificacion.repository.ITipoNotificacionRepository;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

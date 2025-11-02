@@ -1,9 +1,10 @@
 package com.example.eureka.entrepreneurship.service;
 
+import com.example.eureka.controllers.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.dto.*;
-import com.example.eureka.model.Emprendimientos;
-import com.example.eureka.model.SolicitudAprobacion;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.SolicitudAprobacion;
+import com.example.eureka.domain.model.Usuarios;
 import jakarta.validation.Valid;
 
 import java.util.List;

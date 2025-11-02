@@ -1,8 +1,8 @@
 package com.example.eureka.entrepreneurship.specification;
 
-import com.example.eureka.enums.EstadoArticulo;
-import com.example.eureka.model.ArticulosBlog;
-import com.example.eureka.model.TagsBlog;
+import com.example.eureka.domain.enums.EstadoArticulo;
+import com.example.eureka.domain.model.ArticulosBlog;
+import com.example.eureka.domain.model.TagsBlog;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;

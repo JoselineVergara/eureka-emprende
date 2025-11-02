@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.repository;
 
-import com.example.eureka.model.EmprendimientoMultimedia;
+import com.example.eureka.domain.model.EmprendimientoMultimedia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

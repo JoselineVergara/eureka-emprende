@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.config.BusinessException;
-import com.example.eureka.config.s3.FileStorageService;
+import com.example.eureka.exception.BusinessException;
+import com.example.eureka.infrastructure.storage.FileStorageService;
 import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
 import com.example.eureka.entrepreneurship.dto.EventoAdminDTO;
@@ -11,12 +11,12 @@ import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository
 import com.example.eureka.entrepreneurship.repository.IEventosRepository;
 import com.example.eureka.entrepreneurship.service.IEventosService;
 import com.example.eureka.entrepreneurship.specification.EventoSpecification;
-import com.example.eureka.enums.EstadoEvento;
-import com.example.eureka.enums.TipoEvento;
+import com.example.eureka.domain.enums.EstadoEvento;
+import com.example.eureka.domain.enums.TipoEvento;
 import com.example.eureka.general.repository.IMultimediaRepository;
-import com.example.eureka.model.Emprendimientos;
-import com.example.eureka.model.Eventos;
-import com.example.eureka.model.Multimedia;
+import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.Eventos;
+import com.example.eureka.domain.model.Multimedia;
 import com.example.eureka.entrepreneurship.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

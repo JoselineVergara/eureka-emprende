@@ -1,14 +1,15 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.config.BusinessException;
-import com.example.eureka.config.s3.FileStorageService;
+import com.example.eureka.exception.BusinessException;
+import com.example.eureka.controllers.entrepreneurship.dto.*;
+import com.example.eureka.infrastructure.storage.FileStorageService;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.specification.ArticuloSpecification;
-import com.example.eureka.enums.EstadoArticulo;
-import com.example.eureka.model.ArticulosBlog;
-import com.example.eureka.model.Multimedia;
-import com.example.eureka.model.TagsBlog;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.enums.EstadoArticulo;
+import com.example.eureka.domain.model.ArticulosBlog;
+import com.example.eureka.domain.model.Multimedia;
+import com.example.eureka.domain.model.TagsBlog;
+import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.repository.IArticuloRepository;
 import com.example.eureka.entrepreneurship.repository.ITagRepository;
 import com.example.eureka.entrepreneurship.service.IBlogService;

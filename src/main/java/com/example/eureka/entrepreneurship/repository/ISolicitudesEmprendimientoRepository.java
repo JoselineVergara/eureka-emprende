@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.repository;
 
-import com.example.eureka.model.SolicitudEmprendimiento;
+import com.example.eureka.domain.model.SolicitudEmprendimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

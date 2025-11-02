@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.OpcionesParticipacionComunidadDTO;
 import com.example.eureka.general.repository.IOpcionesParticipacionComunidadRepository;
 import com.example.eureka.general.service.IOpcionesParticipacionComunidadService;
-import com.example.eureka.model.OpcionesParticipacionComunidad;
+import com.example.eureka.domain.model.OpcionesParticipacionComunidad;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

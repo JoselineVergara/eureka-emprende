@@ -1,9 +1,10 @@
 package com.example.eureka.entrepreneurship.controller;
 
+import com.example.eureka.controllers.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.service.IBlogService;
-import com.example.eureka.enums.EstadoArticulo;
-import com.example.eureka.utilities.SecurityUtils;
+import com.example.eureka.domain.enums.EstadoArticulo;
+import com.example.eureka.shared.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

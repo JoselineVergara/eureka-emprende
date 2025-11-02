@@ -1,8 +1,8 @@
 package com.example.eureka.entrepreneurship.dto;
 
 
-import com.example.eureka.enums.EstadoEvento;
-import com.example.eureka.enums.TipoEvento;
+import com.example.eureka.domain.enums.EstadoEvento;
+import com.example.eureka.domain.enums.TipoEvento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

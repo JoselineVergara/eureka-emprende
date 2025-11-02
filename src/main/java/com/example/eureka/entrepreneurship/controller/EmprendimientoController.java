@@ -1,9 +1,12 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.entrepreneurship.dto.EmprendimientoPorCategoriaDTO;
+import com.example.eureka.entrepreneurship.dto.EmprendimientoRequestDTO;
+import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.VistaEmprendedorDTO;
 import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
-import com.example.eureka.model.SolicitudAprobacion;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.SolicitudAprobacion;
+import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

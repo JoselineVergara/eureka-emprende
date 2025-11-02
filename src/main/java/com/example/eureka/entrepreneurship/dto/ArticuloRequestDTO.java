@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.dto;
 
-import com.example.eureka.enums.EstadoArticulo;
+import com.example.eureka.domain.enums.EstadoArticulo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

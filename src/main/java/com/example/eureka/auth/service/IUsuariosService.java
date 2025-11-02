@@ -1,7 +1,7 @@
 package com.example.eureka.auth.service;
 
 import com.example.eureka.auth.dto.UsuarioPerfilDTO;
-import com.example.eureka.model.Usuarios;
+import com.example.eureka.domain.model.Usuarios;
 import java.util.Optional;
 
 public interface IUsuariosService {

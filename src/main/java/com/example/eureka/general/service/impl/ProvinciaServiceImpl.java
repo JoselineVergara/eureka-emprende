@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.ProvinciaDTO;
 import com.example.eureka.general.repository.IProvinciaRepository;
 import com.example.eureka.general.service.IProvinciaService;
-import com.example.eureka.model.Provincias;
+import com.example.eureka.domain.model.Provincias;
 import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;

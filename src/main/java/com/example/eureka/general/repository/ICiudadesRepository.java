@@ -1,6 +1,6 @@
 package com.example.eureka.general.repository;
 
-import com.example.eureka.model.Ciudades;
+import com.example.eureka.domain.model.Ciudades;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

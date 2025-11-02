@@ -1,7 +1,6 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.DescripcionesDTO;
-import com.example.eureka.general.dto.OpcionesParticipacionComunidadDTO;
 import com.example.eureka.general.service.IDescripcionesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
