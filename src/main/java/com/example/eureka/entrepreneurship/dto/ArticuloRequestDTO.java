@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,10 +24,11 @@ public class ArticuloRequestDTO {
     private String contenido;
 
     @NotNull(message = "El ID de imagen es obligatorio")
-    private Integer idImagen;
+    private MultipartFile imagen;
 
     private List<Integer> idsTags; // IDs de tags existentes
     private List<String> nombresTags; // Nombres de tags nuevos
 
     private EstadoArticulo estado; // NUEVO: estado inicial (BORRADOR o PUBLICADO)
+
 }

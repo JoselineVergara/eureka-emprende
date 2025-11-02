@@ -2,69 +2,117 @@ package com.example.eureka.entrepreneurship.service;
 
 import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.EventoAdminDTO;
+import com.example.eureka.entrepreneurship.dto.EventoEmprendedorDTO;
+import com.example.eureka.entrepreneurship.dto.EventoPublicoDTO;
 import com.example.eureka.enums.EstadoEvento;
 import com.example.eureka.enums.TipoEvento;
+import com.example.eureka.entrepreneurship.dto.PageResponseDTO;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface IEventosService {
 
     /**
      * Crea un nuevo evento asociado a un emprendimiento
+     * @param request Datos del evento
+     * @param idEmprendimiento ID del emprendimiento
+     * @param idUsuario ID del usuario que crea (validación de permisos)
      */
-    EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idEmprendimiento);
+    EventoResponseDTO crearEvento(EventoRequestDTO request, Integer idEmprendimiento, Integer idUsuario);
 
     /**
      * Edita un evento existente
+     * @param idEvento ID del evento a editar
+     * @param request Nuevos datos del evento
+     * @param idEmprendimiento ID del emprendimiento (validación)
+     * @param idUsuario ID del usuario que edita (validación de permisos)
      */
-    EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idEmprendimiento);
+    EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idEmprendimiento, Integer idUsuario);
 
     /**
      * Cancela un evento (cambio de estado a cancelado)
+     * @param idEvento ID del evento
+     * @param idUsuario ID del usuario (validación de permisos)
      */
-    void inactivarEvento(Integer idEvento);
+    void cancelarEvento(Integer idEvento, Integer idUsuario);
 
     /**
      * Activa un evento (solo admin)
+     * @param idEvento ID del evento
      */
     void activarEvento(Integer idEvento);
 
     /**
      * Desactiva un evento (solo admin)
+     * @param idEvento ID del evento
      */
     void desactivarEvento(Integer idEvento);
 
     /**
-     * Obtiene todos los eventos de un emprendimiento específico
+     * Obtiene eventos públicos (solo programados)
+     * @param titulo Filtro por nombre (opcional)
+     * @param mes Filtro por mes (opcional, 1-12)
+     * @param tipoEvento Filtro por tipo de evento (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de eventos públicos
      */
-    List<EventoResponseDTO> obtenerEventosPorEmprendimiento(Integer idEmprendimiento);
+    PageResponseDTO<EventoPublicoDTO> obtenerEventosPublicos(
+            String titulo,
+            Integer mes,
+            TipoEvento tipoEvento,
+            Pageable pageable);
 
     /**
-     * Obtiene eventos de un usuario con filtros opcionales
-     * @param idUsuario ID del usuario
-     * @param tipoEvento (Opcional) Filtrar por tipo de evento
-     * @param idEmprendimiento (Opcional) Filtrar por emprendimiento específico
+     * Obtiene un evento público por ID (solo si está programado)
+     * @param idEvento ID del evento
+     * @return Evento completo
      */
-    List<EventoResponseDTO> obtenerEventosPorUsuario(Integer idUsuario, TipoEvento tipoEvento, Integer idEmprendimiento);
+    EventoResponseDTO obtenerEventoPublicoPorId(Integer idEvento);
 
     /**
-     * Obtiene un evento por su ID
+     * Obtiene eventos del emprendedor autenticado
+     * @param idUsuario ID del usuario emprendedor
+     * @param titulo Filtro por nombre (opcional)
+     * @param fechaInicio Filtro por fecha inicio (opcional)
+     * @param fechaFin Filtro por fecha fin (opcional)
+     * @param estado Filtro por estado (opcional)
+     * @param tipoEvento Filtro por tipo (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de eventos del emprendedor
+     */
+    PageResponseDTO<EventoEmprendedorDTO> obtenerEventosEmprendedor(
+            Integer idUsuario,
+            String titulo,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            EstadoEvento estado,
+            TipoEvento tipoEvento,
+            Pageable pageable);
+
+    /**
+     * Obtiene todos los eventos (admin)
+     * @param titulo Filtro por nombre (opcional)
+     * @param fechaInicio Filtro por fecha inicio (opcional)
+     * @param fechaFin Filtro por fecha fin (opcional)
+     * @param estado Filtro por estado (opcional)
+     * @param tipoEvento Filtro por tipo (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de eventos (vista admin)
+     */
+    PageResponseDTO<EventoAdminDTO> obtenerEventosAdmin(
+            String titulo,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            EstadoEvento estado,
+            TipoEvento tipoEvento,
+            Pageable pageable);
+
+    /**
+     * Obtiene un evento por ID (admin - cualquier estado)
+     * @param idEvento ID del evento
+     * @return Evento completo
      */
     EventoResponseDTO obtenerEventoPorId(Integer idEvento);
-
-    /**
-     * Obtiene eventos filtrados por múltiples criterios
-     * @param estadoEvento (Opcional) Estado del evento
-     * @param tipoEvento (Opcional) Tipo de evento
-     * @param idEmprendimiento (Opcional) ID del emprendimiento
-     * @param fechaInicio (Opcional) Fecha de inicio del rango - requerida junto con fechaFin
-     * @param fechaFin (Opcional) Fecha de fin del rango - requerida junto con fechaInicio
-     */
-    List<EventoResponseDTO> obtenerEventosFiltrados(
-            EstadoEvento estadoEvento,
-            TipoEvento tipoEvento,
-            Integer idEmprendimiento,
-            LocalDateTime fechaInicio,
-            LocalDateTime fechaFin);
 }

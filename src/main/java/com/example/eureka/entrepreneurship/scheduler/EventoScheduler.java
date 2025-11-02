@@ -1,10 +1,12 @@
 package com.example.eureka.entrepreneurship.scheduler;
 
 import com.example.eureka.entrepreneurship.repository.IEventosRepository;
+import com.example.eureka.entrepreneurship.specification.EventoSpecification;
 import com.example.eureka.enums.EstadoEvento;
 import com.example.eureka.model.Eventos;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,21 +22,23 @@ public class EventoScheduler {
     private final IEventosRepository eventosRepository;
 
     /**
-     * Ejecuta cada segundo para verificar eventos que ya pasaron su fecha
+     * Ejecuta cada minuto para verificar eventos que ya pasaron su fecha
      * y actualiza su estado a TERMINADO
      */
-    @Scheduled(fixedRate = 1000) // Ejecuta cada 1000ms (1 segundo)
+    @Scheduled(fixedRate = 60000) // Ejecuta cada 60000ms (1 minuto)
     @Transactional
     public void actualizarEventosTerminados() {
         try {
             LocalDateTime ahora = LocalDateTime.now();
 
-            // Buscar eventos programados o en curso cuya fecha ya pasó
-            List<Eventos> eventosVencidos = eventosRepository
-                    .findByEstadoEventoAndFechaEventoBefore(
-                            (EstadoEvento.programado),
-                            ahora
+            // Crear specification para buscar eventos programados que ya pasaron
+            Specification<Eventos> spec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.and(
+                            criteriaBuilder.equal(root.get("estadoEvento"), EstadoEvento.programado),
+                            criteriaBuilder.lessThan(root.get("fechaEvento"), ahora)
                     );
+
+            List<Eventos> eventosVencidos = eventosRepository.findAll(spec);
 
             if (!eventosVencidos.isEmpty()) {
                 for (Eventos evento : eventosVencidos) {

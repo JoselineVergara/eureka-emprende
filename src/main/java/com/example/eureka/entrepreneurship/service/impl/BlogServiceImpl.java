@@ -1,9 +1,9 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.config.BusinessException;
-import com.example.eureka.entrepreneurship.dto.ArticuloRequestDTO;
-import com.example.eureka.entrepreneurship.dto.ArticuloResponseDTO;
-import com.example.eureka.entrepreneurship.dto.TagDTO;
+import com.example.eureka.config.s3.FileStorageService;
+import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.entrepreneurship.specification.ArticuloSpecification;
 import com.example.eureka.enums.EstadoArticulo;
 import com.example.eureka.model.ArticulosBlog;
 import com.example.eureka.model.Multimedia;
@@ -15,10 +15,15 @@ import com.example.eureka.entrepreneurship.service.IBlogService;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.auth.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,54 +35,57 @@ public class BlogServiceImpl implements IBlogService {
     private final ITagRepository tagRepository;
     private final IMultimediaRepository multimediaRepository;
     private final IUserRepository userRepository;
+    private final FileStorageService fileStorageService;
+
 
     @Transactional
-    @Override
-    public ArticuloResponseDTO crearArticulo(ArticuloRequestDTO request, Integer idUsuario) {
+    public ArticuloResponseDTO crearArticulo(ArticuloRequestDTO dto, Integer idUsuario) {
+        if (dto == null) {
+            throw new BusinessException("El DTO no puede ser nulo");
+        }
+
+        // Validar usuario administrador
         validarAdministrador(idUsuario);
 
-        Usuarios usuario = userRepository.findById(idUsuario.intValue())
+        Usuarios usuario = userRepository.findById(idUsuario)
                 .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
 
-        Multimedia imagen = multimediaRepository.findById(request.getIdImagen())
-                .orElseThrow(() -> new BusinessException("Imagen no encontrada"));
+        // Subir imagen si fue enviada
+        Multimedia multimedia = null;
+        if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
+            try {
+                String urlArchivo = fileStorageService.uploadFile(dto.getImagen());
+                multimedia = new Multimedia();
+                multimedia.setUrlArchivo(urlArchivo);
+                multimedia.setNombreActivo(dto.getImagen().getOriginalFilename());
+                multimedia.setDescripcion("Imagen de artículo");
+                multimedia = multimediaRepository.save(multimedia);
+            } catch (IOException e) {
+                throw new BusinessException("Error al subir el archivo: " + e.getMessage());
+            }
+        }
 
+        // Crear artículo
         ArticulosBlog articulo = new ArticulosBlog();
-        articulo.setTitulo(request.getTitulo());
-        articulo.setDescripcionCorta(request.getDescripcionCorta());
-        articulo.setContenido(request.getContenido());
-        articulo.setEstado(request.getEstado() != null ? request.getEstado() : EstadoArticulo.BORRADOR);
+        articulo.setTitulo(dto.getTitulo());
+        articulo.setDescripcionCorta(dto.getDescripcionCorta());
+        articulo.setContenido(dto.getContenido());
+        articulo.setEstado(dto.getEstado() != null ? dto.getEstado() : EstadoArticulo.BORRADOR);
         articulo.setFechaCreacion(LocalDateTime.now());
-        articulo.setImagen(imagen);
+        articulo.setImagen(multimedia);
         articulo.setUsuario(usuario);
 
-        if (request.getIdsTags() != null && !request.getIdsTags().isEmpty()) {
-            for (Integer idTag : request.getIdsTags()) {
-                TagsBlog tag = tagRepository.findById(idTag)
-                        .orElseThrow(() -> new BusinessException("Tag no encontrado: " + idTag));
-                articulo.getTags().add(tag);
-            }
-        }
-
-        if (request.getNombresTags() != null && !request.getNombresTags().isEmpty()) {
-            for (String nombreTag : request.getNombresTags()) {
-                TagsBlog tag = tagRepository.findByNombre(nombreTag)
-                        .orElseGet(() -> {
-                            TagsBlog nuevoTag = new TagsBlog();
-                            nuevoTag.setNombre(nombreTag);
-                            return tagRepository.save(nuevoTag);
-                        });
-                articulo.getTags().add(tag);
-            }
-        }
+        procesarTags(articulo, dto.getIdsTags(), dto.getNombresTags());
 
         ArticulosBlog articuloGuardado = articuloRepository.save(articulo);
-        return convertirADTO(articuloGuardado);
+        return convertirAResponseDTO(articuloGuardado);
     }
 
-    @Transactional
+
+
     @Override
-    public ArticuloResponseDTO editarArticulo(Integer idArticulo, ArticuloRequestDTO request, Integer idUsuario) {
+    @Transactional(rollbackFor = Exception.class)
+    public ArticuloResponseDTO editarArticulo(Integer idArticulo, ArticuloRequestDTO dto, Integer idUsuario) {
         validarAdministrador(idUsuario);
 
         ArticulosBlog articulo = articuloRepository.findById(idArticulo)
@@ -87,88 +95,90 @@ public class BlogServiceImpl implements IBlogService {
             throw new BusinessException("No se puede editar un artículo archivado");
         }
 
-        articulo.setTitulo(request.getTitulo());
-        articulo.setDescripcionCorta(request.getDescripcionCorta());
-        articulo.setContenido(request.getContenido());
-        articulo.setEstado(request.getEstado());
+        articulo.setTitulo(dto.getTitulo());
+        articulo.setDescripcionCorta(dto.getDescripcionCorta());
+        articulo.setContenido(dto.getContenido());
+        articulo.setEstado(dto.getEstado());
         articulo.setFechaModificacion(LocalDateTime.now());
 
-        if (!articulo.getImagen().getId().equals(request.getIdImagen())) {
-            Multimedia imagen = multimediaRepository.findById(request.getIdImagen())
-                    .orElseThrow(() -> new BusinessException("Imagen no encontrada"));
-            articulo.setImagen(imagen);
+        // Si viene una nueva imagen
+        if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
+            try {
+                // Eliminar la imagen vieja si existe
+                if (articulo.getImagen() != null) {
+                    String oldUrl = articulo.getImagen().getUrlArchivo();
+                    String oldFileName = extractFileNameFromUrl(oldUrl);
+                    if (oldFileName != null) {
+                        fileStorageService.deleteFile(oldFileName);
+                    }
+                    multimediaRepository.delete(articulo.getImagen());
+                }
+
+                // Subir nueva imagen
+                String urlArchivo = fileStorageService.uploadFile(dto.getImagen());
+                Multimedia multimedia = new Multimedia();
+                multimedia.setUrlArchivo(urlArchivo);
+                multimedia.setNombreActivo(dto.getImagen().getOriginalFilename());
+                multimedia.setDescripcion("Imagen de artículo");
+                multimedia = multimediaRepository.save(multimedia);
+
+                articulo.setImagen(multimedia);
+
+            } catch (IOException e) {
+                throw new BusinessException("Error al actualizar la imagen: " + e.getMessage());
+            }
         }
 
         articulo.getTags().clear();
-
-        if (request.getIdsTags() != null && !request.getIdsTags().isEmpty()) {
-            for (Integer idTag : request.getIdsTags()) {
-                TagsBlog tag = tagRepository.findById(idTag)
-                        .orElseThrow(() -> new BusinessException("Tag no encontrado: " + idTag));
-                articulo.getTags().add(tag);
-            }
-        }
-
-        if (request.getNombresTags() != null && !request.getNombresTags().isEmpty()) {
-            for (String nombreTag : request.getNombresTags()) {
-                TagsBlog tag = tagRepository.findByNombre(nombreTag)
-                        .orElseGet(() -> {
-                            TagsBlog nuevoTag = new TagsBlog();
-                            nuevoTag.setNombre(nombreTag);
-                            return tagRepository.save(nuevoTag);
-                        });
-                articulo.getTags().add(tag);
-            }
-        }
+        procesarTags(articulo, dto.getIdsTags(), dto.getNombresTags());
 
         ArticulosBlog articuloActualizado = articuloRepository.save(articulo);
-        return convertirADTO(articuloActualizado);
+        return convertirAResponseDTO(articuloActualizado);
+    }
+
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ArticuloPublicoDTO> obtenerArticulosPublicos(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            Integer idTag,
+            String titulo,
+            Pageable pageable) {
+
+        Specification<ArticulosBlog> spec = ArticuloSpecification.conFiltros(
+                EstadoArticulo.PUBLICADO,
+                idTag,
+                titulo,
+                fechaInicio,
+                fechaFin
+        );
+
+        Page<ArticulosBlog> articulos = articuloRepository.findAll(spec, pageable);
+        return articulos.map(this::convertirAPublicoDTO);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, Integer idTag,
-                                                      LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        List<ArticulosBlog> articulos;
+    public Page<ArticuloAdminDTO> obtenerArticulosAdmin(
+            EstadoArticulo estado,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            Integer idTag,
+            String titulo,
+            Pageable pageable) {
 
-        // ← NUEVO: Si viene idTag, buscar por tag, sino buscar todos
-        if (idTag != null) {
-            articulos = articuloRepository.findByTagId(idTag);
-        } else {
-            articulos = articuloRepository.findAll();
-        }
+        Specification<ArticulosBlog> spec = ArticuloSpecification.conFiltros(
+                estado,  // Puede ser null para ver todos los estados
+                idTag,
+                titulo,
+                fechaInicio,
+                fechaFin
+        );
 
-        // Filtrar por estado
-        if (estado != null) {
-            articulos = articulos.stream()
-                    .filter(a -> a.getEstado() == estado)
-                    .collect(Collectors.toList());
-        }
-
-        // Filtrar por rango de fechas
-        if (fechaInicio != null && fechaFin != null) {
-            articulos = articulos.stream()
-                    .filter(a -> a.getFechaCreacion().isAfter(fechaInicio) &&
-                            a.getFechaCreacion().isBefore(fechaFin))
-                    .collect(Collectors.toList());
-        } else if (fechaInicio != null) {
-            articulos = articulos.stream()
-                    .filter(a -> a.getFechaCreacion().isAfter(fechaInicio))
-                    .collect(Collectors.toList());
-        } else if (fechaFin != null) {
-            articulos = articulos.stream()
-                    .filter(a -> a.getFechaCreacion().isBefore(fechaFin))
-                    .collect(Collectors.toList());
-        }
-
-        // Ordenar siempre por fecha de creación (descendente)
-        articulos.sort((a, b) -> b.getFechaCreacion().compareTo(a.getFechaCreacion()));
-
-        return articulos.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+        Page<ArticulosBlog> articulos = articuloRepository.findAll(spec, pageable);
+        return articulos.map(this::convertirAAdminDTO);
     }
-
     @Transactional
     @Override
     public void archivarArticulo(Integer idArticulo, Integer idUsuario) {
@@ -201,12 +211,15 @@ public class BlogServiceImpl implements IBlogService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ArticuloResponseDTO> obtenerArticulosPorTag(Integer idTag) {
-        List<ArticulosBlog> articulos = articuloRepository.findByTagId(idTag);
-        return articulos.stream()
-                .filter(a -> a.getEstado() == EstadoArticulo.PUBLICADO)
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public ArticuloPublicoDTO obtenerArticuloPublicoPorId(Integer idArticulo) {
+        ArticulosBlog articulo = articuloRepository.findById(idArticulo)
+                .orElseThrow(() -> new BusinessException("Artículo no encontrado"));
+
+        if (articulo.getEstado() != EstadoArticulo.PUBLICADO) {
+            throw new BusinessException("Artículo no disponible");
+        }
+
+        return convertirAPublicoDTO(articulo);
     }
 
     @Transactional(readOnly = true)
@@ -214,7 +227,7 @@ public class BlogServiceImpl implements IBlogService {
     public ArticuloResponseDTO obtenerArticuloPorId(Integer idArticulo) {
         ArticulosBlog articulo = articuloRepository.findById(idArticulo)
                 .orElseThrow(() -> new BusinessException("Artículo no encontrado"));
-        return convertirADTO(articulo);
+        return convertirAResponseDTO(articulo);
     }
 
     @Transactional(readOnly = true)
@@ -248,6 +261,43 @@ public class BlogServiceImpl implements IBlogService {
                 .build();
     }
 
+    // Métodos privados auxiliares
+
+    private void procesarTags(ArticulosBlog articulo, List<Integer> idsTags, List<String> nombresTags) {
+        if (idsTags != null && !idsTags.isEmpty()) {
+            for (Integer idTag : idsTags) {
+                TagsBlog tag = tagRepository.findById(idTag)
+                        .orElseThrow(() -> new BusinessException("Tag no encontrado: " + idTag));
+                articulo.getTags().add(tag);
+            }
+        }
+
+        if (nombresTags != null && !nombresTags.isEmpty()) {
+            List<String> nombresDistinct = nombresTags.stream()
+                    .filter(nombre -> nombre != null && !nombre.trim().isEmpty())
+                    .map(nombre -> nombre.trim().toLowerCase())
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            List<TagsBlog> existentes = tagRepository.findAllByNombreInIgnoreCase(nombresDistinct);
+
+
+            var mapaExistentes = existentes.stream()
+                    .collect(Collectors.toMap(tag -> tag.getNombre(), tag -> tag));
+
+            for (String nombreTag : nombresDistinct) {
+                TagsBlog tag = mapaExistentes.get(nombreTag);
+                if (tag == null) {
+                    TagsBlog nuevoTag = new TagsBlog();
+                    nuevoTag.setNombre(nombreTag);  // Siempre en minúsculas
+                    tag = tagRepository.save(nuevoTag);
+                    mapaExistentes.put(nombreTag, tag);
+                }
+                articulo.getTags().add(tag);
+            }
+        }
+    }
+
     private void validarAdministrador(Integer idUsuario) {
         if (idUsuario == null) {
             throw new BusinessException("Usuario no especificado");
@@ -261,14 +311,68 @@ public class BlogServiceImpl implements IBlogService {
         }
     }
 
-    private ArticuloResponseDTO convertirADTO(ArticulosBlog articulo) {
-        List<TagDTO> tags = articulo.getTags().stream()
+    private String extractFileNameFromUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
+        }
+
+        try {
+            // Obtener la última parte de la URL después del último '/'
+            int lastSlashIndex = url.lastIndexOf('/');
+            if (lastSlashIndex != -1 && lastSlashIndex < url.length() - 1) {
+                String fileName = url.substring(lastSlashIndex + 1);
+                // Remover parámetros query si existen (por si hay URLs prefirmadas)
+                int queryIndex = fileName.indexOf('?');
+                if (queryIndex != -1) {
+                    fileName = fileName.substring(0, queryIndex);
+                }
+                return fileName;
+            }
+        } catch (Exception e) {
+            System.err.println("Error al extraer nombre de archivo de URL: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+
+    private List<TagDTO> convertirTags(List<TagsBlog> tags) {
+        return tags.stream()
                 .map(tag -> TagDTO.builder()
                         .idTag(tag.getIdTag())
                         .nombre(tag.getNombre())
                         .build())
                 .collect(Collectors.toList());
+    }
+    private ArticuloPublicoDTO convertirAPublicoDTO(ArticulosBlog articulo) {
+        return ArticuloPublicoDTO.builder()
+                .idArticulo(articulo.getIdArticulo())
+                .titulo(articulo.getTitulo())
+                .descripcionCorta(articulo.getDescripcionCorta())
+                .idImagen(articulo.getImagen().getId())
+                .urlImagen(articulo.getImagen().getUrlArchivo())
+                .fechaCreacion(articulo.getFechaCreacion())
+                .tags(convertirTags(new ArrayList<>(articulo.getTags())))  // ← Convertir Set a List
+                .build();
+    }
 
+    private ArticuloAdminDTO convertirAAdminDTO(ArticulosBlog articulo) {
+        return ArticuloAdminDTO.builder()
+                .idArticulo(articulo.getIdArticulo())
+                .titulo(articulo.getTitulo())
+                .descripcionCorta(articulo.getDescripcionCorta())
+                .idImagen(articulo.getImagen().getId())
+                .urlImagen(articulo.getImagen().getUrlArchivo())
+                .fechaCreacion(articulo.getFechaCreacion())
+                .estado(articulo.getEstado())
+                .fechaModificacion(articulo.getFechaModificacion())
+                .idUsuario(articulo.getUsuario().getId())
+                .nombreUsuario(articulo.getUsuario().getNombre() + " " + articulo.getUsuario().getApellido())
+                .tags(convertirTags(new ArrayList<>(articulo.getTags())))  // ← Convertir Set a List
+                .build();
+    }
+
+    private ArticuloResponseDTO convertirAResponseDTO(ArticulosBlog articulo) {
         return ArticuloResponseDTO.builder()
                 .idArticulo(articulo.getIdArticulo())
                 .titulo(articulo.getTitulo())
@@ -281,7 +385,7 @@ public class BlogServiceImpl implements IBlogService {
                 .urlImagen(articulo.getImagen().getUrlArchivo())
                 .idUsuario(articulo.getUsuario().getId())
                 .nombreUsuario(articulo.getUsuario().getNombre() + " " + articulo.getUsuario().getApellido())
-                .tags(tags)
+                .tags(convertirTags(new ArrayList<>(articulo.getTags())))  // ← Convertir Set a List
                 .build();
     }
 }

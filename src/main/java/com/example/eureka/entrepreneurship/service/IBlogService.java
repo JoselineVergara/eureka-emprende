@@ -1,9 +1,9 @@
 package com.example.eureka.entrepreneurship.service;
 
-import com.example.eureka.entrepreneurship.dto.ArticuloRequestDTO;
-import com.example.eureka.entrepreneurship.dto.ArticuloResponseDTO;
-import com.example.eureka.entrepreneurship.dto.TagDTO;
+import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.enums.EstadoArticulo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,14 +14,28 @@ public interface IBlogService {
 
     ArticuloResponseDTO editarArticulo(Integer idArticulo, ArticuloRequestDTO request, Integer idUsuario);
 
-    // ← ACTUALIZADO: ahora incluye el parámetro idTag
-    List<ArticuloResponseDTO> obtenerArticulos(EstadoArticulo estado, Integer idTag, LocalDateTime fechaInicio, LocalDateTime fechaFin);
-
     void archivarArticulo(Integer idArticulo, Integer idUsuario);
 
     void desarchivarArticulo(Integer idArticulo, Integer idUsuario);
 
-    List<ArticuloResponseDTO> obtenerArticulosPorTag(Integer idTag);
+    // Público - solo publicados
+    Page<ArticuloPublicoDTO> obtenerArticulosPublicos(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            Integer idTag,
+            String titulo,
+            Pageable pageable);
+
+    // Admin - todos los estados
+    Page<ArticuloAdminDTO> obtenerArticulosAdmin(
+            EstadoArticulo estado,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            Integer idTag,
+            String titulo,
+            Pageable pageable);
+
+    ArticuloPublicoDTO obtenerArticuloPublicoPorId(Integer idArticulo);
 
     ArticuloResponseDTO obtenerArticuloPorId(Integer idArticulo);
 

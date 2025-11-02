@@ -1,13 +1,14 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.ArticuloRequestDTO;
-import com.example.eureka.entrepreneurship.dto.TagDTO;
-import com.example.eureka.entrepreneurship.dto.TagRequestDTO;
+import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.service.IBlogService;
 import com.example.eureka.enums.EstadoArticulo;
 import com.example.eureka.utilities.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,30 +23,93 @@ import java.time.LocalDateTime;
 public class BlogController {
 
     private final IBlogService blogService;
-    private final SecurityUtils securityUtils;  // ← Inyectar SecurityUtils
+    private final SecurityUtils securityUtils;
+
+    // ========== Endpoints Públicos ==========
+
+    @GetMapping("/publico/articulos")
+    public ResponseEntity<PageResponseDTO<ArticuloPublicoDTO>> obtenerArticulosPublicos(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
+            @RequestParam(required = false) Integer idTag,
+            @RequestParam(required = false) String titulo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ArticuloPublicoDTO> articulos = blogService.obtenerArticulosPublicos(
+                fechaInicio, fechaFin, idTag, titulo, pageable);
+
+        // Convertir a formato personalizado
+        PageResponseDTO<ArticuloPublicoDTO> response = PageResponseDTO.fromPage(articulos);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/publico/articulos/{idArticulo}")
+    public ResponseEntity<ArticuloPublicoDTO> obtenerArticuloPublicoPorId(
+            @PathVariable Integer idArticulo) {
+        ArticuloPublicoDTO articulo = blogService.obtenerArticuloPublicoPorId(idArticulo);
+        return ResponseEntity.ok(articulo);
+    }
+
+    @GetMapping("/publico/tags")
+    public ResponseEntity<?> obtenerTodosTags() {
+        var tags = blogService.obtenerTodosTags();
+        return ResponseEntity.ok(tags);
+    }
+
+    // ========== Endpoints Admin ==========
+
+    @GetMapping("/admin/articulos")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<PageResponseDTO<ArticuloAdminDTO>> obtenerArticulosAdmin(
+            @RequestParam(required = false) EstadoArticulo estado,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
+            @RequestParam(required = false) Integer idTag,
+            @RequestParam(required = false) String titulo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ArticuloAdminDTO> articulos = blogService.obtenerArticulosAdmin(
+                estado, fechaInicio, fechaFin, idTag, titulo, pageable);
+
+        // Convertir a formato personalizado
+        PageResponseDTO<ArticuloAdminDTO> response = PageResponseDTO.fromPage(articulos);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/admin/articulos/{idArticulo}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ArticuloResponseDTO> obtenerArticuloPorId(
+            @PathVariable Integer idArticulo) {
+        ArticuloResponseDTO articulo = blogService.obtenerArticuloPorId(idArticulo);
+        return ResponseEntity.ok(articulo);
+    }
 
     @PostMapping("/articulos/crear")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")  // ← Solo administradores
-    public ResponseEntity<?> crearArticulo(
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ArticuloResponseDTO> crearArticulo(
             @Valid @RequestBody ArticuloRequestDTO request) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
-        var articulo = blogService.crearArticulo(request, idUsuario);
+        ArticuloResponseDTO articulo = blogService.crearArticulo(request, idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(articulo);
     }
 
     @PutMapping("/articulos/{idArticulo}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> editarArticulo(
+    public ResponseEntity<ArticuloResponseDTO> editarArticulo(
             @PathVariable Integer idArticulo,
             @Valid @RequestBody ArticuloRequestDTO request) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
-        var articulo = blogService.editarArticulo(idArticulo, request, idUsuario);
+        ArticuloResponseDTO articulo = blogService.editarArticulo(idArticulo, request, idUsuario);
         return ResponseEntity.ok(articulo);
     }
 
     @PutMapping("/articulos/{idArticulo}/archivar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> archivarArticulo(@PathVariable Integer idArticulo) {
+    public ResponseEntity<String> archivarArticulo(@PathVariable Integer idArticulo) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         blogService.archivarArticulo(idArticulo, idUsuario);
         return ResponseEntity.ok("Artículo archivado exitosamente");
@@ -53,46 +117,17 @@ public class BlogController {
 
     @PutMapping("/articulos/{idArticulo}/desarchivar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> desarchivarArticulo(@PathVariable Integer idArticulo) {
+    public ResponseEntity<String> desarchivarArticulo(@PathVariable Integer idArticulo) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         blogService.desarchivarArticulo(idArticulo, idUsuario);
         return ResponseEntity.ok("Artículo desarchivado exitosamente");
     }
 
-    @GetMapping("/articulos")
-    public ResponseEntity<?> obtenerArticulos(
-            @RequestParam(required = false) EstadoArticulo estado,
-            @RequestParam(required = false) Integer idTag,  // ← NUEVO parámetro
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
-        var articulos = blogService.obtenerArticulos(estado, idTag, fechaInicio, fechaFin);
-        return ResponseEntity.ok(articulos);
-    }
-
-    @GetMapping("/articulos/tag/{idTag}")
-    public ResponseEntity<?> obtenerArticulosPorTag(@PathVariable Integer idTag) {
-        var articulos = blogService.obtenerArticulosPorTag(idTag);
-        return ResponseEntity.ok(articulos);
-    }
-
-    @GetMapping("/articulos/{idArticulo}")
-    public ResponseEntity<?> obtenerArticuloPorId(@PathVariable Integer idArticulo) {
-        var articulo = blogService.obtenerArticuloPorId(idArticulo);
-        return ResponseEntity.ok(articulo);
-    }
-
-    @GetMapping("/tags")
-    public ResponseEntity<?> obtenerTodosTags() {
-        var tags = blogService.obtenerTodosTags();
-        return ResponseEntity.ok(tags);
-    }
-
     @PostMapping("/tags/crear")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")  // ← Solo administradores
-    public ResponseEntity<?> crearTag(
-            @Valid @RequestBody TagRequestDTO request) {
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<TagDTO> crearTag(@Valid @RequestBody TagRequestDTO request) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
-        var tag = blogService.crearTag(request.getNombre(), idUsuario);
+        TagDTO tag = blogService.crearTag(request.getNombre(), idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(tag);
     }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ public class EventoRequestDTO {
 
     private String direccion;
 
-    @NotNull(message = "El ID de multimedia es obligatorio")
-    Integer idMultimedia;
+    @NotNull(message = "La imagen es obligatoria")
+    private MultipartFile imagen; // ← Campo para subida de archivo
+
 }
