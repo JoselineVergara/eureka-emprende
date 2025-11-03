@@ -214,9 +214,10 @@ public class EventosServiceImpl implements EventosService {
                 titulo,
                 null,
                 null,
-                EstadoEvento.programado, // Solo programados
+                EstadoEvento.programado,
                 tipoEvento,
-                mes
+                mes,
+                null
         );
 
         Page<Eventos> eventos = eventosRepository.findAll(spec, pageable);
@@ -246,10 +247,11 @@ public class EventosServiceImpl implements EventosService {
             LocalDateTime fechaFin,
             EstadoEvento estado,
             TipoEvento tipoEvento,
+            Integer idEmprendimiento,
             Pageable pageable) {
 
         Specification<Eventos> spec = EventoSpecification.porUsuarioEmprendedor(idUsuario)
-                .and(EventoSpecification.conFiltros(titulo, fechaInicio, fechaFin, estado, tipoEvento, null));
+                .and(EventoSpecification.conFiltros(titulo, fechaInicio, fechaFin, estado, tipoEvento, null, idEmprendimiento));
 
         Page<Eventos> eventos = eventosRepository.findAll(spec, pageable);
         Page<EventoEmprendedorDTO> eventosDTO = eventos.map(this::convertirAEmprendedorDTO);
@@ -264,10 +266,11 @@ public class EventosServiceImpl implements EventosService {
             LocalDateTime fechaFin,
             EstadoEvento estado,
             TipoEvento tipoEvento,
+            Integer idEmprendimiento,
             Pageable pageable) {
 
         Specification<Eventos> spec = EventoSpecification.conFiltros(
-                titulo, fechaInicio, fechaFin, estado, tipoEvento, null);
+                titulo, fechaInicio, fechaFin, estado, tipoEvento, null, idEmprendimiento);
 
         Page<Eventos> eventos = eventosRepository.findAll(spec, pageable);
         Page<EventoAdminDTO> eventosDTO = eventos.map(this::convertirAAdminDTO);
@@ -301,11 +304,9 @@ public class EventosServiceImpl implements EventosService {
         }
 
         try {
-            // Obtener la última parte de la URL después del último '/'
             int lastSlashIndex = url.lastIndexOf('/');
             if (lastSlashIndex != -1 && lastSlashIndex < url.length() - 1) {
                 String fileName = url.substring(lastSlashIndex + 1);
-                // Remover parámetros query si existen (por si hay URLs prefirmadas)
                 int queryIndex = fileName.indexOf('?');
                 if (queryIndex != -1) {
                     fileName = fileName.substring(0, queryIndex);
