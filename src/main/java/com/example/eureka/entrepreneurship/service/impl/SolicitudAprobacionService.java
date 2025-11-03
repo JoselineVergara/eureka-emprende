@@ -1,11 +1,10 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.auth.repository.IUserRepository;
-import com.example.eureka.controllers.entrepreneurship.dto.*;
-import com.example.eureka.controllers.entrepreneurship.repository.*;
-import com.example.eureka.controllers.general.repository.*;
+import com.example.eureka.entrepreneurship.repository.*;
+import com.example.eureka.general.repository.*;
 import com.example.eureka.domain.model.*;
-import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.entrepreneurship.dto.shared.*;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.domain.enums.EstadoEmprendimiento;
 import com.example.eureka.general.dto.CategoriasDTO;

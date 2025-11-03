@@ -1,8 +1,7 @@
 package com.example.eureka.entrepreneurship.mappers;
 
-import com.example.eureka.controllers.entrepreneurship.dto.*;
 import com.example.eureka.domain.model.*;
-import com.example.eureka.entrepreneurship.dto.*;
+import com.example.eureka.entrepreneurship.dto.shared.*;
 
 import java.util.List;
 import java.util.Objects;

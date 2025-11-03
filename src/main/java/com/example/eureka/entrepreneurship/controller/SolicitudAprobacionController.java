@@ -1,8 +1,8 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.EmprendimientoCompletoDTO;
-import com.example.eureka.entrepreneurship.dto.SolicitudAprobacionDTO;
-import com.example.eureka.entrepreneurship.dto.VistaEmprendedorDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoCompletoDTO;
+import com.example.eureka.entrepreneurship.dto.shared.SolicitudAprobacionDTO;
+import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
 import com.example.eureka.entrepreneurship.service.impl.SolicitudAprobacionService;
 import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;

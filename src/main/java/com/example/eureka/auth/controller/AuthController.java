@@ -2,7 +2,7 @@ package com.example.eureka.auth.controller;
 
 import com.example.eureka.auth.dto.UserDTO;
 import com.example.eureka.auth.dto.UsuarioEmprendeDTO;
-import com.example.eureka.auth.service.IAuthService;
+import com.example.eureka.auth.service.AuthService;
 import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.security.jwt.JwtRequest;
 import com.example.eureka.security.jwt.JwtResponse;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final IAuthService authService;
+    private final AuthService authService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;

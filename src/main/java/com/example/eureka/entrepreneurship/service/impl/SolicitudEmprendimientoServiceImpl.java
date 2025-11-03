@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.entrepreneurship.dto.SolicitudEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.service.ISolicitudEmprendimientoService;
+import com.example.eureka.entrepreneurship.dto.shared.SolicitudEmprendimientoDTO;
+import com.example.eureka.entrepreneurship.service.SolicitudEmprendimientoService;
 import com.example.eureka.entrepreneurship.repository.ISolicitudesEmprendimientoRepository;
 import com.example.eureka.domain.model.SolicitudEmprendimiento;
 import com.example.eureka.domain.model.Emprendimientos;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SolicitudEmprendimientoServiceImpl implements ISolicitudEmprendimientoService {
+public class SolicitudEmprendimientoServiceImpl implements SolicitudEmprendimientoService {
     private final ISolicitudesEmprendimientoRepository repository;
     private final IUserRepository usuarioRepository;
     private final IEmprendimientosRepository emprendimientoRepository;

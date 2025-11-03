@@ -1,11 +1,11 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.infrastructure.storage.FileStorageService;
-import com.example.eureka.entrepreneurship.dto.MultimediaDTO;
+import com.example.eureka.entrepreneurship.dto.shared.MultimediaDTO;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientoMultimediaRepository;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
-import com.example.eureka.entrepreneurship.service.IMultimediaService;
+import com.example.eureka.entrepreneurship.service.MultimediaService;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.domain.model.EmprendimientoMultimedia;
 import com.example.eureka.domain.model.Emprendimientos;
@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MultimediaServiceImpl implements IMultimediaService {
+public class MultimediaServiceImpl implements MultimediaService {
 
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IMultimediaRepository multimediaRepository;

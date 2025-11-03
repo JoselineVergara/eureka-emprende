@@ -2,7 +2,7 @@ package com.example.eureka.general.service.impl;
 
 import com.example.eureka.general.dto.OpcionesParticipacionComunidadDTO;
 import com.example.eureka.general.repository.IOpcionesParticipacionComunidadRepository;
-import com.example.eureka.general.service.IOpcionesParticipacionComunidadService;
+import com.example.eureka.general.service.OpcionesParticipacionComunidadService;
 import com.example.eureka.domain.model.OpcionesParticipacionComunidad;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OpcionesParticipacionServiceImpl implements IOpcionesParticipacionComunidadService {
+public class OpcionesParticipacionServiceImpl implements OpcionesParticipacionComunidadService {
 
     private final IOpcionesParticipacionComunidadRepository repository;
 

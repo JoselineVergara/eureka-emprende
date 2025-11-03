@@ -1,10 +1,10 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.EmprendimientoPorCategoriaDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoRequestDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
-import com.example.eureka.entrepreneurship.dto.VistaEmprendedorDTO;
-import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
+import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoPorCategoriaDTO;
+import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
+import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import com.example.eureka.domain.model.SolicitudAprobacion;
 import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmprendimientoController {
 
-    private final IEmprendimientoService emprendimientoService;
+    private final EmprendimientoService emprendimientoService;
 
     /**
      * Crear estructura de emprendimiento (BORRADOR o enviar directamente)

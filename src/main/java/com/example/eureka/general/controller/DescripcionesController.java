@@ -1,7 +1,7 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.DescripcionesDTO;
-import com.example.eureka.general.service.IDescripcionesService;
+import com.example.eureka.general.service.DescripcionesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DescripcionesController {
 
-    private final IDescripcionesService service;
+    private final DescripcionesService service;
 
     @GetMapping
     public List<DescripcionesDTO> listar() {

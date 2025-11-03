@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.converter.OpcionesPersonaJuridicaDtoConverter;
 import com.example.eureka.general.dto.OpcionesPersonaJuridicaDTO;
 import com.example.eureka.general.repository.IOpcionesPersonaJuridicaRepository;
-import com.example.eureka.general.service.IOpcionesPersonaJuridicaService;
+import com.example.eureka.general.service.OpcionesPersonaJuridicaService;
 import com.example.eureka.domain.model.OpcionesPersonaJuridica;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OpcionesPersonaJuridicaServiceImpl implements IOpcionesPersonaJuridicaService {
+public class OpcionesPersonaJuridicaServiceImpl implements OpcionesPersonaJuridicaService {
 
 
     private final IOpcionesPersonaJuridicaRepository opcionesPersonaJuridicaRepository;

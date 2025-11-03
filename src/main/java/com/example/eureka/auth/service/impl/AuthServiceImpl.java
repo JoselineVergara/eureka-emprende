@@ -2,9 +2,9 @@ package com.example.eureka.auth.service.impl;
 
 import com.example.eureka.auth.dto.UsuarioEmprendeDTO;
 import com.example.eureka.auth.repository.IUserRepository;
-import com.example.eureka.auth.service.IAuthService;
+import com.example.eureka.auth.service.AuthService;
 import com.example.eureka.entrepreneurship.repository.IRepresentanteInformacionRepository;
-import com.example.eureka.entrepreneurship.service.IEmprendimientoService;
+import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import com.example.eureka.domain.enums.Genero;
 import com.example.eureka.general.repository.IRolesRepository;
 import com.example.eureka.domain.model.Emprendimientos;
@@ -23,11 +23,11 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AuthServiceImpl implements IAuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final IUserRepository userRepository;
     private final IRolesRepository rolesRepository;
-    private final IEmprendimientoService emprendimientoService;
+    private final EmprendimientoService emprendimientoService;
     private final IRepresentanteInformacionRepository informacionRepresentanteRepository;
 
     @Override

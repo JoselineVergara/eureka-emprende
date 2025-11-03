@@ -4,7 +4,7 @@ import com.example.eureka.general.dto.CiudadDTO;
 import com.example.eureka.general.dto.ProvinciaDTO;
 import com.example.eureka.general.repository.ICiudadesRepository;
 import com.example.eureka.general.repository.IProvinciaRepository;
-import com.example.eureka.general.service.ICiudadService;
+import com.example.eureka.general.service.CiudadService;
 import com.example.eureka.domain.model.Ciudades;
 import com.example.eureka.domain.model.Provincias;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CiudadServiceImpl implements ICiudadService {
+public class CiudadServiceImpl implements CiudadService {
 
     private final ICiudadesRepository ciudadRepository;
     private final IProvinciaRepository provinciaRepository;

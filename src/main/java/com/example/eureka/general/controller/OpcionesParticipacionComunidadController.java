@@ -1,7 +1,7 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.OpcionesParticipacionComunidadDTO;
-import com.example.eureka.general.service.IOpcionesParticipacionComunidadService;
+import com.example.eureka.general.service.OpcionesParticipacionComunidadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OpcionesParticipacionComunidadController {
 
-    private final IOpcionesParticipacionComunidadService service;
+    private final OpcionesParticipacionComunidadService service;
 
     @GetMapping
     public List<OpcionesParticipacionComunidadDTO> listar() {

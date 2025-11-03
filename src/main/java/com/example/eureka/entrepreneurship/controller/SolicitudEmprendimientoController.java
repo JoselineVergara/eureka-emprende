@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.SolicitudEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.service.ISolicitudEmprendimientoService;
+import com.example.eureka.entrepreneurship.dto.shared.SolicitudEmprendimientoDTO;
+import com.example.eureka.entrepreneurship.service.SolicitudEmprendimientoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SolicitudEmprendimientoController {
 
-    private final ISolicitudEmprendimientoService service;
+    private final SolicitudEmprendimientoService service;
 
     @PostMapping
     public SolicitudEmprendimientoDTO crear(@RequestBody SolicitudEmprendimientoDTO dto) {

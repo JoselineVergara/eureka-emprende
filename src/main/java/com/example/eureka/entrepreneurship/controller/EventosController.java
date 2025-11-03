@@ -1,14 +1,14 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.EventoRequestDTO;
-import com.example.eureka.entrepreneurship.dto.EventoResponseDTO;
-import com.example.eureka.entrepreneurship.dto.EventoAdminDTO;
-import com.example.eureka.entrepreneurship.dto.EventoEmprendedorDTO;
-import com.example.eureka.entrepreneurship.dto.EventoPublicoDTO;
-import com.example.eureka.entrepreneurship.service.IEventosService;
+import com.example.eureka.entrepreneurship.dto.request.EventoRequestDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EventoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.admin.EventoAdminDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EventoEmprendedorDTO;
+import com.example.eureka.entrepreneurship.dto.publico.EventoPublicoDTO;
+import com.example.eureka.entrepreneurship.service.EventosService;
 import com.example.eureka.domain.enums.EstadoEvento;
 import com.example.eureka.domain.enums.TipoEvento;
-import com.example.eureka.entrepreneurship.dto.PageResponseDTO;
+import com.example.eureka.shared.PageResponseDTO;
 import com.example.eureka.shared.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventosController {
 
-    private final IEventosService eventosService;
+    private final EventosService eventosService;
     private final SecurityUtils securityUtils;
 
     // ========== ENDPOINTS PÚBLICOS ==========

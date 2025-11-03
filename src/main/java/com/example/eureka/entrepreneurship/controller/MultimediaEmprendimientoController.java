@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.service.IMultimediaService;
+import com.example.eureka.entrepreneurship.service.MultimediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MultimediaEmprendimientoController {
 
-    private final IMultimediaService multimediaService;
+    private final MultimediaService multimediaService;
 
     /**
      * Agregar una imagen al emprendimiento

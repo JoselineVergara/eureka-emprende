@@ -1,7 +1,7 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.DeclaracionesFinalesDTO;
-import com.example.eureka.general.service.IDeclaracionesFinalesService;
+import com.example.eureka.general.service.DeclaracionesFinalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeclaracionesFinalesController {
 
-    private final IDeclaracionesFinalesService service;
+    private final DeclaracionesFinalesService service;
 
     @GetMapping
     public List<DeclaracionesFinalesDTO> listar() {

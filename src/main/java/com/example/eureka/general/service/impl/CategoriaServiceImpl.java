@@ -6,7 +6,7 @@ import com.example.eureka.general.dto.CategoriasDTO;
 import com.example.eureka.general.dto.converter.CategoriaDtoConverter;
 import com.example.eureka.general.repository.ICategoriasRepository;
 import com.example.eureka.general.repository.IMultimediaRepository;
-import com.example.eureka.general.service.ICategoriaService;
+import com.example.eureka.general.service.CategoriaService;
 import com.example.eureka.domain.model.Categorias;
 import com.example.eureka.domain.model.Multimedia;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoriaServiceImpl implements ICategoriaService {
+public class CategoriaServiceImpl implements CategoriaService {
 
     private final ICategoriasRepository categoriasRepository;
     private final IMultimediaRepository multimediaRepository;

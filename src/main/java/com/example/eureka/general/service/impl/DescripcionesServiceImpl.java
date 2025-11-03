@@ -3,7 +3,7 @@ package com.example.eureka.general.service.impl;
 import com.example.eureka.general.dto.DescripcionesDTO;
 import com.example.eureka.general.dto.converter.DescripcionesDtoConverter;
 import com.example.eureka.general.repository.IDescripcionesRepository;
-import com.example.eureka.general.service.IDescripcionesService;
+import com.example.eureka.general.service.DescripcionesService;
 import com.example.eureka.domain.model.Descripciones;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DescripcionesServiceImpl implements IDescripcionesService {
+public class DescripcionesServiceImpl implements DescripcionesService {
 
     private final IDescripcionesRepository repository;
 

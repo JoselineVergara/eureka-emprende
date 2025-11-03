@@ -1,7 +1,7 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.ProvinciaDTO;
-import com.example.eureka.general.service.IProvinciaService;
+import com.example.eureka.general.service.ProvinciaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProvinciaController {
 
-    private final IProvinciaService provinciaService;
+    private final ProvinciaService provinciaService;
 
     @GetMapping
     public ResponseEntity<List<ProvinciaDTO>> obtenerProvincias() {

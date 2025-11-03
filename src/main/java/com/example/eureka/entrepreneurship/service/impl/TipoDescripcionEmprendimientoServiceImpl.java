@@ -1,11 +1,11 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.entrepreneurship.dto.TipoDescripcionEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.dto.EmprendimientoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.shared.TipoDescripcionEmprendimientoDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosDescripcionRepository;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
-import com.example.eureka.entrepreneurship.service.ITipoDescripcionEmprendimientoService;
+import com.example.eureka.entrepreneurship.service.TipoDescripcionEmprendimientoService;
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.TiposDescripcionEmprendimiento;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TipoDescripcionEmprendimientoServiceImpl implements ITipoDescripcionEmprendimientoService {
+public class TipoDescripcionEmprendimientoServiceImpl implements TipoDescripcionEmprendimientoService {
 
     private final IEmprendimientosDescripcionRepository repository;
     private final IEmprendimientosRepository emprendimientosRepository;

@@ -1,7 +1,7 @@
 package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.OpcionesPersonaJuridicaDTO;
-import com.example.eureka.general.service.IOpcionesPersonaJuridicaService;
+import com.example.eureka.general.service.OpcionesPersonaJuridicaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/opciones-persona-juridica")
 public class OpcionesPersonaJuridicaController {
 
-    private final IOpcionesPersonaJuridicaService opcionesPersonaJuridicaService;
+    private final OpcionesPersonaJuridicaService opcionesPersonaJuridicaService;
 
     @GetMapping
     public ResponseEntity<?> listarOpcionesPersonaJuridica() {

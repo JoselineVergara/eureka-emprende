@@ -2,7 +2,7 @@ package com.example.eureka.general.service.impl;
 
 import com.example.eureka.general.dto.TipoEmprendimientoDTO;
 import com.example.eureka.general.repository.ITipoEmprendimientoRepository;
-import com.example.eureka.general.service.ITiposEmprendimientoService;
+import com.example.eureka.general.service.TiposEmprendimientoService;
 import com.example.eureka.domain.model.TiposEmprendimientos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TiposEmprendimientoServiceImpl implements ITiposEmprendimientoService {
+public class TiposEmprendimientoServiceImpl implements TiposEmprendimientoService {
 
     private final ITipoEmprendimientoRepository tipoRepo;
 

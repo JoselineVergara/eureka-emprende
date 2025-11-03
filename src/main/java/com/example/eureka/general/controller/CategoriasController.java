@@ -2,7 +2,7 @@ package com.example.eureka.general.controller;
 
 import com.example.eureka.general.dto.CategoriaRequestDTO;
 import com.example.eureka.general.dto.CategoriasDTO;
-import com.example.eureka.general.service.ICategoriaService;
+import com.example.eureka.general.service.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriasController {
 
-    private final ICategoriaService categoriaService;
+    private final CategoriaService categoriaService;
 
     @GetMapping
     public ResponseEntity<List<CategoriasDTO>> obtenerCategorias() {

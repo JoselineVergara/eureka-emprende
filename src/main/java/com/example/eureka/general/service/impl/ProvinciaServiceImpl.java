@@ -2,7 +2,7 @@ package com.example.eureka.general.service.impl;
 
 import com.example.eureka.general.dto.ProvinciaDTO;
 import com.example.eureka.general.repository.IProvinciaRepository;
-import com.example.eureka.general.service.IProvinciaService;
+import com.example.eureka.general.service.ProvinciaService;
 import com.example.eureka.domain.model.Provincias;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProvinciaServiceImpl implements IProvinciaService {
+public class ProvinciaServiceImpl implements ProvinciaService {
 
     private final IProvinciaRepository provinciaRepository;
 

@@ -2,7 +2,7 @@ package com.example.eureka.general.service.impl;
 
 import com.example.eureka.general.dto.DeclaracionesFinalesDTO;
 import com.example.eureka.general.repository.IDeclaracionesFinalesRepository;
-import com.example.eureka.general.service.IDeclaracionesFinalesService;
+import com.example.eureka.general.service.DeclaracionesFinalesService;
 import com.example.eureka.domain.model.DeclaracionesFinales;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DeclaracionesFinalesServiceImpl implements IDeclaracionesFinalesService {
+public class DeclaracionesFinalesServiceImpl implements DeclaracionesFinalesService {
 
     private final IDeclaracionesFinalesRepository repository;
 

@@ -1,7 +1,7 @@
 package com.example.eureka.auth.controller;
 
 import com.example.eureka.auth.dto.UsuarioPerfilDTO;
-import com.example.eureka.auth.service.IUsuariosService;
+import com.example.eureka.auth.service.UsuariosService;
 import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UsuariosController {
 
-    private final IUsuariosService usuariosServiceImpl;
+    private final UsuariosService usuariosServiceImpl;
 
     @PostMapping
     public Usuarios createUsuario(@RequestBody Usuarios usuario) {

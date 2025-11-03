@@ -3,7 +3,7 @@ package com.example.eureka.auth.service.impl;
 import com.example.eureka.auth.dto.UsuarioPerfilDTO;
 import com.example.eureka.auth.dto.converter.UsuarioConverter;
 import com.example.eureka.auth.repository.IUserRepository;
-import com.example.eureka.auth.service.IUsuariosService;
+import com.example.eureka.auth.service.UsuariosService;
 import com.example.eureka.domain.model.Usuarios;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UsuariosServiceImpl implements IUsuariosService {
+public class UsuariosServiceImpl implements UsuariosService {
 
     private final IUserRepository usuariosRepository;
     private final UsuarioConverter usuarioConverter;

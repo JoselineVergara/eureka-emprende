@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.entrepreneurship.dto.TipoDescripcionEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.service.ITipoDescripcionEmprendimientoService;
+import com.example.eureka.entrepreneurship.dto.shared.TipoDescripcionEmprendimientoDTO;
+import com.example.eureka.entrepreneurship.service.TipoDescripcionEmprendimientoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMINISTRADOR') or hasRole('EMPRENDEDOR')")
 public class TiposDescripcionEmprendimientoController {
 
-    private final ITipoDescripcionEmprendimientoService service;
+    private final TipoDescripcionEmprendimientoService service;
 
     @GetMapping
     public List<TipoDescripcionEmprendimientoDTO> listar() {

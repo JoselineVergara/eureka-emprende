@@ -1,9 +1,12 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
+import com.example.eureka.entrepreneurship.dto.admin.ArticuloAdminDTO;
+import com.example.eureka.entrepreneurship.dto.publico.ArticuloPublicoDTO;
+import com.example.eureka.entrepreneurship.dto.request.ArticuloRequestDTO;
+import com.example.eureka.entrepreneurship.dto.response.ArticuloResponseDTO;
+import com.example.eureka.entrepreneurship.dto.shared.TagDTO;
 import com.example.eureka.exception.BusinessException;
-import com.example.eureka.controllers.entrepreneurship.dto.*;
 import com.example.eureka.infrastructure.storage.FileStorageService;
-import com.example.eureka.entrepreneurship.dto.*;
 import com.example.eureka.entrepreneurship.specification.ArticuloSpecification;
 import com.example.eureka.domain.enums.EstadoArticulo;
 import com.example.eureka.domain.model.ArticulosBlog;
@@ -12,7 +15,7 @@ import com.example.eureka.domain.model.TagsBlog;
 import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.repository.IArticuloRepository;
 import com.example.eureka.entrepreneurship.repository.ITagRepository;
-import com.example.eureka.entrepreneurship.service.IBlogService;
+import com.example.eureka.entrepreneurship.service.BlogService;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.auth.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BlogServiceImpl implements IBlogService {
+public class BlogServiceImpl implements BlogService {
 
     private final IArticuloRepository articuloRepository;
     private final ITagRepository tagRepository;
