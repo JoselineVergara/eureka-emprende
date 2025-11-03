@@ -71,17 +71,6 @@ public interface EventosService {
      */
     EventoResponseDTO obtenerEventoPublicoPorId(Integer idEvento);
 
-    /**
-     * Obtiene eventos del emprendedor autenticado
-     * @param idUsuario ID del usuario emprendedor
-     * @param titulo Filtro por nombre (opcional)
-     * @param fechaInicio Filtro por fecha inicio (opcional)
-     * @param fechaFin Filtro por fecha fin (opcional)
-     * @param estado Filtro por estado (opcional)
-     * @param tipoEvento Filtro por tipo (opcional)
-     * @param pageable Configuración de paginación
-     * @return Página de eventos del emprendedor
-     */
     PageResponseDTO<EventoEmprendedorDTO> obtenerEventosEmprendedor(
             Integer idUsuario,
             String titulo,
@@ -89,24 +78,16 @@ public interface EventosService {
             LocalDateTime fechaFin,
             EstadoEvento estado,
             TipoEvento tipoEvento,
+            Integer idEmprendimiento,
             Pageable pageable);
 
-    /**
-     * Obtiene todos los eventos (admin)
-     * @param titulo Filtro por nombre (opcional)
-     * @param fechaInicio Filtro por fecha inicio (opcional)
-     * @param fechaFin Filtro por fecha fin (opcional)
-     * @param estado Filtro por estado (opcional)
-     * @param tipoEvento Filtro por tipo (opcional)
-     * @param pageable Configuración de paginación
-     * @return Página de eventos (vista admin)
-     */
     PageResponseDTO<EventoAdminDTO> obtenerEventosAdmin(
             String titulo,
             LocalDateTime fechaInicio,
             LocalDateTime fechaFin,
             EstadoEvento estado,
             TipoEvento tipoEvento,
+            Integer idEmprendimiento,
             Pageable pageable);
 
     /**

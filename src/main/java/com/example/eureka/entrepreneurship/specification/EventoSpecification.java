@@ -18,10 +18,12 @@ public class EventoSpecification {
             LocalDateTime fechaFin,
             EstadoEvento estado,
             TipoEvento tipoEvento,
-            Integer mes) {
+            Integer mes,
+            Integer idEmprendimiento) {
 
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
             // Filtro por título
             if (titulo != null && !titulo.trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
@@ -29,6 +31,7 @@ public class EventoSpecification {
                         "%" + titulo.toLowerCase() + "%"
                 ));
             }
+
             // Filtro por fechas
             if (fechaInicio != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("fechaEvento"), fechaInicio));
@@ -36,15 +39,18 @@ public class EventoSpecification {
             if (fechaFin != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("fechaEvento"), fechaFin));
             }
+
             // Filtro por estado
             if (estado != null) {
                 predicates.add(criteriaBuilder.equal(root.get("estadoEvento"), estado));
             }
+
             // Filtro por tipo
             if (tipoEvento != null) {
                 predicates.add(criteriaBuilder.equal(root.get("tipoEvento"), tipoEvento));
             }
-            // Aquí el cambio crítico:
+
+            // Filtro por mes
             if (mes != null) {
                 predicates.add(
                         criteriaBuilder.equal(
@@ -58,12 +64,20 @@ public class EventoSpecification {
                         )
                 );
             }
+
+            // Filtro por emprendimiento
+            if (idEmprendimiento != null) {
+                predicates.add(criteriaBuilder.equal(
+                        root.get("emprendimiento").get("id"),
+                        idEmprendimiento
+                ));
+            }
+
             query.distinct(true);
             query.orderBy(criteriaBuilder.asc(root.get("fechaEvento")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
-
 
     public static Specification<Eventos> porUsuarioEmprendedor(Integer idUsuario) {
         return (root, query, criteriaBuilder) ->
@@ -72,5 +86,4 @@ public class EventoSpecification {
                         idUsuario
                 );
     }
-
 }

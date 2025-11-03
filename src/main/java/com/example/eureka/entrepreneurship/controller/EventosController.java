@@ -63,18 +63,19 @@ public class EventosController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
             @RequestParam(required = false) EstadoEvento estado,
             @RequestParam(required = false) TipoEvento tipoEvento,
+            @RequestParam(required = false) Integer idEmprendimiento,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         Pageable pageable = PageRequest.of(page, size);
         PageResponseDTO<EventoEmprendedorDTO> eventos = eventosService.obtenerEventosEmprendedor(
-                idUsuario, titulo, fechaInicio, fechaFin, estado, tipoEvento, pageable);
+                idUsuario, titulo, fechaInicio, fechaFin, estado, tipoEvento, idEmprendimiento, pageable);
         return ResponseEntity.ok(eventos);
     }
 
-    @PostMapping("/emprendedor/crear")
-    @PreAuthorize("hasRole('EMPRENDEDOR')")
+    @PostMapping("/crear")
+    @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> crearEvento(
             @Valid @RequestBody EventoRequestDTO request,
             @RequestParam Integer idEmprendimiento) {
@@ -83,8 +84,8 @@ public class EventosController {
         return ResponseEntity.status(HttpStatus.CREATED).body(evento);
     }
 
-    @PutMapping("/emprendedor/{idEvento}")
-    @PreAuthorize("hasRole('EMPRENDEDOR')")
+    @PutMapping("/editar/{idEvento}")
+    @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> editarEvento(
             @PathVariable Integer idEvento,
             @RequestParam Integer idEmprendimiento,
@@ -94,8 +95,8 @@ public class EventosController {
         return ResponseEntity.ok(evento);
     }
 
-    @PutMapping("/emprendedor/{idEvento}/cancelar")
-    @PreAuthorize("hasRole('EMPRENDEDOR')")
+    @PutMapping("/{idEvento}/cancelar")
+    @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<String> cancelarEvento(@PathVariable Integer idEvento) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         eventosService.cancelarEvento(idEvento, idUsuario);
@@ -112,12 +113,13 @@ public class EventosController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
             @RequestParam(required = false) EstadoEvento estado,
             @RequestParam(required = false) TipoEvento tipoEvento,
+            @RequestParam(required = false) Integer idEmprendimiento,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         PageResponseDTO<EventoAdminDTO> eventos = eventosService.obtenerEventosAdmin(
-                titulo, fechaInicio, fechaFin, estado, tipoEvento, pageable);
+                titulo, fechaInicio, fechaFin, estado, tipoEvento, idEmprendimiento, pageable);
         return ResponseEntity.ok(eventos);
     }
 
