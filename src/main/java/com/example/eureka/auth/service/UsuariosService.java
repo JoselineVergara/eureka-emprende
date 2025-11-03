@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface UsuariosService {
     Usuarios crearUsuario(Usuarios usuario);
+    Usuarios findByEmail(String email);
     Optional<Usuarios> obtenerUsuarioPorId(Integer id);
     UsuarioPerfilDTO obtenerUsuarioPorEmail(String email);
     Usuarios actualizarUsuario(Usuarios usuario);

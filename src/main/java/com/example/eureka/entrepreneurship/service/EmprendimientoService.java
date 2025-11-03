@@ -3,6 +3,7 @@ package com.example.eureka.entrepreneurship.service;
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.SolicitudAprobacion;
 import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoPorCategoriaDTO;
@@ -17,6 +18,8 @@ public interface EmprendimientoService {
     Integer estructuraEmprendimiento(EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception;
 
     List<EmprendimientoResponseDTO> obtenerEmprendimientos();
+
+    List<EmprendimientoListaPublicoDTO> obtenesListaDeEmprendimientos(Usuarios usuario);
 
     EmprendimientoPorCategoriaDTO obtenerEmprendimientosPorCategoria(Integer categoriaId);
 

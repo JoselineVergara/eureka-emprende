@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.general.repository.*;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
@@ -318,13 +319,43 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         emprendimientoCategoriasRepository.saveAll(categorias);
     }
 
-    // ... (resto de métodos agregarDescripcion, agregarMetricas, etc. sin cambios)
-
+    // TODO: Ajustado para obtener solo aprobados
     @Override
     public List<EmprendimientoResponseDTO> obtenerEmprendimientos() {
-        List<Emprendimientos> lista = emprendimientosRepository.findAll();
+        List<Emprendimientos> lista = emprendimientosRepository.findByEstadoEmprendimiento("APROBADO");
         return EmprendimientoMapper.toResponseList(lista);
     }
+
+    @Override
+    public List<EmprendimientoListaPublicoDTO> obtenesListaDeEmprendimientos(Usuarios usuario) {
+
+        // Validar que el usuario no sea null
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        List<Emprendimientos> lista;
+        System.out.println("Rol del usuario: " + usuario.getRol());
+        System.out.println("Usuario: " + usuario);
+
+        if (usuario.getRol().getNombre().equals("ADMINISTRADOR")) {
+            lista = emprendimientosRepository.findAll();
+        } else {
+            lista = emprendimientosRepository.findByUsuariosAndEstadoEmprendimientoEquals(usuario,"APROBADO");
+        }
+
+        // Validar si la lista está vacía
+        if (lista.isEmpty()) {
+            throw new RuntimeException("No se encontraron emprendimientos");
+        }
+
+        return lista.stream()
+                .map(emp -> EmprendimientoListaPublicoDTO.builder()
+                        .nombreEmprendimiento(emp.getNombreComercial())
+                        .build())
+                .toList();
+    }
+
 
     @Override
     public EmprendimientoResponseDTO obtenerEmprendimientoPorId(Integer id) {
@@ -536,6 +567,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                     return EmprendimientoSimpleDTO.builder()
                             .id(emp.getId().longValue())
                             .nombreComercial(emp.getNombreComercial())
+                            .ciudad(emp.getCiudades().getNombreCiudad())
                             .build();
                 })
                 .collect(Collectors.toList());

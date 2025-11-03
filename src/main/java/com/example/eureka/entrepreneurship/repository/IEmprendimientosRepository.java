@@ -31,4 +31,8 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
                                         @Param("tipo") String tipo,
                                         @Param("categoria") String categoria,
                                         @Param("ciudad") String ciudad);
+
+    List<Emprendimientos> findByEstadoEmprendimiento(String estadoEmprendimiento);
+
+    List<Emprendimientos> findByUsuariosAndEstadoEmprendimientoEquals(Usuarios usuarios, String estadoEmprendimiento);
 }
