@@ -452,25 +452,23 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Override
     public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad) {
         List<Emprendimientos> lista;
-        boolean tieneNombre = nombre != null && !nombre.trim().isEmpty();
-        boolean tieneTipo = tipo != null && !tipo.trim().isEmpty();
-        boolean tieneCategoria = categoria != null && !categoria.trim().isEmpty();
-        boolean tieneCiudad = ciudad != null && !ciudad.trim().isEmpty();
+        // Normalizar los parámetros: convertir strings vacíos a null
+        String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
+        String tipoParam = (tipo != null && !tipo.trim().isEmpty()) ? tipo.trim() : null;
+        String categoriaParam = (categoria != null && !categoria.trim().isEmpty()) ? categoria.trim() : null;
+        String ciudadParam = (ciudad != null && !ciudad.trim().isEmpty()) ? ciudad.trim() : null;
 
-        if (tieneNombre || tieneTipo || tieneCategoria || tieneCiudad) {
-            lista = emprendimientosRepository.findByFiltros(
-                    tieneNombre ? nombre.trim() : null,
-                    tieneTipo ? tipo.trim() : null,
-                    tieneCategoria ? categoria.trim() : null,
-                    tieneCiudad ? ciudad.trim() : null
-            );
-        } else {
+        // Si todos son null, obtener todos
+        if (nombreParam == null && tipoParam == null && categoriaParam == null && ciudadParam == null) {
             lista = emprendimientosRepository.findAll();
+        } else {
+            lista = emprendimientosRepository.findByFiltros(nombreParam, tipoParam, categoriaParam, ciudadParam);
         }
 
         if (lista.isEmpty()) {
             return Collections.emptyList();
         }
+
 
         List<Integer> empIds = lista.stream()
                 .map(Emprendimientos::getId)
