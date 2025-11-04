@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.general.repository.*;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
@@ -318,13 +319,43 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         emprendimientoCategoriasRepository.saveAll(categorias);
     }
 
-    // ... (resto de métodos agregarDescripcion, agregarMetricas, etc. sin cambios)
-
+    // TODO: Ajustado para obtener solo aprobados
     @Override
     public List<EmprendimientoResponseDTO> obtenerEmprendimientos() {
-        List<Emprendimientos> lista = emprendimientosRepository.findAll();
+        List<Emprendimientos> lista = emprendimientosRepository.findByEstadoEmprendimiento("APROBADO");
         return EmprendimientoMapper.toResponseList(lista);
     }
+
+    @Override
+    public List<EmprendimientoListaPublicoDTO> obtenesListaDeEmprendimientos(Usuarios usuario) {
+
+        // Validar que el usuario no sea null
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        List<Emprendimientos> lista;
+        System.out.println("Rol del usuario: " + usuario.getRol());
+        System.out.println("Usuario: " + usuario);
+
+        if (usuario.getRol().getNombre().equals("ADMINISTRADOR")) {
+            lista = emprendimientosRepository.findAll();
+        } else {
+            lista = emprendimientosRepository.findByUsuariosAndEstadoEmprendimientoEquals(usuario,"APROBADO");
+        }
+
+        // Validar si la lista está vacía
+        if (lista.isEmpty()) {
+            throw new RuntimeException("No se encontraron emprendimientos");
+        }
+
+        return lista.stream()
+                .map(emp -> EmprendimientoListaPublicoDTO.builder()
+                        .nombreEmprendimiento(emp.getNombreComercial())
+                        .build())
+                .toList();
+    }
+
 
     @Override
     public EmprendimientoResponseDTO obtenerEmprendimientoPorId(Integer id) {
@@ -421,25 +452,23 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Override
     public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad) {
         List<Emprendimientos> lista;
-        boolean tieneNombre = nombre != null && !nombre.trim().isEmpty();
-        boolean tieneTipo = tipo != null && !tipo.trim().isEmpty();
-        boolean tieneCategoria = categoria != null && !categoria.trim().isEmpty();
-        boolean tieneCiudad = ciudad != null && !ciudad.trim().isEmpty();
+        // Normalizar los parámetros: convertir strings vacíos a null
+        String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
+        String tipoParam = (tipo != null && !tipo.trim().isEmpty()) ? tipo.trim() : null;
+        String categoriaParam = (categoria != null && !categoria.trim().isEmpty()) ? categoria.trim() : null;
+        String ciudadParam = (ciudad != null && !ciudad.trim().isEmpty()) ? ciudad.trim() : null;
 
-        if (tieneNombre || tieneTipo || tieneCategoria || tieneCiudad) {
-            lista = emprendimientosRepository.findByFiltros(
-                    tieneNombre ? nombre.trim() : null,
-                    tieneTipo ? tipo.trim() : null,
-                    tieneCategoria ? categoria.trim() : null,
-                    tieneCiudad ? ciudad.trim() : null
-            );
-        } else {
+        // Si todos son null, obtener todos
+        if (nombreParam == null && tipoParam == null && categoriaParam == null && ciudadParam == null) {
             lista = emprendimientosRepository.findAll();
+        } else {
+            lista = emprendimientosRepository.findByFiltros(nombreParam, tipoParam, categoriaParam, ciudadParam);
         }
 
         if (lista.isEmpty()) {
             return Collections.emptyList();
         }
+
 
         List<Integer> empIds = lista.stream()
                 .map(Emprendimientos::getId)
@@ -536,6 +565,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                     return EmprendimientoSimpleDTO.builder()
                             .id(emp.getId().longValue())
                             .nombreComercial(emp.getNombreComercial())
+                            .ciudad(emp.getCiudades().getNombreCiudad())
                             .build();
                 })
                 .collect(Collectors.toList());
