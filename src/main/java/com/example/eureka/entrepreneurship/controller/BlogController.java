@@ -58,7 +58,7 @@ public class BlogController {
         return ResponseEntity.ok(articulo);
     }
 
-    @GetMapping("/publico/tags")
+    @GetMapping("/tags")
     public ResponseEntity<?> obtenerTodosTags() {
         var tags = blogService.obtenerTodosTags();
         return ResponseEntity.ok(tags);
@@ -97,7 +97,7 @@ public class BlogController {
     @PostMapping("/articulos/crear")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ArticuloResponseDTO> crearArticulo(
-            @Valid @RequestBody ArticuloRequestDTO request) {
+            @Valid @ModelAttribute ArticuloRequestDTO request) { // ⬅️ Cambiar aquí
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         ArticuloResponseDTO articulo = blogService.crearArticulo(request, idUsuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(articulo);
@@ -107,7 +107,7 @@ public class BlogController {
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ArticuloResponseDTO> editarArticulo(
             @PathVariable Integer idArticulo,
-            @Valid @RequestBody ArticuloRequestDTO request) {
+            @Valid @ModelAttribute ArticuloRequestDTO request) { // ⬅️ Cambiar aquí
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         ArticuloResponseDTO articulo = blogService.editarArticulo(idArticulo, request, idUsuario);
         return ResponseEntity.ok(articulo);
