@@ -52,9 +52,9 @@ public class BlogController {
     }
 
     @GetMapping("/publico/articulos/{idArticulo}")
-    public ResponseEntity<ArticuloPublicoDTO> obtenerArticuloPublicoPorId(
+    public ResponseEntity<ArticuloResponseDTO> obtenerArticuloPublicoPorId(
             @PathVariable Integer idArticulo) {
-        ArticuloPublicoDTO articulo = blogService.obtenerArticuloPublicoPorId(idArticulo);
+        ArticuloResponseDTO articulo = blogService.obtenerArticuloPublicoPorId(idArticulo);
         return ResponseEntity.ok(articulo);
     }
 

@@ -215,7 +215,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Transactional(readOnly = true)
     @Override
-    public ArticuloPublicoDTO obtenerArticuloPublicoPorId(Integer idArticulo) {
+    public ArticuloResponseDTO obtenerArticuloPublicoPorId(Integer idArticulo) {
         ArticulosBlog articulo = articuloRepository.findById(idArticulo)
                 .orElseThrow(() -> new BusinessException("Artículo no encontrado"));
 
@@ -223,7 +223,7 @@ public class BlogServiceImpl implements BlogService {
             throw new BusinessException("Artículo no disponible");
         }
 
-        return convertirAPublicoDTO(articulo);
+        return convertirAResponseDTO(articulo);
     }
 
     @Transactional(readOnly = true)
