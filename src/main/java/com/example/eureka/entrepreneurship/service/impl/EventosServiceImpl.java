@@ -89,13 +89,12 @@ public class EventosServiceImpl implements EventosService {
 
     @Transactional
     @Override
-    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO dto, Integer idEmprendimiento, Integer idUsuario) {
+    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO dto, Integer idUsuario) {
         Eventos evento = eventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        if (!evento.getEmprendimiento().getId().equals(idEmprendimiento)) {
-            throw new BusinessException("El evento no pertenece a este emprendimiento");
-        }
+        // Obtener idEmprendimiento del evento existente
+        Integer idEmprendimiento = evento.getEmprendimiento().getId();
 
         validarEmprendimientoAprobado(idEmprendimiento);
         validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);

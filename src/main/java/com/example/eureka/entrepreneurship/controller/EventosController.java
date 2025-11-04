@@ -77,7 +77,7 @@ public class EventosController {
     @PostMapping("/crear")
     @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> crearEvento(
-            @Valid @RequestBody EventoRequestDTO request,
+            @Valid @ModelAttribute EventoRequestDTO request,
             @RequestParam Integer idEmprendimiento) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         EventoResponseDTO evento = eventosService.crearEvento(request, idEmprendimiento, idUsuario);
@@ -88,10 +88,9 @@ public class EventosController {
     @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> editarEvento(
             @PathVariable Integer idEvento,
-            @RequestParam Integer idEmprendimiento,
-            @Valid @RequestBody EventoRequestDTO request) {
+            @Valid @ModelAttribute EventoRequestDTO request) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
-        EventoResponseDTO evento = eventosService.editarEvento(idEvento, request, idEmprendimiento, idUsuario);
+        EventoResponseDTO evento = eventosService.editarEvento(idEvento, request, idUsuario);
         return ResponseEntity.ok(evento);
     }
 
