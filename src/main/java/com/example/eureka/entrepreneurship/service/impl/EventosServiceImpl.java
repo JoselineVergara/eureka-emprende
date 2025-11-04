@@ -18,6 +18,7 @@ import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.Eventos;
 import com.example.eureka.domain.model.Multimedia;
 import com.example.eureka.shared.PageResponseDTO;
+import com.example.eureka.shared.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,8 @@ public class EventosServiceImpl implements EventosService {
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IMultimediaRepository multimediaRepository;
     private final FileStorageService fileStorageService;
+    private final SecurityUtils securityUtils;
+
 
     @Transactional
     @Override
@@ -45,8 +48,9 @@ public class EventosServiceImpl implements EventosService {
         }
 
         Emprendimientos emprendimiento = validarEmprendimientoAprobado(idEmprendimiento);
-        validarPropietarioEmprendimiento(emprendimiento, idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(emprendimiento, idUsuario);
+        }
         // Subir imagen si fue enviada
         Multimedia multimedia = null;
         if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
@@ -75,7 +79,6 @@ public class EventosServiceImpl implements EventosService {
         evento.setLugar(dto.getLugar());
         evento.setTipoEvento(dto.getTipoEvento());
         evento.setLinkInscripcion(dto.getLinkInscripcion());
-        evento.setDireccion(dto.getDireccion());
         evento.setEstadoEvento(EstadoEvento.programado);
         evento.setFechaCreacion(LocalDateTime.now());
         evento.setActivo(true);
@@ -97,8 +100,9 @@ public class EventosServiceImpl implements EventosService {
         Integer idEmprendimiento = evento.getEmprendimiento().getId();
 
         validarEmprendimientoAprobado(idEmprendimiento);
-        validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
+        }
         if (evento.getEstadoEvento() == EstadoEvento.cancelado ||
                 evento.getEstadoEvento() == EstadoEvento.terminado) {
             throw new BusinessException("No se puede editar un evento cancelado o terminado");
@@ -140,7 +144,6 @@ public class EventosServiceImpl implements EventosService {
         evento.setLugar(dto.getLugar());
         evento.setTipoEvento(dto.getTipoEvento());
         evento.setLinkInscripcion(dto.getLinkInscripcion());
-        evento.setDireccion(dto.getDireccion());
         evento.setFechaModificacion(LocalDateTime.now());
 
         Eventos eventoActualizado = eventosRepository.save(evento);
@@ -153,8 +156,9 @@ public class EventosServiceImpl implements EventosService {
         Eventos evento = eventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
+        }
         if (evento.getEstadoEvento() == EstadoEvento.cancelado) {
             throw new BusinessException("El evento ya está cancelado");
         }
