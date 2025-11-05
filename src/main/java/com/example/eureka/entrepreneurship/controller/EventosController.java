@@ -74,6 +74,15 @@ public class EventosController {
         return ResponseEntity.ok(eventos);
     }
 
+    @GetMapping("/emprendedor/{idEvento}")
+    @PreAuthorize("hasRole('EMPRENDEDOR')")
+    public ResponseEntity<EventoResponseDTO> obtenerEventoEmprendedorPorId(
+            @PathVariable Integer idEvento) {
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
+        EventoResponseDTO evento = eventosService.obtenerEventoEmprendedorPorId(idEvento, idUsuario);
+        return ResponseEntity.ok(evento);
+    }
+
     @PostMapping("/crear")
     @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> crearEvento(

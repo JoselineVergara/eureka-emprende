@@ -89,6 +89,7 @@ public interface EventosService {
             Integer idEmprendimiento,
             Pageable pageable);
 
+    EventoResponseDTO obtenerEventoEmprendedorPorId(Integer idEvento, Integer idUsuario);
     /**
      * Obtiene un evento por ID (admin - cualquier estado)
      * @param idEvento ID del evento

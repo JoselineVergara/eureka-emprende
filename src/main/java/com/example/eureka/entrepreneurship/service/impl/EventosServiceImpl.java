@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 @Service
@@ -243,6 +244,21 @@ public class EventosServiceImpl implements EventosService {
 
     @Transactional(readOnly = true)
     @Override
+    public EventoResponseDTO obtenerEventoEmprendedorPorId(Integer idEvento, Integer idUsuario) {
+        Eventos evento = eventosRepository.findById(idEvento)
+                .orElseThrow(() -> new BusinessException("Evento no encontrado"));
+
+        // Validar que el evento pertenece a un emprendimiento del usuario
+        if (!evento.getEmprendimiento().getUsuarios().getId().equals(idUsuario)) {
+            throw new BusinessException("No tiene permisos para ver este evento");
+        }
+
+        return convertirAResponseDTO(evento);
+    }
+
+
+    @Transactional(readOnly = true)
+    @Override
     public PageResponseDTO<EventoEmprendedorDTO> obtenerEventosEmprendedor(
             Integer idUsuario,
             String titulo,
@@ -279,6 +295,8 @@ public class EventosServiceImpl implements EventosService {
         Page<EventoAdminDTO> eventosDTO = eventos.map(this::convertirAAdminDTO);
         return PageResponseDTO.fromPage(eventosDTO);
     }
+
+
 
     @Transactional(readOnly = true)
     @Override
