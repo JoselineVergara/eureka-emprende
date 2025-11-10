@@ -46,4 +46,8 @@ public interface EmprendimientoService {
      * @return
      */
     List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad);
+
+    void inactivarEmprendimiento(Integer id) throws Exception;
+
+    void activarEmprendimiento(Integer id) throws Exception;
 }

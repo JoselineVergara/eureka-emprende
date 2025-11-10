@@ -865,4 +865,20 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         emprendimientoDeclaracionesRepository.saveAll(declaraciones);
     }
-} // <-- CIERRE DE LA CLASE
+
+
+    @Override
+    public void inactivarEmprendimiento(Integer id) throws Exception {
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        emprendimientos.setActivoEmprendimiento(false);
+        emprendimientosRepository.save(emprendimientos);
+    }
+
+    @Override
+    public void activarEmprendimiento(Integer id) throws Exception {
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        emprendimientos.setActivoEmprendimiento(false);
+        emprendimientosRepository.save(emprendimientos);
+    }
+
+}
