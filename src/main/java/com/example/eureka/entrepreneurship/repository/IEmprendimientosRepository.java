@@ -32,7 +32,31 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
                                         @Param("categoria") String categoria,
                                         @Param("ciudad") String ciudad);
 
-    List<Emprendimientos> findByEstadoEmprendimiento(String estadoEmprendimiento);
+    @Query("SELECT DISTINCT e FROM Emprendimientos e " +
+            "LEFT JOIN e.tiposEmprendimientos te " +
+            "LEFT JOIN EmprendimientoCategorias ec ON ec.emprendimiento.id = e.id " +
+            "LEFT JOIN ec.categoria c " +
+            "LEFT JOIN e.ciudades ci " +
+            "WHERE (COALESCE(:nombre, '') = '' OR LOWER(e.nombreComercial) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
+            "AND (COALESCE(:tipo, '') = '' OR LOWER(te.tipo) LIKE LOWER(CONCAT('%', :tipo, '%'))) " +
+            "AND (COALESCE(:categoria, '') = '' OR LOWER(c.nombre) LIKE LOWER(CONCAT('%', :categoria, '%'))) " +
+            "AND (COALESCE(:ciudad, '') = '' OR LOWER(ci.nombreCiudad) LIKE LOWER(CONCAT('%', :ciudad, '%')))")
+    org.springframework.data.domain.Page<Emprendimientos> findByFiltros(
+            @Param("nombre") String nombre,
+            @Param("tipo") String tipo,
+            @Param("categoria") String categoria,
+            @Param("ciudad") String ciudad,
+            org.springframework.data.domain.Pageable pageable
+    );
+
+
+    @Query("SELECT DISTINCT e FROM Emprendimientos e " +
+            "LEFT JOIN e.tiposEmprendimientos te " +
+            "LEFT JOIN EmprendimientoCategorias ec ON ec.emprendimiento.id = e.id " +
+            "LEFT JOIN ec.categoria c " +
+            "LEFT JOIN e.ciudades ci " +
+            "WHERE e.estadoEmprendimiento =:estadoEmprendimiento" )
+    List<Emprendimientos> findByEstadoEmprendimiento(@Param("estadoEmprendimiento") String estadoEmprendimiento);
 
     List<Emprendimientos> findByUsuariosAndEstadoEmprendimientoEquals(Usuarios usuarios, String estadoEmprendimiento);
 }

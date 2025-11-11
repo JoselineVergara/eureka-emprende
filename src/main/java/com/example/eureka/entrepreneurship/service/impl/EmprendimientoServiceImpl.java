@@ -2,6 +2,7 @@ package com.example.eureka.entrepreneurship.service.impl;
 
 import com.example.eureka.auth.repository.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
+import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.general.repository.*;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
@@ -18,11 +19,15 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -321,9 +326,48 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
     // TODO: Ajustado para obtener solo aprobados
     @Override
-    public List<EmprendimientoResponseDTO> obtenerEmprendimientos() {
+    public List<MiniEmprendimientoDTO> obtenerEmprendimientos() {
         List<Emprendimientos> lista = emprendimientosRepository.findByEstadoEmprendimiento("APROBADO");
-        return EmprendimientoMapper.toResponseList(lista);
+
+        if (lista.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Obtener IDs de emprendimientos
+        List<Integer> empIds = lista.stream()
+                .map(Emprendimientos::getId)
+                .collect(Collectors.toList());
+
+        // Cargar categorías en batch
+        Map<Integer, List<String>> categoriasMap = emprendimientoCategoriasRepository
+                .findByEmprendimientoIdIn(empIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ec -> ec.getEmprendimiento().getId(),
+                        Collectors.mapping(ec -> ec.getCategoria().getNombre(), Collectors.toList())
+                ));
+
+        // Cargar descripciones en batch
+        Map<Integer, String> descripcionesMap = emprendimientosDescripcionRepository
+                .findByEmprendimientoIdIn(empIds)
+                .stream()
+                .filter(d -> "1".equals(d.getTipoDescripcion()))
+                .collect(Collectors.toMap(
+                        d -> d.getEmprendimiento().getId(),
+                        TiposDescripcionEmprendimiento::getDescripcion,
+                        (existing, replacement) -> existing // En caso de duplicados, mantener el primero
+                ));
+
+        // Mapear a DTOs
+        return lista.stream()
+                .map(emp -> MiniEmprendimientoDTO.builder()
+                        .id(emp.getId())
+                        .nombreComercial(emp.getNombreComercial())
+                        .ciudad(emp.getCiudades() != null ? emp.getCiudades().getNombreCiudad() : null)
+                        .categorias(categoriasMap.getOrDefault(emp.getId(), null))
+                        .descripcion(descripcionesMap.getOrDefault(emp.getId(), null))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -450,105 +494,18 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     }
 
     @Override
-    public List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad) {
-        List<Emprendimientos> lista;
+    public Page<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad, Pageable pageable) {
         // Normalizar los parámetros: convertir strings vacíos a null
         String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
         String tipoParam = (tipo != null && !tipo.trim().isEmpty()) ? tipo.trim() : null;
         String categoriaParam = (categoria != null && !categoria.trim().isEmpty()) ? categoria.trim() : null;
         String ciudadParam = (ciudad != null && !ciudad.trim().isEmpty()) ? ciudad.trim() : null;
 
-        // Si todos son null, obtener todos
-        if (nombreParam == null && tipoParam == null && categoriaParam == null && ciudadParam == null) {
-            lista = emprendimientosRepository.findAll();
-        } else {
-            lista = emprendimientosRepository.findByFiltros(nombreParam, tipoParam, categoriaParam, ciudadParam);
-        }
-
-        if (lista.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-
-        List<Integer> empIds = lista.stream()
-                .map(Emprendimientos::getId)
-                .collect(Collectors.toList());
-
-        // Cargar relaciones en batch
-        Map<Integer, List<EmprendimientoCategorias>> categoriasMap =
-                emprendimientoCategoriasRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(ec -> ec.getEmprendimiento().getId()));
-
-        Map<Integer, List<TiposDescripcionEmprendimiento>> descripcionesMap =
-                emprendimientosDescripcionRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(d -> d.getEmprendimiento().getId()));
-
-        Map<Integer, List<TiposPresenciaDigital>> presenciasMap =
-                emprendimientoPresenciaDigitalRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(p -> p.getEmprendimiento().getId()));
-
-        Map<Integer, List<EmprendimientoMetricas>> metricasMap =
-                emprendimientoMetricaRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(m -> m.getEmprendimiento().getId()));
-
-        Map<Integer, List<EmprendimientoDeclaraciones>> declaracionesMap =
-                emprendimientoDeclaracionesRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(d -> d.getEmprendimiento().getId()));
-
-        Map<Integer, List<EmprendimientoParticipacion>> participacionesMap =
-                emprendimientoParticicipacionComunidadRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(p -> p.getEmprendimiento().getId()));
-
-        Map<Integer, InformacionRepresentante> representantesMap =
-                informacionRepresentanteRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.toMap(r -> r.getEmprendimiento().getId(), r -> r));
-
-        // NUEVO: Cargar multimedia en batch
-        Map<Integer, List<EmprendimientoMultimedia>> multimediaMap =
-                emprendimientoMultimediaRepository.findByEmprendimientoIdIn(empIds).stream()
-                        .collect(Collectors.groupingBy(em -> em.getEmprendimiento().getId()));
-
-        return lista.stream().map(emp -> {
-            EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emp);
-
-            dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(
-                    categoriasMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(
-                    descripcionesMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setPresenciasDigitales(EmprendimientoMapper.toPresenciaDigitalDTOList(
-                    presenciasMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setMetricas(EmprendimientoMapper.toMetricasDTOList(
-                    metricasMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setDeclaracionesFinales(EmprendimientoMapper.toDeclaracionesDTOList(
-                    declaracionesMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setParticipacionesComunidad(EmprendimientoMapper.toParticipacionDTOList(
-                    participacionesMap.getOrDefault(emp.getId(), Collections.emptyList())
-            ));
-            dto.setInformacionRepresentante(EmprendimientoMapper.toRepresentanteDTO(
-                    representantesMap.get(emp.getId())
-            ));
-
-            // NUEVO: Mapear multimedia
-            List<EmprendimientoMultimedia> empMultimedia =
-                    multimediaMap.getOrDefault(emp.getId(), Collections.emptyList());
-            dto.setMultimedia(empMultimedia.stream()
-                    .map(em -> {
-                        MultimediaDTO mdto = new MultimediaDTO();
-                        mdto.setId(em.getMultimedia().getId());
-                        mdto.setUrlArchivo(em.getMultimedia().getUrlArchivo());
-                        mdto.setNombreActivo(em.getMultimedia().getNombreActivo());
-                        mdto.setTipo(em.getTipo());
-                        return mdto;
-                    })
-                    .collect(Collectors.toList()));
-
-            return dto;
-        }).collect(Collectors.toList());
+        Page<Emprendimientos> page = emprendimientosRepository.findByFiltros(nombreParam, tipoParam, categoriaParam, ciudadParam, pageable);
+        List<EmprendimientoResponseDTO> dtos = page.getContent().stream()
+            .map(EmprendimientoMapper::toResponseDTO)
+            .collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     @Override
@@ -865,4 +822,21 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         emprendimientoDeclaracionesRepository.saveAll(declaraciones);
     }
-} // <-- CIERRE DE LA CLASE
+
+
+    @Override
+    public void inactivarEmprendimiento(Integer id) throws Exception {
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        emprendimientos.setActivoEmprendimiento(false);
+        emprendimientosRepository.save(emprendimientos);
+    }
+
+    @Override
+    public void activarEmprendimiento(Integer id) throws Exception {
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        emprendimientos.setActivoEmprendimiento(false);
+        emprendimientosRepository.save(emprendimientos);
+    }
+
+}
+
