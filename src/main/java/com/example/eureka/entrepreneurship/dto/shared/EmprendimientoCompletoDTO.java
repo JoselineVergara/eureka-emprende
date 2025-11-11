@@ -36,4 +36,5 @@ public class EmprendimientoCompletoDTO {
     private List<EmprendimientoPresenciaDigitalDTO> presenciasDigitales;
     private List<EmprendimientoDeclaracionesDTO> declaracionesFinales;
     private List<EmprendimientoParticipacionDTO> participacionesComunidad;
+    private UsuarioDTO usuario;
 }

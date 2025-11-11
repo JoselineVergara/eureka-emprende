@@ -3,6 +3,7 @@ package com.example.eureka.entrepreneurship.controller;
 import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
+import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class MiEmprendimientoController {
 
     private final EmprendimientoService emprendimientoService;
+    private final IEmprendimientosRepository emprendimientosRepository;
 
     /**
      * Obtener todos los emprendimientos de un usuario autenticado
@@ -49,6 +51,16 @@ public class MiEmprendimientoController {
             @PathVariable Integer id,
             @AuthenticationPrincipal Usuarios usuario) {
         try {
+            var emprendimientoOpt = emprendimientosRepository.findById(id);
+            if (emprendimientoOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Emprendimiento no encontrado"));
+            }
+            var emprendimiento = emprendimientoOpt.get();
+            if (!emprendimiento.getUsuarios().getId().equals(usuario.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "No tienes acceso a este emprendimiento"));
+            }
             VistaEmprendedorDTO vista = emprendimientoService.obtenerVistaEmprendedor(id);
             return ResponseEntity.ok(vista);
         } catch (Exception e) {

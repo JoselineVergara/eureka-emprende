@@ -4,12 +4,15 @@ import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.SolicitudAprobacion;
 import com.example.eureka.domain.model.Usuarios;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
+import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,7 +20,7 @@ public interface EmprendimientoService {
 
     Integer estructuraEmprendimiento(EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception;
 
-    List<EmprendimientoResponseDTO> obtenerEmprendimientos();
+    List<MiniEmprendimientoDTO> obtenerEmprendimientos();
 
     List<EmprendimientoListaPublicoDTO> obtenesListaDeEmprendimientos(Usuarios usuario);
 
@@ -45,7 +48,12 @@ public interface EmprendimientoService {
      * @param ciudad
      * @return
      */
-    List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad);
+   // List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad);
+
+    /**
+     * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad, paginado
+     */
+    Page<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad, Pageable pageable);
 
     void inactivarEmprendimiento(Integer id) throws Exception;
 

@@ -2,14 +2,17 @@ package com.example.eureka.entrepreneurship.controller;
 
 import com.example.eureka.auth.service.UsuariosService;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
+import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import com.example.eureka.domain.model.SolicitudAprobacion;
 import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.shared.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,15 +48,6 @@ public class EmprendimientoController {
     }
 
     /**
-     * Obtener todos los emprendimientos públicos
-     */
-    @GetMapping
-    public ResponseEntity<List<EmprendimientoResponseDTO>> obtenerEmprendimientos() {
-        List<EmprendimientoResponseDTO> emprendimientos = emprendimientoService.obtenerEmprendimientos();
-        return ResponseEntity.ok(emprendimientos);
-    }
-
-    /**
      * Obtener todos los emprendimientos por nombre
      */
     @GetMapping("/lista")
@@ -82,15 +76,17 @@ public class EmprendimientoController {
     /**
      * Obtener todos los emprendimientos con filtros opcionales
      */
-    @GetMapping("/filtrar")
-    public ResponseEntity<List<EmprendimientoResponseDTO>> obtenerEmprendimientosFiltrado(
+    @GetMapping()
+    public ResponseEntity<PageResponseDTO<EmprendimientoResponseDTO>> obtenerEmprendimientosFiltrado(
             @RequestParam(value = "nombre", required = false) String nombre,
             @RequestParam(value = "tipo", required = false) String tipo,
             @RequestParam(value = "categoria", required = false) String categoria,
-            @RequestParam(value = "ciudad", required = false) String ciudad) {
-        List<EmprendimientoResponseDTO> emprendimientos =
-                emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo, categoria, ciudad);
-        return ResponseEntity.ok(emprendimientos);
+            @RequestParam(value = "ciudad", required = false) String ciudad,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var pageable = PageRequest.of(page, size);
+        var pageResult = emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo, categoria, ciudad, pageable);
+        return ResponseEntity.ok(PageResponseDTO.fromPage(pageResult));
     }
 
     /**
@@ -171,39 +167,6 @@ public class EmprendimientoController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-
-    /**
-     * Obtener mi emprendimiento (emprendedor - incluye datos pendientes si existen)
-     */
-//    @GetMapping("/{id}/mi-emprendimiento")
-//    public ResponseEntity<?> obtenerMiEmprendimiento(
-//            @PathVariable Integer id,
-//            @AuthenticationPrincipal Usuarios usuario) {
-//        try {
-//            VistaEmprendedorDTO vista = emprendimientoService.obtenerVistaEmprendedor(id);
-//            return ResponseEntity.ok(vista);
-//        } catch (Exception e) {
-//            log.error("Error al obtener emprendimiento: {}", e.getMessage(), e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("error", e.getMessage()));
-//        }
-//    }
-
-    /**
-     * Obtener todos los emprendimientos de un usuario autenticado
-     */
-//    @GetMapping("/mis-emprendimientos")
-//    public ResponseEntity<?> obtenerEmprendimientosPorUsuario(@AuthenticationPrincipal Usuarios usuario) {
-//        try {
-//            List<EmprendimientoResponseDTO> emprendimientos = emprendimientoService.obtenerEmprendimientosPorUsuario(usuario);
-//            return ResponseEntity.ok(emprendimientos);
-//        } catch (Exception e) {
-//            log.error("Error al obtener emprendimientos del usuario: {}", e.getMessage(), e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("error", e.getMessage()));
-//        }
-//    }
-
 
     @PutMapping("/{id}/activar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
