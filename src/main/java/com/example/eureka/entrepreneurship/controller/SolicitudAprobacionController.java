@@ -4,7 +4,7 @@ import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoCompletoDTO;
 import com.example.eureka.entrepreneurship.dto.shared.SolicitudAprobacionDTO;
 import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
 import com.example.eureka.entrepreneurship.service.impl.SolicitudAprobacionService;
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

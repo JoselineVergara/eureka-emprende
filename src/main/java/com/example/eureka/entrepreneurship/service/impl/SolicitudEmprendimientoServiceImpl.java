@@ -5,9 +5,9 @@ import com.example.eureka.entrepreneurship.service.SolicitudEmprendimientoServic
 import com.example.eureka.entrepreneurship.repository.ISolicitudesEmprendimientoRepository;
 import com.example.eureka.domain.model.SolicitudEmprendimiento;
 import com.example.eureka.domain.model.Emprendimientos;
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
-import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.auth.port.out.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

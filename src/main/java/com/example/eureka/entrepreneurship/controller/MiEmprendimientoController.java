@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.dto.shared.VistaEmprendedorDTO;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;

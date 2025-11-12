@@ -1,17 +1,16 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.auth.port.out.IUserRepository;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.general.repository.*;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.shared.*;
-import com.example.eureka.general.repository.*;
 import com.example.eureka.infrastructure.storage.FileStorageService;
 import com.example.eureka.domain.model.*;
 import com.example.eureka.entrepreneurship.mappers.EmprendimientoMapper;
-import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import com.example.eureka.domain.enums.EstadoEmprendimiento;
 import jakarta.persistence.EntityNotFoundException;

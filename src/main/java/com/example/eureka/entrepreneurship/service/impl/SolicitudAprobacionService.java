@@ -1,14 +1,13 @@
 package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.auth.port.out.IUserRepository;
 import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.general.repository.*;
 import com.example.eureka.domain.model.*;
 import com.example.eureka.entrepreneurship.dto.shared.*;
-import com.example.eureka.entrepreneurship.repository.*;
 import com.example.eureka.domain.enums.EstadoEmprendimiento;
 import com.example.eureka.general.dto.CategoriasDTO;
-import com.example.eureka.general.repository.*;
 import com.example.eureka.notificacion.service.NotificacionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
