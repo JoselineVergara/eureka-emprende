@@ -1,23 +1,23 @@
-package com.example.eureka.entrepreneurship.service.impl;
+package com.example.eureka.event.aplication.service;
 
-import com.example.eureka.exception.BusinessException;
+import com.example.eureka.event.domain.model.Eventos;
+import com.example.eureka.event.infrastructure.dto.request.EventoRequestDTO;
+import com.example.eureka.event.infrastructure.dto.response.EventoAdminDTO;
+import com.example.eureka.event.infrastructure.dto.response.EventoEmprendedorDTO;
+import com.example.eureka.event.infrastructure.dto.response.EventoPublicoDTO;
+import com.example.eureka.event.infrastructure.dto.response.EventoResponseDTO;
+import com.example.eureka.event.infrastructure.persistence.EventoRepositoryImpl;
+import com.example.eureka.event.infrastructure.specification.EventoSpecification;
+import com.example.eureka.event.port.in.EventosService;
 import com.example.eureka.infrastructure.storage.FileStorageService;
-import com.example.eureka.entrepreneurship.dto.request.EventoRequestDTO;
-import com.example.eureka.entrepreneurship.dto.shared.EventoResponseDTO;
-import com.example.eureka.entrepreneurship.dto.admin.EventoAdminDTO;
-import com.example.eureka.entrepreneurship.dto.shared.EventoEmprendedorDTO;
-import com.example.eureka.entrepreneurship.dto.publico.EventoPublicoDTO;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
-import com.example.eureka.entrepreneurship.repository.IEventosRepository;
-import com.example.eureka.entrepreneurship.service.EventosService;
-import com.example.eureka.entrepreneurship.specification.EventoSpecification;
 import com.example.eureka.domain.enums.EstadoEvento;
 import com.example.eureka.domain.enums.TipoEvento;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.domain.model.Emprendimientos;
-import com.example.eureka.domain.model.Eventos;
 import com.example.eureka.domain.model.Multimedia;
-import com.example.eureka.shared.PageResponseDTO;
+import com.example.eureka.shared.exception.BusinessException;
+import com.example.eureka.shared.util.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventosServiceImpl implements EventosService {
 
-    private final IEventosRepository eventosRepository;
+    private final EventoRepositoryImpl eventosRepository;
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IMultimediaRepository multimediaRepository;
     private final FileStorageService fileStorageService;

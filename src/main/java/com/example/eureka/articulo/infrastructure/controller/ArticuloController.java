@@ -1,14 +1,14 @@
-package com.example.eureka.entrepreneurship.controller;
+package com.example.eureka.articulo.infrastructure.controller;
 
-import com.example.eureka.entrepreneurship.dto.admin.ArticuloAdminDTO;
-import com.example.eureka.entrepreneurship.dto.publico.ArticuloPublicoDTO;
-import com.example.eureka.entrepreneurship.dto.request.ArticuloRequestDTO;
-import com.example.eureka.entrepreneurship.dto.request.TagRequestDTO;
-import com.example.eureka.entrepreneurship.dto.response.ArticuloResponseDTO;
-import com.example.eureka.entrepreneurship.dto.shared.TagDTO;
-import com.example.eureka.entrepreneurship.service.BlogService;
+import com.example.eureka.articulo.infrastructure.dto.request.ArticuloRequestDTO;
+import com.example.eureka.articulo.infrastructure.dto.request.TagRequestDTO;
+import com.example.eureka.articulo.infrastructure.dto.response.ArticuloAdminDTO;
+import com.example.eureka.articulo.infrastructure.dto.response.ArticuloPublicoDTO;
+import com.example.eureka.articulo.infrastructure.dto.response.ArticuloResponseDTO;
+import com.example.eureka.articulo.infrastructure.dto.response.TagDTO;
+import com.example.eureka.articulo.aplication.service.ArticuloServiceImpl;
 import com.example.eureka.domain.enums.EstadoArticulo;
-import com.example.eureka.shared.PageResponseDTO;
+import com.example.eureka.shared.util.PageResponseDTO;
 import com.example.eureka.shared.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/v1/blog")
 @RequiredArgsConstructor
-public class BlogController {
+public class ArticuloController {
 
-    private final BlogService blogService;
+    private final ArticuloServiceImpl blogService;
     private final SecurityUtils securityUtils;
 
     // ========== Endpoints Públicos ==========

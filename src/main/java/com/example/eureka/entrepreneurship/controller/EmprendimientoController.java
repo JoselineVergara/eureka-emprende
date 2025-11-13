@@ -1,15 +1,14 @@
 package com.example.eureka.entrepreneurship.controller;
 
-import com.example.eureka.auth.service.UsuariosService;
+import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
-import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
+import com.example.eureka.auth.aplication.services.UsuariosServiceImpl;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.service.EmprendimientoService;
 import com.example.eureka.domain.model.SolicitudAprobacion;
-import com.example.eureka.domain.model.Usuarios;
-import com.example.eureka.shared.PageResponseDTO;
+import com.example.eureka.shared.util.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +29,7 @@ import java.util.Map;
 public class EmprendimientoController {
 
     private final EmprendimientoService emprendimientoService;
-    private final UsuariosService usuariosServiceImpl;
+    private final UsuariosServiceImpl usuariosServiceImpl;
 
     /**
      * Obtener emprendimiento por ID (público - solo datos publicados)
