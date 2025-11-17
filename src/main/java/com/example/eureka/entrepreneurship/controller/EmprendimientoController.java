@@ -107,7 +107,7 @@ public class EmprendimientoController {
     /**
      * Crear estructura de emprendimiento (BORRADOR o enviar directamente)
      */
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<?> crearEmprendimiento(
             @RequestBody EmprendimientoRequestDTO request) {
         try {

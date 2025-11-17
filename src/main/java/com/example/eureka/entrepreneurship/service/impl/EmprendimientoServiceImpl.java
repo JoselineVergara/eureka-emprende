@@ -59,6 +59,8 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     private final IMultimediaRepository multimediaRepository;
     private final IEmprendimientoMultimediaRepository emprendimientoMultimediaRepository;
     private final FileStorageService fileStorageService;
+    private final ICategoriaRepository categoriasRepository;
+
 
     @Override
     @Transactional
@@ -308,7 +310,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         log.debug("Agregando {} categorías al emprendimiento: {}", lsCategorias.size(), emprendimientos);
 
-        List<EmprendimientoCategorias> categorias = lsCategorias.stream()
+        /*List<EmprendimientoCategorias> categorias = lsCategorias.stream()
                 .map(categoriaDTO -> {
                     EmprendimientoCategorias categoria = new EmprendimientoCategorias();
                     categoria.setEmprendimiento(emprendimientos);
@@ -317,6 +319,31 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                                     "Categoría no encontrada con ID: " + categoriaDTO.getCategoria())).getCategoria();
                     categoria.setCategoria(cat);
                     return categoria;
+                })
+                .collect(Collectors.toList());*/
+
+
+        List<EmprendimientoCategorias> categorias = lsCategorias.stream()
+                .map(categoriaDTO -> {
+
+                    // 1. Buscar categoría REAL
+                    Categorias categoria = categoriasRepository.findById(categoriaDTO.getCategoria().getId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Categoría no encontrada con ID: " + categoriaDTO.getCategoria().getId()));
+
+                    // 2. Crear ID compuesto
+                    EmprendimientoCategoriasId id = new EmprendimientoCategoriasId(
+                            emprendimientos.getId(),
+                            categoria.getId()
+                    );
+
+                    // 3. Crear entidad
+                    EmprendimientoCategorias ec = new EmprendimientoCategorias();
+                    ec.setId(id);
+                    ec.setEmprendimiento(emprendimientos);
+                    ec.setCategoria(categoria);
+
+                    return ec;
                 })
                 .collect(Collectors.toList());
 
