@@ -1,0 +1,8 @@
+[
+  {
+    "name": "restart-daily",
+    "command": "scalingo --app eureka-emprende restart",
+    "schedule": "0 2 * * *",
+    "one_off": false
+  }
+]
