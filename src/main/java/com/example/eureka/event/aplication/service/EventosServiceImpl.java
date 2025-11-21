@@ -1,23 +1,24 @@
-package com.example.eureka.event.aplication.service;
+package com.example.eureka.entrepreneurship.service.impl;
 
-import com.example.eureka.event.domain.model.Eventos;
-import com.example.eureka.event.infrastructure.dto.request.EventoRequestDTO;
-import com.example.eureka.event.infrastructure.dto.response.EventoAdminDTO;
-import com.example.eureka.event.infrastructure.dto.response.EventoEmprendedorDTO;
-import com.example.eureka.event.infrastructure.dto.response.EventoPublicoDTO;
-import com.example.eureka.event.infrastructure.dto.response.EventoResponseDTO;
-import com.example.eureka.event.infrastructure.persistence.EventoRepositoryImpl;
-import com.example.eureka.event.infrastructure.specification.EventoSpecification;
-import com.example.eureka.event.port.in.EventosService;
+import com.example.eureka.exception.BusinessException;
 import com.example.eureka.infrastructure.storage.FileStorageService;
+import com.example.eureka.entrepreneurship.dto.request.EventoRequestDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EventoResponseDTO;
+import com.example.eureka.entrepreneurship.dto.admin.EventoAdminDTO;
+import com.example.eureka.entrepreneurship.dto.shared.EventoEmprendedorDTO;
+import com.example.eureka.entrepreneurship.dto.publico.EventoPublicoDTO;
 import com.example.eureka.entrepreneurship.repository.IEmprendimientosRepository;
+import com.example.eureka.entrepreneurship.repository.IEventosRepository;
+import com.example.eureka.entrepreneurship.service.EventosService;
+import com.example.eureka.entrepreneurship.specification.EventoSpecification;
 import com.example.eureka.domain.enums.EstadoEvento;
 import com.example.eureka.domain.enums.TipoEvento;
 import com.example.eureka.general.repository.IMultimediaRepository;
 import com.example.eureka.domain.model.Emprendimientos;
+import com.example.eureka.domain.model.Eventos;
 import com.example.eureka.domain.model.Multimedia;
-import com.example.eureka.shared.exception.BusinessException;
-import com.example.eureka.shared.util.PageResponseDTO;
+import com.example.eureka.shared.PageResponseDTO;
+import com.example.eureka.shared.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,16 +27,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class EventosServiceImpl implements EventosService {
 
-    private final EventoRepositoryImpl eventosRepository;
+    private final IEventosRepository eventosRepository;
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IMultimediaRepository multimediaRepository;
     private final FileStorageService fileStorageService;
+    private final SecurityUtils securityUtils;
+
 
     @Transactional
     @Override
@@ -45,8 +49,9 @@ public class EventosServiceImpl implements EventosService {
         }
 
         Emprendimientos emprendimiento = validarEmprendimientoAprobado(idEmprendimiento);
-        validarPropietarioEmprendimiento(emprendimiento, idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(emprendimiento, idUsuario);
+        }
         // Subir imagen si fue enviada
         Multimedia multimedia = null;
         if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
@@ -75,7 +80,6 @@ public class EventosServiceImpl implements EventosService {
         evento.setLugar(dto.getLugar());
         evento.setTipoEvento(dto.getTipoEvento());
         evento.setLinkInscripcion(dto.getLinkInscripcion());
-        evento.setDireccion(dto.getDireccion());
         evento.setEstadoEvento(EstadoEvento.programado);
         evento.setFechaCreacion(LocalDateTime.now());
         evento.setActivo(true);
@@ -89,17 +93,17 @@ public class EventosServiceImpl implements EventosService {
 
     @Transactional
     @Override
-    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO dto, Integer idEmprendimiento, Integer idUsuario) {
+    public EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO dto, Integer idUsuario) {
         Eventos evento = eventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        if (!evento.getEmprendimiento().getId().equals(idEmprendimiento)) {
-            throw new BusinessException("El evento no pertenece a este emprendimiento");
-        }
+        // Obtener idEmprendimiento del evento existente
+        Integer idEmprendimiento = evento.getEmprendimiento().getId();
 
         validarEmprendimientoAprobado(idEmprendimiento);
-        validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
+        }
         if (evento.getEstadoEvento() == EstadoEvento.cancelado ||
                 evento.getEstadoEvento() == EstadoEvento.terminado) {
             throw new BusinessException("No se puede editar un evento cancelado o terminado");
@@ -141,7 +145,6 @@ public class EventosServiceImpl implements EventosService {
         evento.setLugar(dto.getLugar());
         evento.setTipoEvento(dto.getTipoEvento());
         evento.setLinkInscripcion(dto.getLinkInscripcion());
-        evento.setDireccion(dto.getDireccion());
         evento.setFechaModificacion(LocalDateTime.now());
 
         Eventos eventoActualizado = eventosRepository.save(evento);
@@ -154,8 +157,9 @@ public class EventosServiceImpl implements EventosService {
         Eventos evento = eventosRepository.findById(idEvento)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
 
-        validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
-
+        if (!securityUtils.esAdministrador()) {
+            validarPropietarioEmprendimiento(evento.getEmprendimiento(), idUsuario);
+        }
         if (evento.getEstadoEvento() == EstadoEvento.cancelado) {
             throw new BusinessException("El evento ya está cancelado");
         }
@@ -240,6 +244,21 @@ public class EventosServiceImpl implements EventosService {
 
     @Transactional(readOnly = true)
     @Override
+    public EventoResponseDTO obtenerEventoEmprendedorPorId(Integer idEvento, Integer idUsuario) {
+        Eventos evento = eventosRepository.findById(idEvento)
+                .orElseThrow(() -> new BusinessException("Evento no encontrado"));
+
+        // Validar que el evento pertenece a un emprendimiento del usuario
+        if (!evento.getEmprendimiento().getUsuarios().getId().equals(idUsuario)) {
+            throw new BusinessException("No tiene permisos para ver este evento");
+        }
+
+        return convertirAResponseDTO(evento);
+    }
+
+
+    @Transactional(readOnly = true)
+    @Override
     public PageResponseDTO<EventoEmprendedorDTO> obtenerEventosEmprendedor(
             Integer idUsuario,
             String titulo,
@@ -276,6 +295,8 @@ public class EventosServiceImpl implements EventosService {
         Page<EventoAdminDTO> eventosDTO = eventos.map(this::convertirAAdminDTO);
         return PageResponseDTO.fromPage(eventosDTO);
     }
+
+
 
     @Transactional(readOnly = true)
     @Override
