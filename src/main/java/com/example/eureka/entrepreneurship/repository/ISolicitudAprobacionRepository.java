@@ -2,7 +2,7 @@ package com.example.eureka.entrepreneurship.repository;
 
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.SolicitudAprobacion;
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,30 +1,31 @@
 package com.example.eureka.domain.model;
 
+import com.example.eureka.formulario.domain.model.Pregunta;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "opciones")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "opciones")
+@ToString(exclude = {"pregunta"})  // Excluir relación del toString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)  // CRÍTICO
 public class Opciones {
 
     @Id
-    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_opcion", nullable = false)
+    @Column(name = "id_opcion")
+    @EqualsAndHashCode.Include  // Solo el ID
     private Long idOpcion;
 
-    @Column(name = "opcion", nullable = false)
+    @Column(nullable = false)
     private String opcion;
 
-    @Column(name = "estado", nullable = false)
+    @Column(nullable = false)
     private String estado;
 
     @Column(name = "fecha_creacion", nullable = false)
@@ -34,6 +35,6 @@ public class Opciones {
     private LocalDateTime fechaModificacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_prgunta", nullable = false)
-    private Preguntas pregunta;
+    @JoinColumn(name = "id_pregunta", nullable = false)
+    private Pregunta pregunta;
 }

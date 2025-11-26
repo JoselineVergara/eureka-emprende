@@ -1,5 +1,6 @@
 package com.example.eureka.domain.model;
 
+import com.example.eureka.auth.domain.Usuarios;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

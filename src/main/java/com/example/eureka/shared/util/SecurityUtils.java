@@ -1,6 +1,6 @@
 package com.example.eureka.shared.util;
 
-import com.example.eureka.auth.repository.IUserRepository;
+import com.example.eureka.auth.port.out.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

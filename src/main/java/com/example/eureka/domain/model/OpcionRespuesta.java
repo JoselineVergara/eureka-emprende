@@ -1,41 +1,38 @@
 package com.example.eureka.domain.model;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import java.io.Serializable;
-
-@Entity
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"respuesta", "opciones"})  // Excluir relación del toString
 @Table(name = "opcion_respuesta")
-@IdClass(OpcionRespuesta.OpcionRespuestaId.class)
 public class OpcionRespuesta {
 
     @Id
-    @Column(name = "id_respuesta", nullable = false)
-    private Long idRespuesta;
-
-    @Id
-    @Column(name = "id_opcion", nullable = false)
-    private Long idOpcion;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_respuesta", insertable = false, updatable = false)
+    @JoinColumn(name = "id_respuesta", nullable = false)
     private Respuesta respuesta;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_opcion", insertable = false, updatable = false)
-    private Opciones opcion;
+    @JoinColumn(name = "id_opcion", nullable = false)
+    private Opciones opciones;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OpcionRespuestaId implements Serializable {
-        private Long idRespuesta;
-        private Long idOpcion;
-    }
+    @Column(name = "valor_escala", nullable = false)
+    private Integer valorescala;
+
+
+
+
+
 }

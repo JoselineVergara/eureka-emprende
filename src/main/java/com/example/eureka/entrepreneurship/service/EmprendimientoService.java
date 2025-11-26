@@ -2,7 +2,7 @@ package com.example.eureka.entrepreneurship.service;
 
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.SolicitudAprobacion;
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.dto.request.EmprendimientoRequestDTO;

@@ -1,7 +1,7 @@
 package com.example.eureka.notificacion.repository;
 
 import com.example.eureka.domain.model.Notificacion;
-import com.example.eureka.domain.model.Usuarios;
+import com.example.eureka.auth.domain.Usuarios;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
