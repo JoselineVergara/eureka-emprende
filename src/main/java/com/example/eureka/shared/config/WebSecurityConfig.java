@@ -87,7 +87,12 @@ public class WebSecurityConfig {
                                 "/v1/emprendimientos",
                                 "/v1/emprendimientos/{id}/publico",
                                 "/v1/emprendimientos/filtrar",
-                                "/v1/valoraciones")
+                                "/v1/valoraciones",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/webjars/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

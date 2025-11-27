@@ -39,7 +39,7 @@ public interface ArticuloService {
             String titulo,
             Pageable pageable);
 
-    ArticuloPublicoDTO obtenerArticuloPublicoPorId(Integer idArticulo);
+    ArticuloResponseDTO obtenerArticuloPublicoPorId(Integer idArticulo);
 
     ArticuloResponseDTO obtenerArticuloPorId(Integer idArticulo);
 

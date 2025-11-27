@@ -26,10 +26,9 @@ public interface EventosService {
      * Edita un evento existente
      * @param idEvento ID del evento a editar
      * @param request Nuevos datos del evento
-     * @param idEmprendimiento ID del emprendimiento (validación)
      * @param idUsuario ID del usuario que edita (validación de permisos)
      */
-    EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idEmprendimiento, Integer idUsuario);
+    EventoResponseDTO editarEvento(Integer idEvento, EventoRequestDTO request, Integer idUsuario);
 
     /**
      * Cancela un evento (cambio de estado a cancelado)
@@ -90,6 +89,7 @@ public interface EventosService {
             Integer idEmprendimiento,
             Pageable pageable);
 
+    EventoResponseDTO obtenerEventoEmprendedorPorId(Integer idEvento, Integer idUsuario);
     /**
      * Obtiene un evento por ID (admin - cualquier estado)
      * @param idEvento ID del evento

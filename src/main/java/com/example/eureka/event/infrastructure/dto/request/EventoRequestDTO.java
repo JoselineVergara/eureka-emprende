@@ -24,7 +24,6 @@ public class EventoRequestDTO {
     @NotNull(message = "La fecha del evento es obligatoria")
     private LocalDateTime fechaEvento;
 
-    @NotBlank(message = "El lugar es obligatorio")
     private String lugar;
 
     @NotNull(message = "El tipo de evento es obligatorio")
@@ -33,8 +32,6 @@ public class EventoRequestDTO {
     private boolean activo;
 
     private String linkInscripcion;
-
-    private String direccion;
 
     @NotNull(message = "La imagen es obligatoria")
     private MultipartFile imagen; // ← Campo para subida de archivo
