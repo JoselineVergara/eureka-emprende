@@ -1,4 +1,4 @@
-package com.example.eureka.valoracion.dto;
+package com.example.eureka.autoevaluacion.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValoracionDTO {
+public class AutoevaluacionDTO {
 
     private Integer id;
     private String nombre;

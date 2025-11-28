@@ -1,4 +1,4 @@
-package com.example.eureka.valoracion.dto;
+package com.example.eureka.autoevaluacion.dto;
 
 public interface EmprendimientoInfo {
     Long getId();

@@ -1,16 +1,16 @@
-package com.example.eureka.valoracion.repository;
+package com.example.eureka.autoevaluacion.repository;
 
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.Respuesta;
-import com.example.eureka.valoracion.dto.EmprendimientoInfo;
-import com.example.eureka.valoracion.dto.RespuestaFormularioDTO;
+import com.example.eureka.autoevaluacion.dto.EmprendimientoInfo;
+import com.example.eureka.autoevaluacion.dto.RespuestaFormularioDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface IValoracionRepository extends JpaRepository<Respuesta, Integer> {
+public interface IAutoevaluacionRepository extends JpaRepository<Respuesta, Integer> {
 
     List<Respuesta> findAllByEmprendimientos(Emprendimientos emprendimientos);
 
@@ -61,6 +61,7 @@ public interface IValoracionRepository extends JpaRepository<Respuesta, Integer>
             nativeQuery = true
     )
     List<RespuestaFormularioDTO> obtenerRespuestasPorEmprendimiento(Long idEmprendimiento);
+
 
 
 
