@@ -1,9 +1,8 @@
 package com.example.eureka.formulario.application.service;
 
-import com.example.eureka.domain.model.OpcionRespuesta;
-import com.example.eureka.domain.model.Opciones;
-import com.example.eureka.domain.model.Respuesta;
-import com.example.eureka.formulario.infrastructure.dto.response.OpcionResponseDTO;
+import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
+import com.example.eureka.formulario.domain.model.Opciones;
+import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
