@@ -6,6 +6,8 @@ import com.example.eureka.roadmap.dto.RoadmapDTO;
 import com.example.eureka.roadmap.service.RoadmapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,8 @@ public class RoadmapController {
     private final RoadmapService  roadmapService;
 
     @GetMapping
-    public ResponseEntity<List<Roadmap>> findAll() {
-        return ResponseEntity.ok(roadmapService.findAll());
+    public ResponseEntity<Page<Roadmap>> findAll(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(roadmapService.findAll(pageable));
     }
 
     @GetMapping("/emprendimiento/{id}")

@@ -11,6 +11,9 @@ import com.example.eureka.metricas.repository.IMetricasBasicasRepository;
 import com.example.eureka.metricas.service.EmprendimientoMetricasService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,9 +62,11 @@ public class EmprendimientoMetricasServiceImpl implements EmprendimientoMetricas
     }
 
     @Override
-    public List<EmprendimientoMetricas> getEmprendimientosVisualizacion() {
+    public Page<EmprendimientoMetricas> getEmprendimientosVisualizacion(Pageable pageable) {
         List<EmprendimientoMetricas> emprendimientoMetricas = emprendimientoMetricasRepository.findAll();
-        return emprendimientoMetricas.stream().filter(item -> esNumerico(item.getValor())).collect(Collectors.toList());
+        List<EmprendimientoMetricas> empFin = emprendimientoMetricas.stream().filter(item -> esNumerico(item.getValor())).collect(Collectors.toList());
+        return  new PageImpl<>(empFin, pageable, empFin.size());
+
     }
 
     @Override

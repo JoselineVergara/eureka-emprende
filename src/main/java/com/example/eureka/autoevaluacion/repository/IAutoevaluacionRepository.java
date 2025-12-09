@@ -4,8 +4,9 @@ import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.domain.model.Respuesta;
 import com.example.eureka.autoevaluacion.dto.EmprendimientoInfo;
 import com.example.eureka.autoevaluacion.dto.RespuestaFormularioDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface IAutoevaluacionRepository extends JpaRepository<Respuesta, Inte
 
     List<Respuesta> findAllByEmprendimientos(Emprendimientos emprendimientos);
 
-    @Modifying
+
     @Query(
             value = """
         SELECT 
@@ -37,7 +38,7 @@ public interface IAutoevaluacionRepository extends JpaRepository<Respuesta, Inte
         """,
             nativeQuery = true
     )
-    List<EmprendimientoInfo> obtenerEmprendimientos();
+    Page<EmprendimientoInfo> obtenerEmprendimientos(Pageable pageable);
 
     boolean existsByEmprendimientos(Emprendimientos emprendimientos);
 

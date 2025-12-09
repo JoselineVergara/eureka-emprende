@@ -8,6 +8,8 @@ import com.example.eureka.metricas.service.EmprendimientoMetricasService;
 import com.example.eureka.metricas.service.MetricasBasicasService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +27,8 @@ public class MetricasController {
     private final EmprendimientoService emprendimientoService;
 
     @GetMapping("/cantidad-visualizacion")
-    public ResponseEntity<List<EmprendimientoMetricas>> obtenerMetricasCantidad(){
-        return ResponseEntity.ok(emprendimientoMetricasService.getEmprendimientosVisualizacion());
+    public ResponseEntity<Page<EmprendimientoMetricas>> obtenerMetricasCantidad(@org.springdoc.core.annotations.ParameterObject Pageable pageable){
+        return ResponseEntity.ok(emprendimientoMetricasService.getEmprendimientosVisualizacion(pageable));
     }
 
     @GetMapping("/filtros/{fechaInicio}/{fechaFin}/{idEmprendimiento}")

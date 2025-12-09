@@ -9,6 +9,8 @@ import com.example.eureka.roadmap.service.RoadmapService;
 import com.example.eureka.shared.config.openapi.GPTRoadmap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +61,7 @@ public class RoadmapServiceImpl implements RoadmapService {
     }
 
     @Override
-    public List<Roadmap> findAll() {
-        return roadmapRepository.findAll();
+    public Page<Roadmap> findAll(Pageable pageable) {
+        return roadmapRepository.findAll(pageable);
     }
 }

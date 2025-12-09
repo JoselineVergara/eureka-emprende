@@ -3,6 +3,8 @@ package com.example.eureka.metricas.service;
 import com.example.eureka.domain.model.EmprendimientoMetricas;
 import com.example.eureka.domain.model.Emprendimientos;
 import com.example.eureka.metricas.dto.EmprendimientoMetricaDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +17,7 @@ public interface EmprendimientoMetricasService {
     EmprendimientoMetricas findById(Long id);
     List<EmprendimientoMetricas> findAll();
     void delete(Long id);
-    List<EmprendimientoMetricas> getEmprendimientosVisualizacion();
+    Page<EmprendimientoMetricas> getEmprendimientosVisualizacion(Pageable pageable);
     List<EmprendimientoMetricas> getEmprendimientosFiltros(LocalDateTime fechaInicio, LocalDateTime fechaFin, Integer idEmprendimientos);
 
 }

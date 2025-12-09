@@ -11,6 +11,8 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuesta
 import com.example.eureka.formulario.port.in.FormularioService;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
 import com.example.eureka.formulario.port.in.OpcionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,9 +60,9 @@ public class FormularioController {
     }
 
     @GetMapping("/get-respuesta/{idRespuesta}")
-    public ResponseEntity<List<OpcionRespuestaDTO>> findAllByRespuesta(@PathVariable Long idRespuesta) {
+    public ResponseEntity<Page<OpcionRespuestaDTO>> findAllByRespuesta(@PathVariable Long idRespuesta, @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         Respuesta respuesta = respuestaService.findById(idRespuesta);
-        return ResponseEntity.ok(opcionRespuestaService.findAllByRespuesta(respuesta));
+        return ResponseEntity.ok(opcionRespuestaService.findAllByRespuesta(respuesta, pageable));
     }
 
 

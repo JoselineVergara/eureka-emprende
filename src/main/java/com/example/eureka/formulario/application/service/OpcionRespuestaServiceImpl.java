@@ -7,6 +7,9 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionResponseD
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +28,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
 
     @Override
-    public List<OpcionRespuestaDTO> findAllByRespuesta(Respuesta respuesta) {
+    public Page<OpcionRespuestaDTO> findAllByRespuesta(Respuesta respuesta, Pageable pageable) {
         List<OpcionRespuestaDTO> opcionRespuestaDTOs = new ArrayList<>();
         List<OpcionRespuesta> opcionRespuestas = opcionRespuestaRepository.findAllByRespuesta(respuesta);
         if(opcionRespuestas != null) {
@@ -37,13 +40,13 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                 opcionRespuestaDTO.setValorescala(opcionRespuesta.getValorescala());
                 opcionRespuestaDTOs.add(opcionRespuestaDTO);
             }
-            return opcionRespuestaDTOs;
+            return  new PageImpl<>(opcionRespuestaDTOs, pageable, opcionRespuestaDTOs.size());
         }
-        return List.of();
+        return new PageImpl<>(List.of(), pageable, opcionRespuestaDTOs.size());
     }
 
     @Override
-    public List<OpcionRespuestaDTO> findAllByOpciones(Opciones opciones) {
+    public Page<OpcionRespuestaDTO> findAllByOpciones(Opciones opciones, Pageable pageable) {
         List<OpcionRespuestaDTO> opcionRespuestaDTOs = new ArrayList<>();
         List<OpcionRespuesta> opcionRespuestas = opcionRespuestaRepository.findAllByOpciones(opciones);
         if(opcionRespuestas != null) {
@@ -55,9 +58,10 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                 opcionRespuestaDTO.setValorescala(opcionRespuesta.getValorescala());
                 opcionRespuestaDTOs.add(opcionRespuestaDTO);
             }
-            return opcionRespuestaDTOs;
+            return  new PageImpl<>(opcionRespuestaDTOs, pageable, opcionRespuestaDTOs.size());
+
         }
-        return List.of();
+        return new PageImpl<>(List.of(), pageable, opcionRespuestaDTOs.size());
     }
 
     @Override
