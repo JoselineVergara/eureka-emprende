@@ -8,6 +8,7 @@ import com.example.eureka.entrepreneurship.infrastructure.dto.request.Emprendimi
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoResponseDTO;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
 import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
+import com.example.eureka.shared.util.CustomUserDetails;
 import com.example.eureka.shared.util.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -156,7 +157,8 @@ public class EmprendimientoController {
     @PostMapping("/{id}/enviar-aprobacion")
     public ResponseEntity<?> enviarParaAprobacion(
             @PathVariable Integer id,
-            @AuthenticationPrincipal Usuarios usuario) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Usuarios usuario = userDetails.getUsuario();
         try {
             SolicitudAprobacion solicitud = emprendimientoService.enviarParaAprobacion(id, usuario);
             return ResponseEntity.ok(Map.of(
