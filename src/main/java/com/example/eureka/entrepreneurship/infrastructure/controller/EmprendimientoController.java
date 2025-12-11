@@ -107,10 +107,12 @@ public class EmprendimientoController {
     /**
      * Crear estructura de emprendimiento (BORRADOR o enviar directamente)
      */
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> crearEmprendimiento(
-            @RequestBody EmprendimientoRequestDTO request) {
+            @RequestPart("data") EmprendimientoRequestDTO request,
+            @RequestPart(value = "imagenes", required = false) List<MultipartFile> imagenes) {
         try {
+            request.setImagenes(imagenes);
             Integer id = emprendimientoService.estructuraEmprendimiento(request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
