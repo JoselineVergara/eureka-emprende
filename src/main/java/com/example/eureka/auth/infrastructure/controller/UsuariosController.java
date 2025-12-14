@@ -54,7 +54,7 @@ public class UsuariosController {
 
         usuario.setId(id);
 
-        if (usuario.getContrasena()!= null && !usuario.getContrasena().isEmpty()) {
+        if (usuario.getContrasena()!= null && !usuario.getContrasena().trim().isEmpty()) {
             usuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
 
         } else {
