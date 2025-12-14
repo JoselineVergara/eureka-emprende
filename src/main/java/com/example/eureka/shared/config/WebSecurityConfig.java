@@ -74,6 +74,7 @@ public class WebSecurityConfig {
                                 "/v1/auth/test-bcrypt",
                                 "/v1/auth/rehash-password",
                                 "/v1/provincia",
+                                "/v1/ciudad",
                                 "/v1/ciudad/provincia/{id}",
                                 "/v1/eventos/emprendimiento/{idEmprendimiento}",
                                 "/v1/eventos/publico/{idEvento}",
