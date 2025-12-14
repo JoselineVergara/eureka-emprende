@@ -15,7 +15,7 @@ public class TipoNotificacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_tipo_notificacion")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "codigo", nullable = false, unique = true, length = 50)
