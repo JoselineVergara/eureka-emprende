@@ -10,6 +10,14 @@ import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
 import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
 import com.example.eureka.shared.util.CustomUserDetails;
 import com.example.eureka.shared.util.PageResponseDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.StringToClassMapItem;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +41,7 @@ public class EmprendimientoController {
 
     private final EmprendimientoService emprendimientoService;
     private final UsuariosServiceImpl usuariosServiceImpl;
+    private final ObjectMapper objectMapper;
 
     /**
      * Obtener emprendimiento por ID (público - solo datos publicados)
@@ -111,9 +120,41 @@ public class EmprendimientoController {
      * Crear estructura de emprendimiento (BORRADOR o enviar directamente)
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Crear emprendimiento",
+            description = "Crea un emprendimiento con datos JSON y múltiples imágenes",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(
+                                    type = "object",
+                                    requiredProperties = { "data" },
+                                    properties = {
+                                            @StringToClassMapItem(
+                                                    key = "data",
+                                                    value = EmprendimientoRequestDTO.class
+                                            )
+                                    }
+                            )
+                    )
+            )
+    )
     public ResponseEntity<?> crearEmprendimiento(
-            @RequestPart("data") EmprendimientoRequestDTO request,
-            @RequestPart(value = "imagenes", required = false) List<MultipartFile> imagenes) {
+            @RequestPart("data") String data,
+            @Parameter(
+                    description = "Imágenes del emprendimiento",
+                    content = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(type = "string", format = "binary")
+                            )
+                    )
+            )
+            @RequestPart(value = "imagenes", required = false) List<MultipartFile> imagenes)
+            throws JsonProcessingException {
+
+        EmprendimientoRequestDTO request =
+                objectMapper.readValue(data, EmprendimientoRequestDTO.class);
         try {
             request.setImagenes(imagenes);
             Integer id = emprendimientoService.estructuraEmprendimiento(request);
