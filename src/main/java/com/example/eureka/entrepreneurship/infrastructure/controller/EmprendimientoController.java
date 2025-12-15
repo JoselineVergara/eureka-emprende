@@ -173,11 +173,44 @@ public class EmprendimientoController {
     /**
      * Actualizar emprendimiento (guarda cambios en borrador o crea solicitud)
      */
-    @PutMapping("/{id}")
+    @PutMapping( path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Actualizar emprendimiento",
+            description = "Actualiza emprendimiento con datos JSON y múltiples imágenes",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(
+                                    type = "object",
+                                    requiredProperties = { "data" },
+                                    properties = {
+                                            @StringToClassMapItem(
+                                                    key = "data",
+                                                    value = EmprendimientoRequestDTO.class
+                                            )
+                                    }
+                            )
+                    )
+            )
+    )
     public ResponseEntity<?> actualizarEmprendimiento(
             @PathVariable Integer id,
-            @RequestBody EmprendimientoRequestDTO request) {
+            @RequestPart("data") String data,
+            @Parameter(
+                    description = "Imágenes del emprendimiento",
+                    content = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(type = "string", format = "binary")
+                            )
+                    )
+            )
+            @RequestPart(value = "imagenes", required = false) List<MultipartFile> imagenes)
+            throws JsonProcessingException {
+        EmprendimientoRequestDTO request =
+                objectMapper.readValue(data, EmprendimientoRequestDTO.class);
         try {
+            request.setImagenes(imagenes);
             EmprendimientoResponseDTO actualizado = emprendimientoService
                     .actualizarEmprendimiento(id, request);
             return ResponseEntity.ok(Map.of(
