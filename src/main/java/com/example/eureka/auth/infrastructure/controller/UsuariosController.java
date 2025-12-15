@@ -63,6 +63,12 @@ public class UsuariosController {
         if(null == usuario.getFechaRegistro()){
             usuario.setFechaRegistro(usuarioAutenticado.getFechaRegistro());
         }
+        if(null == usuario.getRol()){
+            usuario.setRol(usuarioAutenticado.getRol());
+        }
+        if(null == usuario.getActivo()){
+            usuario.setActivo(usuarioAutenticado.getActivo());
+        }
 
         return usuariosServiceImpl.actualizarUsuario(usuario);
     }
