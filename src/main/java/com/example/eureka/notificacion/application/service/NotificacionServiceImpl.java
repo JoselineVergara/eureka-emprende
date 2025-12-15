@@ -241,7 +241,7 @@ public class NotificacionServiceImpl implements NotificacionService {
                 .metadata(n.getMetadata())
                 .emprendimientoId(n.getEmprendimiento() != null ? n.getEmprendimiento().getId() : null)
                 .nombreEmprendimiento(n.getEmprendimiento() != null ? n.getEmprendimiento().getNombreComercial() : null)
-                .solicitudId(Math.toIntExact(n.getSolicitud() != null ? n.getSolicitud().getId() : null))
+                .solicitudId(n.getSolicitud() != null ? Math.toIntExact(n.getSolicitud() != null ? n.getSolicitud().getId() : null) : null)
                 .build();
     }
 }
