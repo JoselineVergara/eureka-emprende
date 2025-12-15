@@ -37,7 +37,7 @@ public class TipoNotificacion {
     private String color;
 
     @Column(name = "prioridad", length = 20)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Prioridad prioridad;
 
     @Column(name = "activo")

@@ -66,7 +66,7 @@ public class Notificacion {
     private LocalDateTime fechaLectura;
 
     @Column(name = "prioridad", length = 20)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Prioridad prioridad;
 
     @PrePersist
