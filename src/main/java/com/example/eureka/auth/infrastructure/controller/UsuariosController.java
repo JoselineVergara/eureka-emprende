@@ -60,6 +60,10 @@ public class UsuariosController {
         } else {
             usuario.setContrasena(usuarioAutenticado.getContrasena());
         }
+        if(null == usuario.getFechaRegistro()){
+            usuario.setFechaRegistro(usuarioAutenticado.getFechaRegistro());
+        }
+
         return usuariosServiceImpl.actualizarUsuario(usuario);
     }
 
