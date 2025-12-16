@@ -2,6 +2,8 @@ package com.example.eureka.entrepreneurship.aplication.service;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.auth.port.out.IUserRepository;
+import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaFormularioDTO;
+import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
@@ -11,6 +13,8 @@ import com.example.eureka.general.domain.model.*;
 import com.example.eureka.general.port.out.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.metricas.domain.MetricasBasicas;
+import com.example.eureka.metricas.domain.MetricasGenerales;
+import com.example.eureka.metricas.port.out.IMetricasGeneralesRepository;
 import com.example.eureka.shared.storage.FileStorageService;
 import com.example.eureka.entrepreneurship.infrastructure.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
@@ -61,6 +65,9 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     private final IEmprendimientoMultimediaRepository emprendimientoMultimediaRepository;
     private final FileStorageService fileStorageService;
     private final ICategoriaRepository categoriasRepository;
+
+    private final IMetricasGeneralesRepository metricasGeneralesRepository;
+    private final IAutoevaluacionRepository autoevaluacionRepository;
 
 
     @Override
@@ -481,6 +488,33 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         // NUEVO: Incluir multimedia
         dto.setMultimedia(obtenerMultimediaPorEmprendimiento(id));
+        try{
+            MetricasGenerales metricasGenerales = metricasGeneralesRepository.findByEmprendimientos(emprendimiento).orElse(null);
+            List<RespuestaFormularioDTO> respuestaFormularioDTOS = autoevaluacionRepository.obtenerRespuestasPorEmprendimiento(Long.valueOf(emprendimiento.getId()));
+
+            Integer promedioNivelValoracion = respuestaFormularioDTOS.stream()
+                    .filter(r -> r.getValorEscala() != null)
+                    .mapToInt(RespuestaFormularioDTO::getValorEscala)
+                    .average()
+                    .stream()
+                    .mapToInt(avg -> (int) Math.round(avg))
+                    .findFirst()
+                    .orElse(0);
+
+            if(null == metricasGenerales){
+                metricasGenerales = new MetricasGenerales();
+                metricasGenerales.setEmprendimientos(emprendimiento);
+                metricasGenerales.setVistas(1);
+                metricasGenerales.setNivelValoracion(promedioNivelValoracion);
+            }else{
+                metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
+                metricasGenerales.setNivelValoracion(promedioNivelValoracion);
+            }
+            metricasGeneralesRepository.save(metricasGenerales);
+
+        }catch(Exception e){
+            log.error("ERROR AL GUARDAR METRICA DE EMPRENDIMIENTO {}", emprendimiento.getId());
+        }
 
         return dto;
     }
@@ -568,6 +602,9 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                             .build();
                 })
                 .collect(Collectors.toList());
+
+
+
 
         return EmprendimientoPorCategoriaDTO.builder()
                 .categoriaId(categoria.getId())

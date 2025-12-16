@@ -49,6 +49,7 @@ public class SolicitudAprobacionService {
     private final ObjectMapper objectMapper;
     private final NotificacionService notificacionService;
     private final IUserRepository userRepository;
+
     /**
      * Captura el estado completo actual del emprendimiento (todas las relaciones)
      */
