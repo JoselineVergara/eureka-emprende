@@ -121,6 +121,11 @@ public class NotificacionController {
     }
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?>  obtenerNotificacionPorId(@PathVariable("id") Integer id){
+        return ResponseEntity.ok(notificacionService.obtenerNotificacionPorId(id));
+    }
+
 
 
 }

@@ -26,4 +26,5 @@ public class EventoEmprendedorDTO {
     private String linkInscripcion;
     private String direccion;
     private Integer idMultimedia;
+    private String urlMultimedia;
 }

@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,6 +92,12 @@ public class NotificacionServiceImpl implements NotificacionService {
 
         log.info("✅ Notificación creada: ID {}", notificacion.getId());
         return notificacion;
+    }
+
+    @Override
+    public NotificacionDTO obtenerNotificacionPorId(Integer id) {
+        Optional<Notificacion> notificacion = notificacionRepository.findById(id);
+        return notificacion.map(this::toDTO).orElse(null);
     }
 
     /**

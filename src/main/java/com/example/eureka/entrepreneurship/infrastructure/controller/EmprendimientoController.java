@@ -51,6 +51,8 @@ public class EmprendimientoController {
         try {
             EmprendimientoResponseDTO emprendimiento = emprendimientoService
                     .obtenerEmprendimientoCompletoPorId(id);
+
+
             return ResponseEntity.ok(emprendimiento);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

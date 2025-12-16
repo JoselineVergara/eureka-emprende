@@ -1,5 +1,6 @@
 package com.example.eureka.event.infrastructure.controller;
 
+import com.example.eureka.articulo.infrastructure.specification.ValidationGroups;
 import com.example.eureka.event.infrastructure.dto.response.EventoResponseDTO;
 import com.example.eureka.event.infrastructure.dto.response.EventoEmprendedorDTO;
 import com.example.eureka.shared.enums.EstadoEvento;
@@ -18,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -86,7 +88,7 @@ public class EventosController {
     @PostMapping("/crear")
     @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> crearEvento(
-            @Valid @ModelAttribute EventoRequestDTO request,
+            @Validated(ValidationGroups.OnCreate.class) @ModelAttribute EventoRequestDTO request,
             @RequestParam Integer idEmprendimiento) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         EventoResponseDTO evento = eventosService.crearEvento(request, idEmprendimiento, idUsuario);
@@ -97,7 +99,7 @@ public class EventosController {
     @PreAuthorize("hasRole('EMPRENDEDOR') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<EventoResponseDTO> editarEvento(
             @PathVariable Integer idEvento,
-            @Valid @ModelAttribute EventoRequestDTO request) {
+            @Validated(ValidationGroups.OnUpdate.class)  @ModelAttribute EventoRequestDTO request) {
         Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
         EventoResponseDTO evento = eventosService.editarEvento(idEvento, request, idUsuario);
         return ResponseEntity.ok(evento);

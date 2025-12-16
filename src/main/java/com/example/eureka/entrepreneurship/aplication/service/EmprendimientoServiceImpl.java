@@ -32,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -491,21 +492,26 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         try{
             MetricasGenerales metricasGenerales = metricasGeneralesRepository.findByEmprendimientos(emprendimiento).orElse(null);
             List<RespuestaFormularioDTO> respuestaFormularioDTOS = autoevaluacionRepository.obtenerRespuestasPorEmprendimiento(Long.valueOf(emprendimiento.getId()));
+            Integer promedioNivelValoracion = 0;
+            if(respuestaFormularioDTOS.size() > 0){
+                promedioNivelValoracion = respuestaFormularioDTOS.stream()
+                        .filter(r -> r.getValorEscala() != null)
+                        .mapToInt(RespuestaFormularioDTO::getValorEscala)
+                        .average()
+                        .stream()
+                        .mapToInt(avg -> (int) Math.round(avg))
+                        .findFirst()
+                        .orElse(0);
 
-            Integer promedioNivelValoracion = respuestaFormularioDTOS.stream()
-                    .filter(r -> r.getValorEscala() != null)
-                    .mapToInt(RespuestaFormularioDTO::getValorEscala)
-                    .average()
-                    .stream()
-                    .mapToInt(avg -> (int) Math.round(avg))
-                    .findFirst()
-                    .orElse(0);
+            }
 
             if(null == metricasGenerales){
                 metricasGenerales = new MetricasGenerales();
                 metricasGenerales.setEmprendimientos(emprendimiento);
                 metricasGenerales.setVistas(1);
                 metricasGenerales.setNivelValoracion(promedioNivelValoracion);
+                metricasGenerales.setFechaRegistro(LocalDateTime.now());
+
             }else{
                 metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
                 metricasGenerales.setNivelValoracion(promedioNivelValoracion);

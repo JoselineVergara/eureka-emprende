@@ -113,10 +113,10 @@ public class EventosServiceImpl implements EventosService {
         }
 
         // ACTUALIZAR IMAGEN SI VIENE EN DTO
-        if (dto.getImagen() != null && !dto.getImagen().isEmpty()) {
+        if ( null != dto.getImagen() && !dto.getImagen().isEmpty()) {
             try {
                 // Eliminar la imagen vieja si existe
-                if (evento.getMultimedia() != null) {
+                if (null != evento.getMultimedia()) {
                     String oldUrl = evento.getMultimedia().getUrlArchivo();
                     String oldFileName = extractFileNameFromUrl(oldUrl);
                     if (oldFileName != null) {
@@ -371,6 +371,7 @@ public class EventosServiceImpl implements EventosService {
                 .linkInscripcion(evento.getLinkInscripcion())
                 .direccion(evento.getDireccion())
                 .idMultimedia(evento.getMultimedia().getId())
+                .urlMultimedia(evento.getMultimedia().getUrlArchivo())
                 .build();
     }
 
@@ -406,6 +407,7 @@ public class EventosServiceImpl implements EventosService {
                 .idEmprendimiento(evento.getEmprendimiento().getId())
                 .nombreEmprendimiento(evento.getEmprendimiento().getNombreComercial())
                 .idMultimedia(evento.getMultimedia().getId())
+                .urlMultimedia(evento.getMultimedia().getUrlArchivo())
                 .build();
     }
 }

@@ -18,6 +18,8 @@ public interface NotificacionService {
             Integer emprendimientoId,
             Integer solicitudId);
 
+    NotificacionDTO obtenerNotificacionPorId(Integer id);
+
     Page<NotificacionDTO> obtenerNotificaciones(Integer usuarioId, Pageable pageable);
 
     List<NotificacionDTO> obtenerNoLeidas(Integer usuarioId);
