@@ -1,8 +1,7 @@
 package com.example.eureka.metricas.domain;
 
-
-
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
+import com.example.eureka.formulario.domain.model.Pregunta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,8 +16,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "metricas_generales")
-public class MetricasGenerales {
+@Table(name = "metricas_pregunta")
+public class MetricasPregunta {
 
     @Id
     @EqualsAndHashCode.Include
@@ -26,16 +25,17 @@ public class MetricasGenerales {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emprendimiento_id", nullable = false)
     private Emprendimientos emprendimientos;
 
-    @Column(name = "vistas", nullable = false)
-    private Integer vistas;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pregunta_id", nullable = false)
+    private Pregunta pregunta;
+
+    @Column(name = "valoracion", nullable = false)
+    private Double valoracion;
 
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro;
-
-
 }

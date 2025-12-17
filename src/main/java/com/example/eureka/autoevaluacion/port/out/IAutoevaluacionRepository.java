@@ -1,5 +1,6 @@
 package com.example.eureka.autoevaluacion.port.out;
 
+import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaFormularioPreguntaDTO;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.autoevaluacion.infrastructure.dto.EmprendimientoInfo;
@@ -65,5 +66,37 @@ public interface IAutoevaluacionRepository extends JpaRepository<Respuesta, Inte
 
 
 
+    @Query(
+            value = """
+                SELECT
+                    f.nombre                      AS nombreFormulario,
+                    e.id                          AS idEmprendimiento,
+                    e.nombre_comercial            AS nombreComercial,
+                    p.id_pregunta                 AS idPregunta,
+                    p.pregunta                    AS pregunta,
+                    AVG(COALESCE(ore.valor_escala, 0)) AS promedio
+                FROM respuesta r
+                         INNER JOIN formulario f
+                                    ON f.id_formulario = r.id_formulario
+                         INNER JOIN formulario_preguntas fp
+                                    ON f.id_formulario = fp.id_formulario
+                         INNER JOIN preguntas p
+                                    ON fp.id_pregunta = p.id_pregunta
+                         INNER JOIN opcion_respuesta ore
+                                    ON ore.id_respuesta = r.id_respuesta
+                         INNER JOIN emprendimientos e
+                                    ON e.id = r.id_emprendimiento
+                GROUP BY
+                    f.nombre,
+                    e.id,
+                    e.nombre_comercial,
+                    p.id_pregunta,
+                    p.pregunta
+                ORDER BY
+                    p.pregunta
+        """,
+            nativeQuery = true
+    )
+    List<RespuestaFormularioPreguntaDTO> obtenerPreguntasValoracion();
 
 }

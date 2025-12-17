@@ -15,10 +15,6 @@ public interface IMetricasGeneralesRepository extends JpaRepository<MetricasGene
 
     Optional<MetricasGenerales> findTopByOrderByVistasAsc();
 
-    Optional<MetricasGenerales> findTopByOrderByNivelValoracionDesc();
-
-    Optional<MetricasGenerales> findTopByOrderByNivelValoracionAsc();
-
     Optional<MetricasGenerales> findByEmprendimientos(Emprendimientos emprendimientos);
 
     List<MetricasGenerales> findAllByFechaRegistroIsBetweenOrEmprendimientos(LocalDateTime fechaRegistroAfter, LocalDateTime fechaRegistroBefore, Emprendimientos emprendimientos);

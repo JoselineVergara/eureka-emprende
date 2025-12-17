@@ -2,6 +2,7 @@ package com.example.eureka.metricas.infrastructure.controller;
 
 
 import com.example.eureka.metricas.domain.MetricasGenerales;
+import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.port.in.MetricasGeneralesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +41,12 @@ public class MetricasGeneralesController {
     }
 
     @GetMapping("/emprendimiento/mayor-valoracion")
-    public ResponseEntity<MetricasGenerales> mayorValoracion() {
+    public ResponseEntity<MetricasPregunta> mayorValoracion() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionDesc());
     }
 
     @GetMapping("/emprendimiento/menor-valoracion")
-    public ResponseEntity<MetricasGenerales> menorValoracion() {
+    public ResponseEntity<MetricasPregunta> menorValoracion() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionAsc());
     }
 

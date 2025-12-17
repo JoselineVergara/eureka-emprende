@@ -7,8 +7,10 @@ import com.example.eureka.entrepreneurship.port.out.IEmprendimientoCategoriasRep
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
 import com.example.eureka.general.domain.model.Categorias;
 import com.example.eureka.metricas.domain.MetricasGenerales;
+import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.port.in.MetricasGeneralesService;
 import com.example.eureka.metricas.port.out.IMetricasGeneralesRepository;
+import com.example.eureka.metricas.port.out.IMetricasPreguntaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IEmprendimientoCategoriasRepository emprendimientoCategoriasRepository;
     private final ICategoriaRepository categoriaRepository;
+    private final IMetricasPreguntaRepository  metricasPreguntaRepository;
 
 
 
@@ -40,13 +43,13 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
     }
 
     @Override
-    public MetricasGenerales findTopByOrderByNivelValoracionDesc() {
-        return metricasGeneralesRepository.findTopByOrderByNivelValoracionDesc().orElse(null);
+    public MetricasPregunta findTopByOrderByNivelValoracionDesc() {
+        return metricasPreguntaRepository.findTopByOrderByValoracionDesc();
     }
 
     @Override
-    public MetricasGenerales findTopByOrderByNivelValoracionAsc() {
-        return metricasGeneralesRepository.findTopByOrderByNivelValoracionAsc().orElse(null);
+    public MetricasPregunta findTopByOrderByNivelValoracionAsc() {
+        return metricasPreguntaRepository.findTopByOrderByValoracionAsc();
     }
 
     @Override

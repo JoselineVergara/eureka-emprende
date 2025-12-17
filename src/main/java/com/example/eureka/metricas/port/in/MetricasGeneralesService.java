@@ -2,6 +2,7 @@ package com.example.eureka.metricas.port.in;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.metricas.domain.MetricasGenerales;
+import com.example.eureka.metricas.domain.MetricasPregunta;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -13,9 +14,9 @@ public interface MetricasGeneralesService {
 
     MetricasGenerales findTopByOrderByVistasAsc();
 
-    MetricasGenerales findTopByOrderByNivelValoracionDesc();
+    MetricasPregunta findTopByOrderByNivelValoracionDesc();
 
-    MetricasGenerales findTopByOrderByNivelValoracionAsc();
+    MetricasPregunta findTopByOrderByNivelValoracionAsc();
 
     MetricasGenerales save(MetricasGenerales metricasGenerales);
 

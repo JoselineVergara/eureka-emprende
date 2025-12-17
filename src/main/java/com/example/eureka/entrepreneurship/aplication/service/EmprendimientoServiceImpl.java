@@ -2,19 +2,22 @@ package com.example.eureka.entrepreneurship.aplication.service;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.auth.port.out.IUserRepository;
-import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaFormularioDTO;
+import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaFormularioPreguntaDTO;
 import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
 import com.example.eureka.entrepreneurship.port.out.*;
+import com.example.eureka.formulario.domain.model.Pregunta;
 import com.example.eureka.general.domain.model.*;
 import com.example.eureka.general.port.out.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.metricas.domain.MetricasBasicas;
 import com.example.eureka.metricas.domain.MetricasGenerales;
+import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.port.out.IMetricasGeneralesRepository;
+import com.example.eureka.metricas.port.out.IMetricasPreguntaRepository;
 import com.example.eureka.shared.storage.FileStorageService;
 import com.example.eureka.entrepreneurship.infrastructure.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
@@ -69,6 +72,8 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
     private final IMetricasGeneralesRepository metricasGeneralesRepository;
     private final IAutoevaluacionRepository autoevaluacionRepository;
+    private final IMetricasPreguntaRepository metricasPreguntaRepository;
+    private final IPreguntaRepository preguntaRepository;
 
 
     @Override
@@ -491,30 +496,28 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         dto.setMultimedia(obtenerMultimediaPorEmprendimiento(id));
         try{
             MetricasGenerales metricasGenerales = metricasGeneralesRepository.findByEmprendimientos(emprendimiento).orElse(null);
-            List<RespuestaFormularioDTO> respuestaFormularioDTOS = autoevaluacionRepository.obtenerRespuestasPorEmprendimiento(Long.valueOf(emprendimiento.getId()));
-            Integer promedioNivelValoracion = 0;
-            if(respuestaFormularioDTOS.size() > 0){
-                promedioNivelValoracion = respuestaFormularioDTOS.stream()
-                        .filter(r -> r.getValorEscala() != null)
-                        .mapToInt(RespuestaFormularioDTO::getValorEscala)
-                        .average()
-                        .stream()
-                        .mapToInt(avg -> (int) Math.round(avg))
-                        .findFirst()
-                        .orElse(0);
+            List<RespuestaFormularioPreguntaDTO> respuestaFormularioDTOS = autoevaluacionRepository.obtenerPreguntasValoracion();
 
+            for(RespuestaFormularioPreguntaDTO rp : respuestaFormularioDTOS){
+                Pregunta p = preguntaRepository.findById(rp.getIdPregunta()).orElse(null);
+                MetricasPregunta m = new MetricasPregunta();
+                m.setEmprendimientos(emprendimiento);
+                m.setPregunta(p);
+                m.setValoracion(rp.getPromedio());
+                m.setFechaRegistro(LocalDateTime.now());
+                metricasPreguntaRepository.save(m);
             }
+
 
             if(null == metricasGenerales){
                 metricasGenerales = new MetricasGenerales();
                 metricasGenerales.setEmprendimientos(emprendimiento);
                 metricasGenerales.setVistas(1);
-                metricasGenerales.setNivelValoracion(promedioNivelValoracion);
+
                 metricasGenerales.setFechaRegistro(LocalDateTime.now());
 
             }else{
                 metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
-                metricasGenerales.setNivelValoracion(promedioNivelValoracion);
             }
             metricasGeneralesRepository.save(metricasGenerales);
 
