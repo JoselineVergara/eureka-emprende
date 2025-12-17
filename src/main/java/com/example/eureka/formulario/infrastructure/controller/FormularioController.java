@@ -44,6 +44,11 @@ public class FormularioController {
         return ResponseEntity.ok(formulario);
     }
 
+    @GetMapping("/emprendimiento/{idEmprendimiento}")
+    public ResponseEntity<?> getFormularioByIdEmprendimiento(@PathVariable Integer idEmprendimiento){
+
+    }
+
     @PostMapping("/save-opcion-respuesta")
     public ResponseEntity<OpcionRespuestaDTO> save(@RequestBody OpcionRespuestaResponseDTO opcionRespuestaDTO) {
 
