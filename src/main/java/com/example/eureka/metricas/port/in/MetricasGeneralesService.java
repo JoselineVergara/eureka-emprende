@@ -3,6 +3,8 @@ package com.example.eureka.metricas.port.in;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.metricas.domain.MetricasGenerales;
 import com.example.eureka.metricas.domain.MetricasPregunta;
+import com.example.eureka.metricas.infrastructure.dto.MetricaPreguntaDTO;
+import com.example.eureka.metricas.infrastructure.dto.MetricasGeneralesDTO;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -10,22 +12,22 @@ import java.util.List;
 
 public interface MetricasGeneralesService {
 
-    MetricasGenerales findTopByOrderByVistasDesc();
+    MetricasGeneralesDTO findTopByOrderByVistasDesc();
 
-    MetricasGenerales findTopByOrderByVistasAsc();
+    MetricasGeneralesDTO findTopByOrderByVistasAsc();
 
-    MetricasPregunta findTopByOrderByNivelValoracionDesc();
+    MetricaPreguntaDTO findTopByOrderByNivelValoracionDesc();
 
-    MetricasPregunta findTopByOrderByNivelValoracionAsc();
+    MetricaPreguntaDTO findTopByOrderByNivelValoracionAsc();
 
-    MetricasGenerales save(MetricasGenerales metricasGenerales);
+    MetricasGeneralesDTO save(MetricasGeneralesDTO metricasGenerales);
 
-    MetricasGenerales findById(Integer id);
+    MetricasGeneralesDTO findById(Integer id);
 
-    MetricasGenerales findByIdEmprendimiento(Integer id);
+    MetricasGeneralesDTO findByIdEmprendimiento(Integer id);
 
     HashMap<String, Object> findTopByOrderByVistasCategoriaDesc();
 
-    List<MetricasGenerales> findAllByFechaRegistroIsBetweenOrEmprendimientos(LocalDateTime fechaRegistroAfter, LocalDateTime fechaRegistroBefore, Integer idEmprendimientos);
+    List<MetricasGeneralesDTO> findAllByFechaRegistroIsBetweenOrEmprendimientos(LocalDateTime fechaRegistroAfter, LocalDateTime fechaRegistroBefore, Integer idEmprendimientos);
 
 }
