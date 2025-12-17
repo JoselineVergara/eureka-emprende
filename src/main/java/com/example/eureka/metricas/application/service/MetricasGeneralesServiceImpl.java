@@ -6,6 +6,7 @@ import com.example.eureka.entrepreneurship.port.out.ICategoriaRepository;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientoCategoriasRepository;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
 import com.example.eureka.general.domain.model.Categorias;
+import com.example.eureka.general.infrastructure.dto.CategoriasDTO;
 import com.example.eureka.metricas.domain.MetricasGenerales;
 import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.infrastructure.dto.MetricaPreguntaDTO;
@@ -88,10 +89,17 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
         if(null != emprendimientoCategorias) {
             categorias = emprendimientoCategorias.get(0).getCategoria();
         }
+        CategoriasDTO cat = new CategoriasDTO();
+        cat.setId(categorias.getId());
+        cat.setDescripcion(categorias.getDescripcion());
+        cat.setNombre(categorias.getNombre());
+        cat.setIdMultimedia(categorias.getMultimedia().getId());
+        cat.setUrlImagen(categorias.getMultimedia().getUrlArchivo());
         HashMap<String, Object> resultado = new HashMap<>();
-        resultado.put("categorias", categorias);
+        MetricasGeneralesDTO me = toDTO(metricasGenerales);
+        resultado.put("categorias", cat);
         if(categorias != null) {
-            resultado.put("vistas", metricasGenerales.getVistas());
+            resultado.put("vistas", me.getVistas());
         }
 
 
