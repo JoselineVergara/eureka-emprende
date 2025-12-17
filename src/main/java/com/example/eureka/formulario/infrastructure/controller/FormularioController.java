@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1/formularios")
 public class FormularioController {
@@ -45,8 +47,8 @@ public class FormularioController {
     }
 
     @GetMapping("/emprendimiento/{idEmprendimiento}")
-    public ResponseEntity<?> getFormularioByIdEmprendimiento(@PathVariable Integer idEmprendimiento){
-
+    public ResponseEntity<List<FormularioResponseDTO>> getFormularioByIdEmprendimiento(@PathVariable Integer idEmprendimiento){
+        return ResponseEntity.ok(formularioService.getFormularioByEmprendimiento(idEmprendimiento));
     }
 
     @PostMapping("/save-opcion-respuesta")
