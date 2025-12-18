@@ -150,7 +150,7 @@ public class SolicitudAprobacionService {
 
         String estadoActual = emprendimiento.getEstadoEmprendimiento();
 
-        if (EstadoEmprendimiento.BORRADOR.name().equals(estadoActual)) {
+        if (EstadoEmprendimiento.PENDIENTE_APROBACION.name().equals(estadoActual)) {
             tipoSolicitud = SolicitudAprobacion.TipoSolicitud.CREACION;
         } else if (EstadoEmprendimiento.PUBLICADO.name().equals(estadoActual)) {
             tipoSolicitud = SolicitudAprobacion.TipoSolicitud.ACTUALIZACION;
