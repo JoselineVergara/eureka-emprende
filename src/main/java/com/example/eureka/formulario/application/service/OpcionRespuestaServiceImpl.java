@@ -76,24 +76,31 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
     }
 
     @Override
-    public OpcionRespuestaDTO save(OpcionRespuestaResponseDTO opcionRespuesta) {
-        Emprendimientos emp = emprendimientosRepository.findById(opcionRespuesta.getIdEmprendimiento()).orElse(null);
-        Opciones opc = opcionRepository.findById(opcionRespuesta.getIdOpcion().longValue());
-        Respuesta rp = autoevaluacionRepository.findById(opcionRespuesta.getIdRespuesta()).orElse(null);
-        OpcionRespuesta op = new  OpcionRespuesta();
-        op.setRespuesta(rp);
-        op.setOpciones(opc);
-        op.setEmprendimiento(emp);
-        op.setValorescala(opcionRespuesta.getValorescala());
-        op = opcionRespuestaRepository.save(op);
+    public List<OpcionRespuestaDTO> save(List<OpcionRespuestaResponseDTO> ls) {
+        List<OpcionRespuestaDTO> opcionRespuestaDTOs = new ArrayList<>();
 
-        OpcionRespuestaDTO  opcionRespuestaDTO = new OpcionRespuestaDTO();
-        opcionRespuestaDTO.setId(op.getId());
-        opcionRespuestaDTO.setOpciones(op.getOpciones());
-        opcionRespuestaDTO.setRespuesta(op.getRespuesta());
-        opcionRespuestaDTO.setEmprendimientos(op.getEmprendimiento());
-        opcionRespuestaDTO.setValorescala(op.getValorescala());
+        for(OpcionRespuestaResponseDTO opcionRespuesta : ls){
+            Emprendimientos emp = emprendimientosRepository.findById(opcionRespuesta.getIdEmprendimiento()).orElse(null);
+            Opciones opc = opcionRepository.findById(opcionRespuesta.getIdOpcion().longValue());
+            Respuesta rp = autoevaluacionRepository.findById(opcionRespuesta.getIdRespuesta()).orElse(null);
+            OpcionRespuesta op = new  OpcionRespuesta();
+            op.setRespuesta(rp);
+            op.setOpciones(opc);
+            op.setEmprendimiento(emp);
+            op.setValorescala(opcionRespuesta.getValorescala());
+            op = opcionRespuestaRepository.save(op);
 
-        return opcionRespuestaDTO;
+            OpcionRespuestaDTO  opcionRespuestaDTO = new OpcionRespuestaDTO();
+            opcionRespuestaDTO.setId(op.getId());
+            opcionRespuestaDTO.setOpciones(op.getOpciones());
+            opcionRespuestaDTO.setRespuesta(op.getRespuesta());
+            opcionRespuestaDTO.setEmprendimientos(op.getEmprendimiento());
+            opcionRespuestaDTO.setValorescala(op.getValorescala());
+
+            opcionRespuestaDTOs.add(opcionRespuestaDTO);
+        }
+
+
+        return opcionRespuestaDTOs;
     }
 }

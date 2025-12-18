@@ -51,7 +51,7 @@ public class FormularioController {
     }
 
     @PostMapping("/save-opcion-respuesta")
-    public ResponseEntity<OpcionRespuestaDTO> save(@RequestBody OpcionRespuestaResponseDTO opcionRespuestaDTO) {
+    public ResponseEntity<List<OpcionRespuestaDTO>> save(@RequestBody List<OpcionRespuestaResponseDTO> opcionRespuestaDTO) {
         return ResponseEntity.ok(opcionRespuestaService.save(opcionRespuestaDTO));
     }
 
