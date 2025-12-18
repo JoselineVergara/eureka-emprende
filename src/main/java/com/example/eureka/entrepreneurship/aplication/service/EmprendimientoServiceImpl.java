@@ -471,7 +471,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emprendimiento);
         dto.setCategorias(EmprendimientoMapper.toCategoriaDTOList(
-                emprendimientoCategoriasRepository.findEmprendimientosPorCategoria(id)
+                emprendimientoCategoriasRepository.findByEmprendimientoIdWithCategoria(id)
         ));
         dto.setDescripciones(EmprendimientoMapper.toDescripcionDTOList(
                 emprendimientosDescripcionRepository.findByEmprendimientoId(id)
