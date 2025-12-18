@@ -1,5 +1,6 @@
 package com.example.eureka.formulario.infrastructure.dto.response;
 
+import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.formulario.domain.model.Opciones;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import lombok.AllArgsConstructor;
@@ -14,4 +15,5 @@ public class OpcionRespuestaDTO {
     private Respuesta respuesta;
     private Opciones opciones;
     private Integer valorescala;
+    private Emprendimientos emprendimientos;
 }

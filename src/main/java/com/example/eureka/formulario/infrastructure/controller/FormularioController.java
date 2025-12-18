@@ -2,6 +2,7 @@ package com.example.eureka.formulario.infrastructure.controller;
 
 import com.example.eureka.autoevaluacion.port.in.AutoevaluacionService;
 import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
+import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
 import com.example.eureka.formulario.domain.model.Opciones;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.formulario.infrastructure.dto.response.FormularioResponseDTO;
@@ -24,14 +25,12 @@ public class FormularioController {
     private final FormularioService formularioService;
     private final OpcionRespuestaService opcionRespuestaService;
     private final AutoevaluacionService respuestaService;
-    private final OpcionService opcionService;
 
 
-    public FormularioController(FormularioService formularioService, OpcionRespuestaService opcionRespuestaService, AutoevaluacionService respuestaService, OpcionService opcionService) {
+    public FormularioController(FormularioService formularioService, OpcionRespuestaService opcionRespuestaService, AutoevaluacionService respuestaService) {
         this.formularioService = formularioService;
         this.opcionRespuestaService = opcionRespuestaService;
         this.respuestaService = respuestaService;
-        this.opcionService = opcionService;
     }
 
     @GetMapping("/tipo/{tipo}")
@@ -53,14 +52,7 @@ public class FormularioController {
 
     @PostMapping("/save-opcion-respuesta")
     public ResponseEntity<OpcionRespuestaDTO> save(@RequestBody OpcionRespuestaResponseDTO opcionRespuestaDTO) {
-
-        Respuesta respuesta = respuestaService.findById(opcionRespuestaDTO.getIdRespuesta().longValue());
-        Opciones opcion = opcionService.findById(opcionRespuestaDTO.getIdOpcion().longValue());
-        OpcionRespuesta respuestaDTO = new OpcionRespuesta();
-        respuestaDTO.setRespuesta(respuesta);
-        respuestaDTO.setOpciones(opcion);
-        respuestaDTO.setValorescala(opcionRespuestaDTO.getValorescala());
-        return ResponseEntity.ok(opcionRespuestaService.save(respuestaDTO));
+        return ResponseEntity.ok(opcionRespuestaService.save(opcionRespuestaDTO));
     }
 
     @GetMapping("/get-respuesta/{idRespuesta}")

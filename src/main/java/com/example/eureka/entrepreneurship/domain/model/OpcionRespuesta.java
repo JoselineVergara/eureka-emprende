@@ -13,7 +13,7 @@ import lombok.ToString;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"respuesta", "opciones"})  // Excluir relación del toString
+@ToString(exclude = {"respuesta", "opciones", "emprendimiento"})  // Excluir relación del toString
 @Table(name = "opcion_respuesta")
 public class OpcionRespuesta {
 
@@ -29,6 +29,10 @@ public class OpcionRespuesta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_opcion", nullable = false)
     private Opciones opciones;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_emprendimiento")
+    private Emprendimientos emprendimiento;
 
     @Column(name = "valor_escala", nullable = false)
     private Integer valorescala;

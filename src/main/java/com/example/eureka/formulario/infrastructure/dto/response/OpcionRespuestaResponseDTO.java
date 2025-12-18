@@ -5,6 +5,7 @@ public class OpcionRespuestaResponseDTO {
     private Integer idRespuesta;
     private Integer idOpcion;
     private Integer valorescala;
+    private Integer idEmprendimiento;
 
     public OpcionRespuestaResponseDTO() {}
 
@@ -30,5 +31,13 @@ public class OpcionRespuestaResponseDTO {
 
     public void setValorescala(Integer valorescala) {
         this.valorescala = valorescala;
+    }
+
+    public Integer getIdEmprendimiento() {
+        return idEmprendimiento;
+    }
+
+    public void setIdEmprendimiento(Integer idEmprendimiento) {
+        this.idEmprendimiento = idEmprendimiento;
     }
 }

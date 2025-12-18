@@ -1,10 +1,15 @@
 package com.example.eureka.formulario.application.service;
 
+import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
+import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
+import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
 import com.example.eureka.formulario.domain.model.Opciones;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
+import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaResponseDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
+import com.example.eureka.formulario.port.out.IOpcionRepository;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,11 +25,16 @@ import java.util.List;
 public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
     private final IOpcionRespuestaRepository opcionRespuestaRepository;
+    private final IEmprendimientosRepository  emprendimientosRepository;
+    private final IOpcionRepository  opcionRepository;
+    private final IAutoevaluacionRepository   autoevaluacionRepository;
 
-    public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository) {
+    public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository, IEmprendimientosRepository emprendimientosRepository, IOpcionRepository opcionRepository, IAutoevaluacionRepository autoevaluacionRepository) {
         this.opcionRespuestaRepository = opcionRespuestaRepository;
+        this.emprendimientosRepository = emprendimientosRepository;
+        this.opcionRepository = opcionRepository;
+        this.autoevaluacionRepository = autoevaluacionRepository;
     }
-
 
     @Override
     public Page<OpcionRespuestaDTO> findAllByRespuesta(Respuesta respuesta, Pageable pageable) {
@@ -37,6 +47,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                 opcionRespuestaDTO.setOpciones(opcionRespuesta.getOpciones());
                 opcionRespuestaDTO.setRespuesta(opcionRespuesta.getRespuesta());
                 opcionRespuestaDTO.setValorescala(opcionRespuesta.getValorescala());
+                opcionRespuestaDTO.setEmprendimientos(opcionRespuesta.getEmprendimiento());
                 opcionRespuestaDTOs.add(opcionRespuestaDTO);
             }
             return  new PageImpl<>(opcionRespuestaDTOs, pageable, opcionRespuestaDTOs.size());
@@ -55,6 +66,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                 opcionRespuestaDTO.setOpciones(opcionRespuesta.getOpciones());
                 opcionRespuestaDTO.setRespuesta(opcionRespuesta.getRespuesta());
                 opcionRespuestaDTO.setValorescala(opcionRespuesta.getValorescala());
+                opcionRespuestaDTO.setEmprendimientos(opcionRespuesta.getEmprendimiento());
                 opcionRespuestaDTOs.add(opcionRespuestaDTO);
             }
             return  new PageImpl<>(opcionRespuestaDTOs, pageable, opcionRespuestaDTOs.size());
@@ -64,12 +76,22 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
     }
 
     @Override
-    public OpcionRespuestaDTO save(OpcionRespuesta opcionRespuesta) {
-        OpcionRespuesta op = opcionRespuestaRepository.save(opcionRespuesta);
+    public OpcionRespuestaDTO save(OpcionRespuestaResponseDTO opcionRespuesta) {
+        Emprendimientos emp = emprendimientosRepository.findById(opcionRespuesta.getIdEmprendimiento()).orElse(null);
+        Opciones opc = opcionRepository.findById(opcionRespuesta.getIdOpcion().longValue());
+        Respuesta rp = autoevaluacionRepository.findById(opcionRespuesta.getIdRespuesta()).orElse(null);
+        OpcionRespuesta op = new  OpcionRespuesta();
+        op.setRespuesta(rp);
+        op.setOpciones(opc);
+        op.setEmprendimiento(emp);
+        op.setValorescala(opcionRespuesta.getValorescala());
+        op = opcionRespuestaRepository.save(op);
+
         OpcionRespuestaDTO  opcionRespuestaDTO = new OpcionRespuestaDTO();
         opcionRespuestaDTO.setId(op.getId());
         opcionRespuestaDTO.setOpciones(op.getOpciones());
         opcionRespuestaDTO.setRespuesta(op.getRespuesta());
+        opcionRespuestaDTO.setEmprendimientos(op.getEmprendimiento());
         opcionRespuestaDTO.setValorescala(op.getValorescala());
 
         return opcionRespuestaDTO;
