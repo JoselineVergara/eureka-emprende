@@ -1,6 +1,7 @@
 package com.example.eureka.entrepreneurship.domain.model;
 
 import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.general.domain.model.Categorias;
 import com.example.eureka.general.domain.model.Ciudades;
 import com.example.eureka.general.domain.model.TiposEmprendimientos;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -59,5 +61,10 @@ public class Emprendimientos {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_emprendimiento", nullable = false)
     private TiposEmprendimientos tiposEmprendimientos;
+
+    @OneToMany(mappedBy = "emprendimiento", fetch = FetchType.LAZY)
+    private List<EmprendimientoCategorias> emprendimientoCategorias;
+
+
 
 }

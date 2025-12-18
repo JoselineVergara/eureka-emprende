@@ -19,4 +19,9 @@ public interface IEmprendimientoCategoriasRepository extends JpaRepository<Empre
     List<EmprendimientoCategorias> findByEmprendimientoId(Integer emprendimientoId);
     List<EmprendimientoCategorias> findByEmprendimientoIdIn(List<Integer> emprendimientoIds);
     void deleteEmprendimientoCategoriasByEmprendimientoId(Integer emprendimientoId);
+    @Query("SELECT ec FROM EmprendimientoCategorias ec " +
+            "JOIN FETCH ec.categoria c " +
+            "JOIN FETCH c.multimedia " +
+            "WHERE ec.emprendimiento.id = :emprendimientoId")
+    List<EmprendimientoCategorias> findByEmprendimientoIdWithCategoria(@Param("emprendimientoId") Integer emprendimientoId);
 }
