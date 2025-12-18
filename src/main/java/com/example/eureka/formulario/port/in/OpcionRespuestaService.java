@@ -7,11 +7,13 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuesta
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface OpcionRespuestaService {
 
     Page<OpcionRespuestaDTO> findAllByRespuesta(Respuesta respuesta, Pageable pageable);
 
     Page<OpcionRespuestaDTO> findAllByOpciones(Opciones opciones, Pageable pageable);
 
-    OpcionRespuestaDTO save(OpcionRespuestaResponseDTO opcionRespuesta);
+    List<OpcionRespuestaDTO> save(List<OpcionRespuestaResponseDTO> opcionRespuesta);
 }
