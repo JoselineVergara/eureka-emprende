@@ -3,6 +3,8 @@ package com.example.eureka.metricas.infrastructure.controller;
 
 import com.example.eureka.metricas.domain.MetricasGenerales;
 import com.example.eureka.metricas.domain.MetricasPregunta;
+import com.example.eureka.metricas.infrastructure.dto.MetricaPreguntaDTO;
+import com.example.eureka.metricas.infrastructure.dto.MetricasGeneralesDTO;
 import com.example.eureka.metricas.port.in.MetricasGeneralesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +28,12 @@ public class MetricasGeneralesController {
     private final MetricasGeneralesService metricasGeneralesService;
 
     @GetMapping("/emprendimiento/mayor-vista")
-    public ResponseEntity<MetricasGenerales> mayorVista() {
+    public ResponseEntity<MetricasGeneralesDTO> mayorVista() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasDesc());
     }
 
     @GetMapping("/emprendimiento/menor-vista")
-    public ResponseEntity<MetricasGenerales> menorVista() {
+    public ResponseEntity<MetricasGeneralesDTO> menorVista() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasAsc());
     }
 
@@ -41,17 +43,17 @@ public class MetricasGeneralesController {
     }
 
     @GetMapping("/emprendimiento/mayor-valoracion")
-    public ResponseEntity<MetricasPregunta> mayorValoracion() {
+    public ResponseEntity<MetricaPreguntaDTO> mayorValoracion() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionDesc());
     }
 
     @GetMapping("/emprendimiento/menor-valoracion")
-    public ResponseEntity<MetricasPregunta> menorValoracion() {
+    public ResponseEntity<MetricaPreguntaDTO> menorValoracion() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionAsc());
     }
 
     @GetMapping("/filtros")
-    public ResponseEntity<List<MetricasGenerales>> filtros(
+    public ResponseEntity<List<MetricasGeneralesDTO>> filtros(
             @RequestParam(value = "fechaInicio", required = false) LocalDateTime fechaInicio,
             @RequestParam(value = "fechaFin", required = false) LocalDateTime fechaFin,
             @RequestParam(value = "idEmprendimiento", required = false) Integer idEmprendimiento) {
