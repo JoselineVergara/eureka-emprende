@@ -88,6 +88,7 @@ public class WebSecurityConfig {
                                 "/v1/emprendimientos",
                                 "/v1/emprendimientos/{id}/publico",
                                 "/v1/emprendimientos/filtrar",
+                                "v1/formularios/tipo/{tipo}",
                                 "/v1/valoraciones",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
