@@ -1,5 +1,6 @@
 package com.example.eureka.formulario.infrastructure.controller;
 
+import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaResponseDTO;
 import com.example.eureka.autoevaluacion.port.in.AutoevaluacionService;
 import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
@@ -53,6 +54,11 @@ public class FormularioController {
     @PostMapping("/save-opcion-respuesta")
     public ResponseEntity<List<OpcionRespuestaDTO>> save(@RequestBody List<OpcionRespuestaResponseDTO> opcionRespuestaDTO) {
         return ResponseEntity.ok(opcionRespuestaService.save(opcionRespuestaDTO));
+    }
+
+    @PostMapping("/autoevaluacion/save")
+    public ResponseEntity<RespuestaResponseDTO> saveAutoevaluacion(@RequestBody RespuestaResponseDTO respuestaDTO) {
+        return ResponseEntity.ok(opcionRespuestaService.generaRespuestaAutoevaluacion(respuestaDTO));
     }
 
     @GetMapping("/get-respuesta/{idRespuesta}")
