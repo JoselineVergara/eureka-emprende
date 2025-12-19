@@ -9,6 +9,7 @@ public class MetricasGeneralesDTO {
 
     private Integer id;
     private Integer idEmprendimiento;
+    private String nombreEmprendimiento;
     private Integer vistas;
     private LocalDateTime fechaRegistro;
 

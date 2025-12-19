@@ -107,25 +107,46 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
         return resultado;
     }
 
-    @Override
-    public List<MetricasGeneralesDTO> findAllByFechaRegistroIsBetweenOrEmprendimientos(LocalDateTime fechaRegistroAfter, LocalDateTime fechaRegistroBefore, Integer  idEmprendimientos) {
-        Emprendimientos emprendimientos = emprendimientosRepository.findById(idEmprendimientos).orElse(null);
-        List<MetricasGenerales> ls = metricasGeneralesRepository.findAllByFechaRegistroIsBetweenOrEmprendimientos(fechaRegistroAfter, fechaRegistroBefore, emprendimientos);
-        List<MetricasGeneralesDTO> resultado = new ArrayList<>();
-        for(MetricasGenerales metricasGenerales : ls) {
-            resultado.add(toDTO(metricasGenerales));
+    public List<MetricasGeneralesDTO> findAllByFechaRegistroIsBetweenOrEmprendimientos(
+            LocalDateTime fechaRegistroAfter,
+            LocalDateTime fechaRegistroBefore,
+            Integer idEmprendimientos) {
+
+        // Caso 1: sin ningún filtro → devolver todo
+        if (fechaRegistroAfter == null && fechaRegistroBefore == null && idEmprendimientos == null) {
+            List<MetricasGenerales> todos = metricasGeneralesRepository.findAll();
+            return todos.stream().map(this::toDTO).toList();
         }
-        return resultado;
+
+        Emprendimientos emprendimientos = null;
+        if (idEmprendimientos != null) {
+            emprendimientos = emprendimientosRepository.findById(idEmprendimientos).orElse(null);
+        }
+
+        List<MetricasGenerales> ls =
+                metricasGeneralesRepository.findByFiltrosOpcionales(
+                        fechaRegistroAfter, fechaRegistroBefore, emprendimientos);
+
+        return ls.stream().map(this::toDTO).toList();
     }
 
+
+
     MetricasGeneralesDTO toDTO(MetricasGenerales metricasGenerales) {
-        MetricasGeneralesDTO metricasGeneralesDTO = new MetricasGeneralesDTO();
-        metricasGeneralesDTO.setId(metricasGenerales.getId());
-        metricasGeneralesDTO.setVistas(metricasGenerales.getVistas());
-        metricasGeneralesDTO.setIdEmprendimiento(metricasGenerales.getEmprendimientos().getId());
-        metricasGeneralesDTO.setFechaRegistro(metricasGenerales.getFechaRegistro());
-        return  metricasGeneralesDTO;
+        MetricasGeneralesDTO dto = new MetricasGeneralesDTO();
+        dto.setId(metricasGenerales.getId());
+        dto.setVistas(metricasGenerales.getVistas());
+        dto.setFechaRegistro(metricasGenerales.getFechaRegistro());
+
+        if (metricasGenerales.getEmprendimientos() != null) {
+            Emprendimientos emp = metricasGenerales.getEmprendimientos();
+            dto.setIdEmprendimiento(emp.getId());
+            dto.setNombreEmprendimiento(emp.getNombreComercial()); // ← aquí mapeas el nombre
+        }
+
+        return dto;
     }
+
 
     MetricaPreguntaDTO metricaPreguntaDTO(MetricasPregunta metricasPregunta) {
         MetricaPreguntaDTO metricaPreguntaDTO = new MetricaPreguntaDTO();

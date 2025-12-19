@@ -4,6 +4,8 @@ import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.metricas.domain.MetricasBasicas;
 import com.example.eureka.metricas.domain.MetricasGenerales;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,4 +20,19 @@ public interface IMetricasGeneralesRepository extends JpaRepository<MetricasGene
     Optional<MetricasGenerales> findByEmprendimientos(Emprendimientos emprendimientos);
 
     List<MetricasGenerales> findAllByFechaRegistroIsBetweenOrEmprendimientos(LocalDateTime fechaRegistroAfter, LocalDateTime fechaRegistroBefore, Emprendimientos emprendimientos);
+
+    @Query("""
+       SELECT m
+       FROM MetricasGenerales m
+       WHERE (:fechaInicio IS NULL OR m.fechaRegistro >= :fechaInicio)
+         AND (:fechaFin IS NULL OR m.fechaRegistro <= :fechaFin)
+         AND (:emprendimiento IS NULL OR m.emprendimientos = :emprendimiento)
+       """)
+    List<MetricasGenerales> findByFiltrosOpcionales(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            @Param("emprendimiento") Emprendimientos emprendimiento
+    );
+
+
 }
