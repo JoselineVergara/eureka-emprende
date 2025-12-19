@@ -34,5 +34,16 @@ public interface IMetricasGeneralesRepository extends JpaRepository<MetricasGene
             @Param("emprendimiento") Emprendimientos emprendimiento
     );
 
+    @Query("""
+        SELECT c, SUM(m.vistas)
+        FROM MetricasGenerales m
+        JOIN m.emprendimientos e
+        JOIN e.emprendimientoCategorias ec
+        JOIN ec.categoria c
+        GROUP BY c
+        ORDER BY SUM(m.vistas) DESC
+    """)
+    List<Object[]> findCategoriasConVistas();
+
 
 }

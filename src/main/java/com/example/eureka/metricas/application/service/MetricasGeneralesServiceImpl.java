@@ -82,30 +82,34 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
 
     @Override
     public HashMap<String, Object> findTopByOrderByVistasCategoriaDesc() {
-        MetricasGenerales metricasGenerales = metricasGeneralesRepository.findTopByOrderByVistasDesc().orElse(null);
-        Emprendimientos emp = metricasGenerales.getEmprendimientos();
-        List<EmprendimientoCategorias> emprendimientoCategorias = emprendimientoCategoriasRepository.findByEmprendimientoId(emp.getId());
-        Categorias categorias = null;
-        if(null != emprendimientoCategorias) {
-            categorias = emprendimientoCategorias.get(0).getCategoria();
+        List<Object[]> rows = metricasGeneralesRepository.findCategoriasConVistas();
+
+        List<HashMap<String, Object>> lista = new ArrayList<>();
+
+        for (Object[] row : rows) {
+            Categorias categorias = (Categorias) row[0];
+            Long totalVistas = (Long) row[1];
+
+            CategoriasDTO cat = new CategoriasDTO();
+            cat.setId(categorias.getId());
+            cat.setDescripcion(categorias.getDescripcion());
+            cat.setNombre(categorias.getNombre());
+            cat.setIdMultimedia(categorias.getMultimedia().getId());
+            cat.setUrlImagen(categorias.getMultimedia().getUrlArchivo());
+
+            HashMap<String, Object> item = new HashMap<>();
+            item.put("categoria", cat);
+            item.put("vistas", totalVistas);
+
+            lista.add(item);
         }
-        CategoriasDTO cat = new CategoriasDTO();
-        cat.setId(categorias.getId());
-        cat.setDescripcion(categorias.getDescripcion());
-        cat.setNombre(categorias.getNombre());
-        cat.setIdMultimedia(categorias.getMultimedia().getId());
-        cat.setUrlImagen(categorias.getMultimedia().getUrlArchivo());
+
         HashMap<String, Object> resultado = new HashMap<>();
-        MetricasGeneralesDTO me = toDTO(metricasGenerales);
-        resultado.put("categorias", cat);
-        if(categorias != null) {
-            resultado.put("vistas", me.getVistas());
-        }
-
-
+        resultado.put("categorias", lista); // ahora es listado, no solo una
 
         return resultado;
     }
+
 
     public List<MetricasGeneralesDTO> findAllByFechaRegistroIsBetweenOrEmprendimientos(
             LocalDateTime fechaRegistroAfter,
