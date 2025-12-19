@@ -382,7 +382,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     // TODO: Ajustado para obtener solo aprobados
     @Override
     public List<MiniEmprendimientoDTO> obtenerEmprendimientos() {
-        List<Emprendimientos> lista = emprendimientosRepository.findByEstadoEmprendimiento("APROBADO");
+        List<Emprendimientos> lista = emprendimientosRepository.findByEstadoEmprendimiento("PUBLICADO");
 
         if (lista.isEmpty()) {
             return Collections.emptyList();
