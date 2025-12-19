@@ -1,5 +1,6 @@
 package com.example.eureka.formulario.port.in;
 
+import com.example.eureka.autoevaluacion.infrastructure.dto.RespuestaResponseDTO;
 import com.example.eureka.formulario.domain.model.Opciones;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
@@ -16,4 +17,6 @@ public interface OpcionRespuestaService {
     Page<OpcionRespuestaDTO> findAllByOpciones(Opciones opciones, Pageable pageable);
 
     List<OpcionRespuestaDTO> save(List<OpcionRespuestaResponseDTO> opcionRespuesta);
+
+    RespuestaResponseDTO generaRespuestaAutoevaluacion(RespuestaResponseDTO respuesta);
 }
