@@ -238,8 +238,6 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         return emprendimientosRepository.save(emprendimiento);
     }
 
-    // ... (resto de métodos sin cambios hasta actualizarEmprendimiento)
-
     @Override
     @Transactional
     public EmprendimientoResponseDTO actualizarEmprendimiento(Integer id, EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception {
@@ -281,7 +279,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         emprendimientoCategoriasRepository.deleteEmprendimientoCategoriasByEmprendimientoId(id);
         agregarCategoriaEmprendimiento(emprendimiento, emprendimientoRequestDTO.getCategorias());
 
-        // ... (resto del código de actualización sin cambios)
+
         actualizarDescripciones(id, emprendimiento, emprendimientoRequestDTO.getDescripciones());
         actualizarMetricas(id, emprendimiento, emprendimientoRequestDTO.getMetricas());
         actualizarPresenciaDigital(id, emprendimiento, emprendimientoRequestDTO.getPresenciasDigitales());
