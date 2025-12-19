@@ -440,7 +440,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         if (usuario.getRol().getNombre().equals("ADMINISTRADOR")) {
             lista = emprendimientosRepository.findAll();
         } else {
-            lista = emprendimientosRepository.findByUsuariosAndEstadoEmprendimientoEquals(usuario,"APROBADO");
+            lista = emprendimientosRepository.findByUsuariosAndEstadoEmprendimientoEquals(usuario,"PUBLICADO");
         }
 
         // Validar si la lista está vacía

@@ -42,7 +42,7 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
             "AND (COALESCE(:tipo, '') = '' OR LOWER(te.tipo) LIKE LOWER(CONCAT('%', :tipo, '%'))) " +
             "AND (COALESCE(:categoria, '') = '' OR LOWER(c.nombre) LIKE LOWER(CONCAT('%', :categoria, '%'))) " +
             "AND (COALESCE(:ciudad, '') = '' OR LOWER(ci.nombreCiudad) LIKE LOWER(CONCAT('%', :ciudad, '%')))" +
-            "AND e.estadoEmprendimiento = 'APROBADO'")
+            "AND e.estadoEmprendimiento = 'PUBLICADO'")
     org.springframework.data.domain.Page<Emprendimientos> findByFiltros(
             @Param("nombre") String nombre,
             @Param("tipo") String tipo,
