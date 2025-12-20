@@ -20,6 +20,8 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
     List<Emprendimientos> findByTiposEmprendimientos_Tipo(String tiposEmprendimientosTipo);
 
     @Query("SELECT DISTINCT e FROM Emprendimientos e " +
+            "LEFT JOIN FETCH e.multimedia m " +  // ← Ahora sí funciona
+            "LEFT JOIN FETCH m.multimedia " +
             "LEFT JOIN e.tiposEmprendimientos te " +
             "LEFT JOIN EmprendimientoCategorias ec ON ec.emprendimiento.id = e.id " +
             "LEFT JOIN ec.categoria c " +
@@ -34,6 +36,7 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
                                         @Param("ciudad") String ciudad);
 
     @Query("SELECT DISTINCT e FROM Emprendimientos e " +
+
             "LEFT JOIN e.tiposEmprendimientos te " +
             "LEFT JOIN EmprendimientoCategorias ec ON ec.emprendimiento.id = e.id " +
             "LEFT JOIN ec.categoria c " +

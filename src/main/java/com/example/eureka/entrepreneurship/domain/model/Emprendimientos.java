@@ -65,6 +65,9 @@ public class Emprendimientos {
     @OneToMany(mappedBy = "emprendimiento", fetch = FetchType.LAZY)
     private List<EmprendimientoCategorias> emprendimientoCategorias;
 
+    @OneToMany(mappedBy = "emprendimiento", fetch = FetchType.LAZY)
+    private List<EmprendimientoMultimedia> multimedia;
+
 
 
 }
