@@ -3,6 +3,7 @@ package com.example.eureka.entrepreneurship.infrastructure.controller;
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.auth.aplication.services.UsuariosServiceImpl;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoResponseDTO;
@@ -90,7 +91,7 @@ public class EmprendimientoController {
      * Obtener todos los emprendimientos con filtros opcionales
      */
     @GetMapping()
-    public ResponseEntity<PageResponseDTO<EmprendimientoResponseDTO>> obtenerEmprendimientosFiltrado(
+    public ResponseEntity<PageResponseDTO<EmprendimientoListadoResponseDTO>> obtenerEmprendimientosFiltrado(
             @RequestParam(value = "nombre", required = false) String nombre,
             @RequestParam(value = "tipo", required = false) String tipo,
             @RequestParam(value = "categoria", required = false) String categoria,

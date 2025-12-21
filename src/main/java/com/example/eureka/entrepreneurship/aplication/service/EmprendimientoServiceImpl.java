@@ -7,6 +7,9 @@ import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.CategoriaListadoDTO;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.MultimediaListadoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
 import com.example.eureka.entrepreneurship.port.out.*;
 import com.example.eureka.formulario.domain.model.Pregunta;
@@ -579,19 +582,50 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     }
 
     @Override
-    public Page<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad, Pageable pageable) {
-        // Normalizar los parámetros: convertir strings vacíos a null
+    public Page<EmprendimientoListadoResponseDTO> obtenerEmprendimientosFiltrado(
+            String nombre, String tipo, String categoria, String ciudad, Pageable pageable) {
+
         String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
         String tipoParam = (tipo != null && !tipo.trim().isEmpty()) ? tipo.trim() : null;
         String categoriaParam = (categoria != null && !categoria.trim().isEmpty()) ? categoria.trim() : null;
         String ciudadParam = (ciudad != null && !ciudad.trim().isEmpty()) ? ciudad.trim() : null;
 
-        Page<Emprendimientos> page = emprendimientosRepository.findByFiltros(nombreParam, tipoParam, categoriaParam, ciudadParam, pageable);
-        List<EmprendimientoResponseDTO> dtos = page.getContent().stream()
-            .map(EmprendimientoMapper::toResponseDTO)
-            .collect(Collectors.toList());
-        return new PageImpl<>(dtos, pageable, page.getTotalElements());
+        Page<EmprendimientoListadoResponseDTO> page =
+                emprendimientosRepository.findByFiltrosListado(
+                        nombreParam, tipoParam, categoriaParam, ciudadParam, pageable);
+
+        page.getContent().forEach(dto -> {
+            Integer idEmprendimiento = dto.getIdEmprendimiento();
+
+            // Categorías
+            var ecs = emprendimientoCategoriasRepository.findByEmprendimientoIdWithCategoria(idEmprendimiento);
+            dto.setCategorias(
+                    ecs.stream()
+                            .map(ec -> new CategoriaListadoDTO(
+                                    ec.getCategoria().getId(),
+                                    ec.getCategoria().getNombre()
+                            ))
+                            .toList()
+            );
+
+            // Multimedia
+            var ems = emprendimientoMultimediaRepository.findByEmprendimientoId(idEmprendimiento);
+            dto.setMultimedia(
+                    ems.stream()
+                            .map(em -> new MultimediaListadoDTO(
+                                    em.getMultimedia().getNombreActivo(),
+                                    em.getMultimedia().getUrlArchivo()
+                            ))
+                            .toList()
+            );
+        });
+
+        return page;
     }
+
+
+
+
 
     @Override
     public EmprendimientoPorCategoriaDTO obtenerEmprendimientosPorCategoria(Integer categoriaId) {
@@ -925,6 +959,15 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         emprendimientos.setActivoEmprendimiento(true);
         emprendimientosRepository.save(emprendimientos);
     }
+
+    public List<String> obtenerNombresCategorias(Integer emprendimientoId) {
+        return emprendimientoCategoriasRepository
+                .findByEmprendimientoIdWithCategoria(emprendimientoId)
+                .stream()
+                .map(ec -> ec.getCategoria().getNombre())
+                .toList();
+    }
+
 
 }
 

@@ -2,11 +2,14 @@ package com.example.eureka.entrepreneurship.port.out;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,6 +56,41 @@ public interface IEmprendimientosRepository extends JpaRepository<Emprendimiento
             @Param("ciudad") String ciudad,
             org.springframework.data.domain.Pageable pageable
     );
+
+    @Query("""
+select distinct new com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO(
+    e.id,
+    e.nombreComercial,
+    e.fechaCreacion,
+    ci.id,
+    ci.nombreCiudad,
+    p.id,
+    p.nombre,
+    e.estatusEmprendimiento,
+    te.tipo,
+    te.subTipo,
+    te.id
+)
+from Emprendimientos e
+left join e.tiposEmprendimientos te
+left join e.ciudades ci
+left join ci.provincias p
+left join EmprendimientoCategorias ec on ec.emprendimiento.id = e.id
+left join ec.categoria c
+where lower(e.nombreComercial) like lower(concat('%', coalesce(:nombre,  e.nombreComercial), '%'))
+  and lower(te.tipo)            like lower(concat('%', coalesce(:tipo,    te.tipo),          '%'))
+  and lower(ci.nombreCiudad)    like lower(concat('%', coalesce(:ciudad,  ci.nombreCiudad),  '%'))
+  and lower(c.nombre)           like lower(concat('%', coalesce(:categoria, c.nombre),       '%'))
+  and e.estadoEmprendimiento = 'PUBLICADO'
+""")
+    Page<EmprendimientoListadoResponseDTO> findByFiltrosListado(
+            @Param("nombre") String nombre,
+            @Param("tipo") String tipo,
+            @Param("categoria") String categoria,
+            @Param("ciudad") String ciudad,
+            Pageable pageable
+    );
+
 
 
     @Query("SELECT DISTINCT e FROM Emprendimientos e " +

@@ -24,4 +24,5 @@ public interface IEmprendimientoCategoriasRepository extends JpaRepository<Empre
             "JOIN FETCH c.multimedia " +
             "WHERE ec.emprendimiento.id = :emprendimientoId")
     List<EmprendimientoCategorias> findByEmprendimientoIdWithCategoria(@Param("emprendimientoId") Integer emprendimientoId);
+
 }
