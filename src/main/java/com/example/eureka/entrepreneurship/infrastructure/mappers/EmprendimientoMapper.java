@@ -2,6 +2,7 @@ package com.example.eureka.entrepreneurship.infrastructure.mappers;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.domain.model.*;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
 import com.example.eureka.general.domain.model.Categorias;
 import com.example.eureka.general.domain.model.Ciudades;
@@ -43,8 +44,14 @@ public class EmprendimientoMapper {
             dto.setNombreTipoEmprendimiento(emprendimiento.getTiposEmprendimientos().getSubTipo());
         }
 
+        // ← AGREGAR ESTE MAPEO DE MULTIMEDIA
+        if (emprendimiento.getMultimedia() != null && !emprendimiento.getMultimedia().isEmpty()) {
+            dto.setMultimedia(toMultimediaDTOList(emprendimiento.getMultimedia()));
+        }
+
         return dto;
     }
+
 
     public static Emprendimientos toDTOResponse(EmprendimientoResponseDTO emprendimiento) {
         if (emprendimiento == null) return null;

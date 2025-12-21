@@ -311,8 +311,8 @@ public class EventosServiceImpl implements EventosService {
         Emprendimientos emprendimiento = emprendimientosRepository.findById(idEmprendimiento)
                 .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado"));
 
-        if (!emprendimiento.getEstadoEmprendimiento().equalsIgnoreCase("APROBADO")) {
-            throw new BusinessException("El emprendimiento debe estar aprobado para crear eventos");
+        if (!emprendimiento.getEstadoEmprendimiento().equalsIgnoreCase("PUBLICADO")) {
+            throw new BusinessException("El emprendimiento debe estar publicado para crear eventos");
         }
 
         return emprendimiento;

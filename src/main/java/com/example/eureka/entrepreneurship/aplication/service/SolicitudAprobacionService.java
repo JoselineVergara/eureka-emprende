@@ -125,7 +125,6 @@ public class SolicitudAprobacionService {
     /**
      * Crear solicitud con todos los datos propuestos
      */
-    @Transactional
     public SolicitudAprobacion crearSolicitud(
             Integer emprendimientoId,
             EmprendimientoCompletoDTO datosCompletos,
@@ -157,7 +156,7 @@ public class SolicitudAprobacionService {
             // Capturar estado original para comparación
             datosOriginales = capturarEstadoCompleto(emprendimientoId);
         } else {
-            throw new IllegalStateException("El emprendimiento debe estar en estado BORRADOR o PUBLICADO");
+            throw new IllegalStateException("El emprendimiento debe estar en estado PENDIENTE_APROBACION o PUBLICADO");
         }
 
         // Crear solicitud
@@ -166,6 +165,7 @@ public class SolicitudAprobacionService {
         solicitud.setUsuarioSolicitante(usuario);
         solicitud.setTipoSolicitud(tipoSolicitud);
         solicitud.setEstadoSolicitud(SolicitudAprobacion.EstadoSolicitud.PENDIENTE);
+        solicitud.setFechaSolicitud(LocalDateTime.now());
 
         // Convertir DTOs a Map para JSONB
         try {
@@ -181,12 +181,14 @@ public class SolicitudAprobacionService {
             throw new RuntimeException("Error al procesar datos del emprendimiento");
         }
 
-        // Actualizar estado del emprendimiento
+        // Actualizar estado del emprendimiento según tipo de solicitud
         if (tipoSolicitud == SolicitudAprobacion.TipoSolicitud.CREACION) {
             emprendimiento.setEstadoEmprendimiento(EstadoEmprendimiento.PENDIENTE_APROBACION.name());
-            emprendimientosRepository.save(emprendimiento);
+        } else if (tipoSolicitud == SolicitudAprobacion.TipoSolicitud.ACTUALIZACION) {
+            // ✅ Cambiar a EN_REVISION pero el público sigue viendo los datos actuales
+            emprendimiento.setEstadoEmprendimiento(EstadoEmprendimiento.EN_REVISION.name());
         }
-        // Si es ACTUALIZACION, el emprendimiento sigue PUBLICADO
+        emprendimientosRepository.save(emprendimiento);
 
         solicitud = solicitudRepository.save(solicitud);
 
@@ -199,7 +201,6 @@ public class SolicitudAprobacionService {
         } else {
             notificarAdminsActualizacion(emprendimiento, usuario, solicitud.getId());
         }
-
 
         log.info("Solicitud creada exitosamente con ID: {}", solicitud.getId());
         return solicitud;

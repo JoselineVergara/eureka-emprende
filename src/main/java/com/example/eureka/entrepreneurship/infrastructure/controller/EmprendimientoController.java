@@ -3,6 +3,7 @@ package com.example.eureka.entrepreneurship.infrastructure.controller;
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.auth.aplication.services.UsuariosServiceImpl;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoResponseDTO;
@@ -90,15 +91,16 @@ public class EmprendimientoController {
      * Obtener todos los emprendimientos con filtros opcionales
      */
     @GetMapping()
-    public ResponseEntity<PageResponseDTO<EmprendimientoResponseDTO>> obtenerEmprendimientosFiltrado(
+    public ResponseEntity<PageResponseDTO<EmprendimientoListadoResponseDTO>> obtenerEmprendimientosFiltrado(
             @RequestParam(value = "nombre", required = false) String nombre,
             @RequestParam(value = "tipo", required = false) String tipo,
+            @RequestParam(value = "subtipo",  required = false) String subtipo,   // Servicio / Producto
             @RequestParam(value = "categoria", required = false) String categoria,
             @RequestParam(value = "ciudad", required = false) String ciudad,
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var pageable = PageRequest.of(page, size);
-        var pageResult = emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo, categoria, ciudad, pageable);
+        var pageResult = emprendimientoService.obtenerEmprendimientosFiltrado(nombre, tipo, subtipo, categoria, ciudad, pageable);
         return ResponseEntity.ok(PageResponseDTO.fromPage(pageResult));
     }
 

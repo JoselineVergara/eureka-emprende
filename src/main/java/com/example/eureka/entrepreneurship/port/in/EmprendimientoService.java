@@ -6,6 +6,7 @@ import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoListadoResponseDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoPorCategoriaDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.EmprendimientoResponseDTO;
@@ -38,7 +39,7 @@ public interface EmprendimientoService {
     SolicitudAprobacion enviarParaAprobacion(Integer emprendimientoId, Usuarios usuario);
     VistaEmprendedorDTO obtenerVistaEmprendedor(Integer emprendimientoId);
 
-    List<EmprendimientoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario);
+    Page<EmprendimientoListadoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario, Pageable pageable);
 
     /**
      * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad
@@ -53,7 +54,7 @@ public interface EmprendimientoService {
     /**
      * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad, paginado
      */
-    Page<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad, Pageable pageable);
+    Page<EmprendimientoListadoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String subtipo, String categoria, String ciudad, Pageable pageable);
 
     void inactivarEmprendimiento(Integer id) throws Exception;
 
