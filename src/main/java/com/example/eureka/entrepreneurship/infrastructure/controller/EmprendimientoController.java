@@ -66,7 +66,7 @@ public class EmprendimientoController {
         }
     }
 
-    @GetMapping("publico/{id}")
+    @GetMapping("{id}/publico")
     public ResponseEntity<EmprendimientoPublicoDTO> obtenerEmprendimientoPublico(@PathVariable Integer id) {
         EmprendimientoPublicoDTO dto = emprendimientoService.obtenerEmprendimientoPublicoPorId(id);
         return ResponseEntity.ok(dto);
