@@ -507,6 +507,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         return lista.stream()
                 .map(emp -> EmprendimientoListaPublicoDTO.builder()
+                        .idEmprendimiento(emp.getId())
                         .nombreEmprendimiento(emp.getNombreComercial())
                         .build())
                 .toList();
