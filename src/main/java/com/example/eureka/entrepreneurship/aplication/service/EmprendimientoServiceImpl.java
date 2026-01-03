@@ -66,19 +66,12 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     private final IRepresentanteInformacionRepository informacionRepresentanteRepository;
     private final SolicitudAprobacionService solicitudAprobacionService;
     private final IOpcionesPersonaJuridicaRepository opcionesPersonaJuridicaRepository;
-    // NUEVAS DEPENDENCIAS PARA MULTIMEDIA
-    private final IMultimediaRepository multimediaRepository;
     private final IEmprendimientoMultimediaRepository emprendimientoMultimediaRepository;
-    private final FileStorageService fileStorageService;
     private final ICategoriaRepository categoriasRepository;
     private final MultimediaService multimediaService;
 
 
     private final IMetricasGeneralesRepository metricasGeneralesRepository;
-    private final IAutoevaluacionRepository autoevaluacionRepository;
-    private final IMetricasPreguntaRepository metricasPreguntaRepository;
-    private final IPreguntaRepository preguntaRepository;
-
     private final IDescripcionesRepository descripcionesRepository;
 
 
