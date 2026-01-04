@@ -523,7 +523,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         // 1) Datos básicos
         EmprendimientoPublicoDTO dto = EmprendimientoMapper.toPublicoDTO(e);
 
-        // 2) Categorías (usando la tabla intermedia)
+        // 2) Categorías
         dto.setCategorias(
                 emprendimientoCategoriasRepository.findByEmprendimientoIdWithCategoria(id)
                         .stream()
@@ -538,7 +538,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         dto.setDescripciones(
                 emprendimientosDescripcionRepository.findByEmprendimientoId(id)
                         .stream()
-                        .map(EmprendimientoMapper::mapDescripcionToDTO)   // asegúrate que sea public static
+                        .map(EmprendimientoMapper::mapDescripcionToDTO)
                         .toList()
         );
 
@@ -546,11 +546,11 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         dto.setPresenciasDigitales(
                 emprendimientoPresenciaDigitalRepository.findByEmprendimientoId(id)
                         .stream()
-                        .map(EmprendimientoMapper::toPresenciaDigitalDTO)  // también public static
+                        .map(EmprendimientoMapper::toPresenciaDigitalDTO)
                         .toList()
         );
 
-        // 5) Multimedia (solo nombre + url)
+        // 5) Multimedia
         dto.setMultimedia(
                 emprendimientoMultimediaRepository.findByEmprendimientoId(id)
                         .stream()
@@ -561,8 +561,27 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                         ))
                         .toList()
         );
-    return dto;}
 
+        // 6) Registrar vista pública
+        try {
+            MetricasGenerales metricasGenerales =  metricasGeneralesRepository.findByEmprendimientos(e).orElse(null);
+
+            if (metricasGenerales == null) {
+                metricasGenerales = new MetricasGenerales();
+                metricasGenerales.setEmprendimientos(e);
+                metricasGenerales.setVistas(1);
+                metricasGenerales.setFechaRegistro(LocalDateTime.now());
+            } else {
+                metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
+            }
+
+            metricasGeneralesRepository.save(metricasGenerales);
+        } catch (Exception ex) {
+            log.error("ERROR AL GUARDAR MÉTRICA DE VISTAS DEL EMPRENDIMIENTO PÚBLICO {}", e.getId(), ex);
+        }
+
+        return dto;
+    }
 
 
 
