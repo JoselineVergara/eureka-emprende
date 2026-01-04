@@ -37,16 +37,18 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
 
 
 
-    @Override
-    public MetricasGeneralesDTO findTopByOrderByVistasDesc() {
-        MetricasGenerales metricasGenerales = metricasGeneralesRepository.findTopByOrderByVistasDesc().orElse(null);
-        return toDTO(metricasGenerales);
+    public List<MetricasGeneralesDTO> findAllOrderByVistasDesc() {
+        return metricasGeneralesRepository.findAllByOrderByVistasDesc()
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
-    @Override
-    public MetricasGeneralesDTO findTopByOrderByVistasAsc() {
-        MetricasGenerales metricasGenerales = metricasGeneralesRepository.findTopByOrderByVistasAsc().orElse(null);
-        return toDTO(metricasGenerales);
+    public List<MetricasGeneralesDTO> findAllOrderByVistasAsc() {
+        return metricasGeneralesRepository.findAllByOrderByVistasAsc()
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     @Override

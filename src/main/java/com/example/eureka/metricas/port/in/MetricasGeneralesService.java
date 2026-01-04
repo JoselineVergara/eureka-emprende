@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface MetricasGeneralesService {
 
-    MetricasGeneralesDTO findTopByOrderByVistasDesc();
+    List<MetricasGeneralesDTO> findAllOrderByVistasDesc();
 
-    MetricasGeneralesDTO findTopByOrderByVistasAsc();
+    List<MetricasGeneralesDTO> findAllOrderByVistasAsc();
 
     MetricaPreguntaDTO findTopByOrderByNivelValoracionDesc();
 

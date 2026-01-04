@@ -312,9 +312,11 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
         System.out.println("Promedio de valorescala: " + promedio);
 
         // NUEVO: procesar métricas por pregunta con las respuestas guardadas
-        if (emp != null && !respuestasGuardadas.isEmpty()) {
+        if (emp != null && !respuestasGuardadas.isEmpty() && cabeceraValoracion != null) {
+            // Aquí sabes que en este request se creó/uso una cabecera de VALORACIÓN
             procesarValoracion(emp, respuestasGuardadas);
         }
+
 
         // 6) Si el promedio es bajo, crear notificación de AUTOEVALUACION_REQUERIDA
         if (promedio <= 2 && emp != null && cabeceraValoracion != null) {

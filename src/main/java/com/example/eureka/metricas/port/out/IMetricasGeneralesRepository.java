@@ -13,9 +13,9 @@ import java.util.Optional;
 
 public interface IMetricasGeneralesRepository extends JpaRepository<MetricasGenerales, Integer> {
 
-    Optional<MetricasGenerales> findTopByOrderByVistasDesc();
+    List<MetricasGenerales> findAllByOrderByVistasDesc();
 
-    Optional<MetricasGenerales> findTopByOrderByVistasAsc();
+    List<MetricasGenerales> findAllByOrderByVistasAsc();
 
     Optional<MetricasGenerales> findByEmprendimientos(Emprendimientos emprendimientos);
 

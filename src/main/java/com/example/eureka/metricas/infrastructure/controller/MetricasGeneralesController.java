@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,16 +27,15 @@ public class MetricasGeneralesController {
     private final MetricasGeneralesService metricasGeneralesService;
     private final MetricasPreguntaService metricasPreguntaService;
 
-    @GetMapping("/emprendimiento/mayor-vista")
-    public ResponseEntity<MetricasGeneralesDTO> mayorVista() {
-        return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasDesc());
+    @GetMapping("/emprendimientos/mas-vistos")
+    public List<MetricasGeneralesDTO> getMasVistos() {
+        return metricasGeneralesService.findAllOrderByVistasDesc();
     }
 
-    @GetMapping("/emprendimiento/menor-vista")
-    public ResponseEntity<MetricasGeneralesDTO> menorVista() {
-        return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasAsc());
+    @GetMapping("/emprendimientos/menos-vistos")
+    public List<MetricasGeneralesDTO> getMenosVistos() {
+        return metricasGeneralesService.findAllOrderByVistasAsc();
     }
-
     @GetMapping("/categoria/mayor-vista")
     public ResponseEntity<HashMap<String, Object>> mayorVistaCategoria() {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasCategoriaDesc());
