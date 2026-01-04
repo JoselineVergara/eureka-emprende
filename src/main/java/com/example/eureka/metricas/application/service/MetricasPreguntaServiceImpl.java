@@ -83,12 +83,16 @@ public class MetricasPreguntaServiceImpl implements MetricasPreguntaService {
         return metricasPreguntaRepository.save(metrica);
     }
 
-
-    // NUEVO: ranking global
     @Override
-    public Page<RankingGlobalDTO> obtenerRankingGlobal(Pageable pageable) {
-        return metricasPreguntaRepository.rankingGlobal(pageable);
+    public List<RankingGlobalDTO> findAllOrderByValoracionAsc() {
+        return metricasPreguntaRepository.findAllOrderByValoracionAsc();
     }
+
+    @Override
+    public List<RankingGlobalDTO> findAllOrderByValoracionDesc() {
+        return metricasPreguntaRepository.findAllOrderByValoracionDesc();
+    }
+
 
     // NUEVO: ranking por pregunta
     @Override

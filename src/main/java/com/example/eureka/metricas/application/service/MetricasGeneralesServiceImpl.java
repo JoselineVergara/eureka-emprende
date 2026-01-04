@@ -31,9 +31,7 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
 
     private final IMetricasGeneralesRepository metricasGeneralesRepository;
     private final IEmprendimientosRepository emprendimientosRepository;
-    private final IEmprendimientoCategoriasRepository emprendimientoCategoriasRepository;
-    private final ICategoriaRepository categoriaRepository;
-    private final IMetricasPreguntaRepository  metricasPreguntaRepository;
+
 
 
 
@@ -49,18 +47,6 @@ public class MetricasGeneralesServiceImpl implements MetricasGeneralesService {
                 .stream()
                 .map(this::toDTO)
                 .toList();
-    }
-
-    @Override
-    public MetricaPreguntaDTO findTopByOrderByNivelValoracionDesc() {
-        MetricasPregunta metricasPregunta = metricasPreguntaRepository.findTopByOrderByValoracionDesc();
-        return metricaPreguntaDTO(metricasPregunta);
-    }
-
-    @Override
-    public MetricaPreguntaDTO findTopByOrderByNivelValoracionAsc() {
-        MetricasPregunta metricasPregunta = metricasPreguntaRepository.findTopByOrderByValoracionAsc();
-        return metricaPreguntaDTO(metricasPregunta);
     }
 
     @Override

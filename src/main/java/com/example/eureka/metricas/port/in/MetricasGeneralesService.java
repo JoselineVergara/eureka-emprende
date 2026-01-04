@@ -16,9 +16,6 @@ public interface MetricasGeneralesService {
 
     List<MetricasGeneralesDTO> findAllOrderByVistasAsc();
 
-    MetricaPreguntaDTO findTopByOrderByNivelValoracionDesc();
-
-    MetricaPreguntaDTO findTopByOrderByNivelValoracionAsc();
 
     MetricasGeneralesDTO save(MetricasGeneralesDTO metricasGenerales);
 

@@ -17,11 +17,13 @@ public interface MetricasPreguntaService {
     MetricasPregunta findById(Integer id);
     void deleteById(Integer id);
 
+    List<RankingGlobalDTO> findAllOrderByValoracionAsc();
+
+    List<RankingGlobalDTO> findAllOrderByValoracionDesc();
+
     MetricasPregunta guardarOActualizar(Emprendimientos emprendimiento,
                                         Pregunta pregunta,
                                         Double valoracion, Long cantidadRespuestasNuevas);
-
-    Page<RankingGlobalDTO> obtenerRankingGlobal(Pageable pageable);
 
     Page<RankingPreguntaDTO> obtenerRankingPorPregunta(Long idPregunta,
                                                        Long idTipoEmprendimiento,

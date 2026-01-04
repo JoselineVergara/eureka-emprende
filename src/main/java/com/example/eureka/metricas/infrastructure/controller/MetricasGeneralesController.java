@@ -1,6 +1,6 @@
 package com.example.eureka.metricas.infrastructure.controller;
 
-import com.example.eureka.metricas.infrastructure.dto.MetricaPreguntaDTO;
+import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.infrastructure.dto.MetricasGeneralesDTO;
 import com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO;
 import com.example.eureka.metricas.infrastructure.dto.RankingPreguntaDTO;
@@ -41,22 +41,15 @@ public class MetricasGeneralesController {
         return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByVistasCategoriaDesc());
     }
 
-    @GetMapping("/emprendimiento/mayor-valoracion")
-    public ResponseEntity<MetricaPreguntaDTO> mayorValoracion() {
-        return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionDesc());
+    @GetMapping("/valoracion/asc")
+    public List<RankingGlobalDTO> obtenerPorValoracionAsc() {
+        return metricasPreguntaService.findAllOrderByValoracionAsc();
     }
 
-    @GetMapping("/emprendimiento/menor-valoracion")
-    public ResponseEntity<MetricaPreguntaDTO> menorValoracion() {
-        return ResponseEntity.ok(metricasGeneralesService.findTopByOrderByNivelValoracionAsc());
-    }
-
-    @GetMapping("/valoracion")
-    public ResponseEntity<PageResponseDTO<RankingGlobalDTO>> rankingGlobal(
-            @org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-
-        Page<RankingGlobalDTO> page = metricasPreguntaService.obtenerRankingGlobal(pageable);
-        return ResponseEntity.ok(PageResponseDTO.fromPage(page));
+    // Todas ordenadas de mayor a menor valoración
+    @GetMapping("/valoracion/desc")
+    public List<RankingGlobalDTO> obtenerPorValoracionDesc() {
+        return metricasPreguntaService.findAllOrderByValoracionDesc();
     }
 
     // Ranking por pregunta (opcional: filtrar por tipo de emprendimiento)

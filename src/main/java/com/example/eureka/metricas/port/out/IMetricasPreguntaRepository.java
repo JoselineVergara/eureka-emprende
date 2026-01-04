@@ -17,9 +17,6 @@ import java.util.Optional;
 public interface IMetricasPreguntaRepository extends JpaRepository<MetricasPregunta, Integer> {
 
 
-    MetricasPregunta findTopByOrderByValoracionDesc();
-
-    MetricasPregunta findTopByOrderByValoracionAsc();
 
     Optional<MetricasPregunta> findByEmprendimientosAndPregunta(Emprendimientos emprendimientos,
                                                                 Pregunta pregunta);
@@ -29,16 +26,31 @@ public interface IMetricasPreguntaRepository extends JpaRepository<MetricasPregu
 
     // Ranking global por emprendimiento (promedio de todas las preguntas)
     @Query("""
-           select new com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO(
-               e.id,
-               e.nombreComercial,
-               avg(mp.valoracion)
-           )
-           from MetricasPregunta mp
-           join mp.emprendimientos e
-           group by e.id, e.nombreComercial
-           """)
-    Page<RankingGlobalDTO> rankingGlobal(Pageable pageable);
+       select new com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO(
+           e.id,
+           e.nombreComercial,
+           avg(mp.valoracion)
+       )
+       from MetricasPregunta mp
+       join mp.emprendimientos e
+       group by e.id, e.nombreComercial
+       order by avg(mp.valoracion) asc
+       """)
+    List<RankingGlobalDTO> findAllOrderByValoracionAsc();
+
+    @Query("""
+       select new com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO(
+           e.id,
+           e.nombreComercial,
+           avg(mp.valoracion)
+       )
+       from MetricasPregunta mp
+       join mp.emprendimientos e
+       group by e.id, e.nombreComercial
+       order by avg(mp.valoracion) desc
+       """)
+    List<RankingGlobalDTO> findAllOrderByValoracionDesc();
+
 
     // Ranking por pregunta (opcionalmente filtrando por tipo de emprendimiento)
     @Query("""
