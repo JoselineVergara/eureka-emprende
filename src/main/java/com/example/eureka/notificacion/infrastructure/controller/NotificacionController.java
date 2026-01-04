@@ -1,14 +1,18 @@
 package com.example.eureka.notificacion.infrastructure.controller;
 
 
-import com.example.eureka.auth.aplication.services.UsuariosServiceImpl;
-import com.example.eureka.entrepreneurship.domain.model.Notificacion;
+import com.example.eureka.notificacion.domain.Notificacion;
+import com.example.eureka.notificacion.infrastructure.dto.NotificacionDTO;
 import com.example.eureka.notificacion.infrastructure.dto.request.NotificacionRequestDTO;
 import com.example.eureka.notificacion.port.in.NotificacionService;
+import com.example.eureka.shared.util.PageResponseDTO;
+import com.example.eureka.shared.util.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +27,7 @@ public class NotificacionController {
 
     private final NotificacionService notificacionService;
 
-    private final UsuariosServiceImpl usuariosServiceImpl;
+    private final SecurityUtils securityUtils;
 
 
 
@@ -56,13 +60,25 @@ public class NotificacionController {
     }
 
 
-    @GetMapping()
-    public ResponseEntity<?>  obtenerNotificacion(@RequestParam(value = "id") Integer id,
-                                                  @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size){
-        var pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(notificacionService.obtenerNotificaciones(id, pageable));
+
+    @GetMapping
+    public ResponseEntity<PageResponseDTO<NotificacionDTO>> obtenerNotificacion(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+
+        Integer idUsuario = securityUtils.getIdUsuarioAutenticado();
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<NotificacionDTO> pageNotificaciones =
+                notificacionService.obtenerNotificaciones(idUsuario, pageable);
+
+        PageResponseDTO<NotificacionDTO> response =
+                PageResponseDTO.fromPage(pageNotificaciones);
+
+        return ResponseEntity.ok(response);
     }
+
+
 
     @GetMapping("/no-leidas")
     public ResponseEntity<?>  obtenerNoLeidas(@RequestParam(value = "usuarioId") Integer usuarioId){

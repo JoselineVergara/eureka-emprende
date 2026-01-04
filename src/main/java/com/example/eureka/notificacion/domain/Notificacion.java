@@ -1,8 +1,9 @@
-package com.example.eureka.entrepreneurship.domain.model;
+package com.example.eureka.notificacion.domain;
 
 import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
+import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
 import com.example.eureka.shared.enums.Prioridad;
-import com.example.eureka.notificacion.domain.TipoNotificacion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +32,10 @@ public class Notificacion {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuarios usuario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_notificacion", nullable = false)
     private TipoNotificacion tipoNotificacion;
+
 
     @Column(name = "titulo", nullable = false, length = 200)
     private String titulo;

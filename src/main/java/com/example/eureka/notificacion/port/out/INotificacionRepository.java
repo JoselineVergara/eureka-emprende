@@ -1,6 +1,6 @@
 package com.example.eureka.notificacion.port.out;
 
-import com.example.eureka.entrepreneurship.domain.model.Notificacion;
+import com.example.eureka.notificacion.domain.Notificacion;
 import com.example.eureka.auth.domain.Usuarios;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

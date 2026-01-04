@@ -3,7 +3,7 @@ package com.example.eureka.notificacion.application.service;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.auth.port.out.IUserRepository;
-import com.example.eureka.entrepreneurship.domain.model.Notificacion;
+import com.example.eureka.notificacion.domain.Notificacion;
 import com.example.eureka.notificacion.domain.TipoNotificacion;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.port.out.ISolicitudAprobacionRepository;
