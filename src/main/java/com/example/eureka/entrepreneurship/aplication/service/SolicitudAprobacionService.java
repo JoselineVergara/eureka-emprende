@@ -29,10 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,6 +58,7 @@ public class SolicitudAprobacionService {
     private final NotificacionService notificacionService;
     private final IUserRepository userRepository;
     private final IDescripcionesRepository descripcionesRepository;
+    private final IMultimediaRepository multimediaRepository;
 
     /**
      * Captura el estado completo actual del emprendimiento (todas las relaciones)
@@ -807,6 +805,65 @@ public class SolicitudAprobacionService {
                 }
             });
         }
+
+        // 9. Actualizar multimedia
+        if (datos.getMultimedia() != null) {
+            Integer emprendimientoId = emprendimiento.getId();
+
+            // Multimedia actual asociada al emprendimiento
+            List<EmprendimientoMultimedia> actuales =
+                    emprendimientoMultimediaRepository.findByEmprendimientoId(empId);
+
+            // IDs que vienen en el DTO (solo los > 0, asumimos que ya existen en BD)
+            Set<Integer> nuevosIds = datos.getMultimedia().stream()
+                    .map(MultimediaListadoDTO::getId)   // int -> Integer por autoboxing
+                    .collect(Collectors.toSet());
+
+            // 9.1 Eliminar relaciones que ya no están en el DTO
+            for (EmprendimientoMultimedia actual : actuales) {
+                Integer idMultimediaActual = actual.getMultimedia().getId();
+                if (!nuevosIds.contains(idMultimediaActual)) {
+                    emprendimientoMultimediaRepository.delete(actual);
+                }
+            }
+
+            // 9.2 Crear relaciones nuevas (y crear Multimedia si hace falta)
+            for (MultimediaListadoDTO mDto : datos.getMultimedia()) {
+
+                if (mDto.getId() > 0) {
+                    // Caso A: Multimedia ya existe, solo relacionar si no estaba
+                    boolean yaExiste = actuales.stream()
+                            .anyMatch(act -> act.getMultimedia().getId().equals(mDto.getId()));
+
+                    if (!yaExiste) {
+                        Multimedia multimedia = multimediaRepository.findById(mDto.getId())
+                                .orElseThrow(() -> new EntityNotFoundException("Multimedia no encontrada"));
+
+                        EmprendimientoMultimedia nuevaRel = new EmprendimientoMultimedia();
+                        nuevaRel.setEmprendimiento(emprendimiento);
+                        nuevaRel.setMultimedia(multimedia);
+                        emprendimientoMultimediaRepository.save(nuevaRel);
+                    }
+
+                } else {
+                    // Caso B: es una imagen nueva (sin id) -> crear Multimedia y luego la relación
+                    if (mDto.getUrlArchivo() != null && !mDto.getUrlArchivo().isBlank()) {
+
+                        Multimedia nueva = new Multimedia();
+                        nueva.setNombreActivo(mDto.getNombreActivo());
+                        nueva.setUrlArchivo(mDto.getUrlArchivo());
+                        // setea aquí otros campos de Multimedia si tienes
+                        multimediaRepository.save(nueva);
+
+                        EmprendimientoMultimedia nuevaRel = new EmprendimientoMultimedia();
+                        nuevaRel.setEmprendimiento(emprendimiento);
+                        nuevaRel.setMultimedia(nueva);
+                        emprendimientoMultimediaRepository.save(nuevaRel);
+                    }
+                }
+            }
+        }
+
 
         log.debug("Cambios aplicados exitosamente");
     }
