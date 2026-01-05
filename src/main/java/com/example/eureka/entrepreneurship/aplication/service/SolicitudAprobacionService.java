@@ -894,7 +894,7 @@ public class SolicitudAprobacionService {
         Map<String, Object> detalle = new HashMap<>();
         detalle.put("solicitud", mapSolicitudToDTO(solicitud));
 
-        // ===== PROpuestos (sigue como antes) =====
+        // ===== PROpuestos (ya comprobaste que funciona) =====
         EmprendimientoDetallesDTO propuestosDto = null;
         if (solicitud.getDatosPropuestos() != null) {
             Map<String, Object> propuestosMap = new HashMap<>(solicitud.getDatosPropuestos());
@@ -903,19 +903,16 @@ public class SolicitudAprobacionService {
         }
         detalle.put("datosPropuestos", propuestosDto);
 
-        // ===== ORIginAles: NO usar convertValue, no lanzar excepción =====
+        // ===== ORIginAles: solo devolver el mapa tal cual, sin nada más =====
         if (solicitud.getDatosOriginales() != null) {
             Map<String, Object> originalesMap = new HashMap<>(solicitud.getDatosOriginales());
             originalesMap.remove("usuario");
 
-            // Se devuelven crudos al front
-            detalle.put("datosOriginales", originalesMap);
+            // 1) NO convertValue
+            // 2) NO calcular diferencias todavía
+            // 3) NO try/catch que vuelva a lanzar RuntimeException
 
-            // Las diferencias se calculan con los mapas
-            detalle.put("diferencias", calcularDiferencias(
-                    solicitud.getDatosOriginales(),
-                    solicitud.getDatosPropuestos()
-            ));
+            detalle.put("datosOriginales", originalesMap);
         }
 
         return detalle;
