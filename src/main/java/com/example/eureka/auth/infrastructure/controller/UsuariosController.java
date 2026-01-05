@@ -1,6 +1,7 @@
 package com.example.eureka.auth.infrastructure.controller;
 
 import com.example.eureka.auth.infrastructure.dto.UsuarioPerfilDTO;
+import com.example.eureka.auth.infrastructure.dto.converter.UsuarioConverter;
 import com.example.eureka.auth.port.in.UsuariosService;
 import com.example.eureka.auth.domain.Usuarios;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Objects;
 public class UsuariosController {
 
     private final UsuariosService usuariosServiceImpl;
+    private final UsuarioConverter usuarioConverter;
 
     @PostMapping
     public Usuarios createUsuario(@RequestBody Usuarios usuario) {
@@ -36,41 +38,38 @@ public class UsuariosController {
     }
 
     @PutMapping("/{id}")
-    public Usuarios updateUsuario(@PathVariable Integer id, @RequestBody Usuarios usuario, Authentication authentication) {
-        // Validar autenticación
+    public UsuarioPerfilDTO updateUsuario(@PathVariable Integer id,
+                                          @RequestBody UsuarioPerfilDTO dto,
+                                          Authentication authentication) {
+
         if (authentication == null || authentication.getName() == null) {
             throw new RuntimeException("Usuario no autenticado");
         }
 
-        // Obtener el usuario autenticado
         String emailAutenticado = authentication.getName();
         Usuarios usuarioAutenticado = usuariosServiceImpl.findByEmail(emailAutenticado);
 
-        // Verificar que el usuario solo edite su propio perfil (excepto ADMIN)
         boolean esAdmin = usuarioAutenticado.getRol().getNombre().equals("ROLE_ADMINISTRADOR");
         if (!esAdmin && !usuarioAutenticado.getId().equals(id)) {
             throw new RuntimeException("No tienes permiso para editar este usuario");
         }
 
-        usuario.setId(id);
+        // Cargar usuario real de BD
+        Usuarios usuarioBD = usuariosServiceImpl.obtenerUsuarioPorId(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (usuario.getContrasena()!= null && !usuario.getContrasena().trim().isEmpty()) {
-            usuario.setContrasena(BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt()));
+        // Mapear solo campos editables desde el DTO
+        usuarioBD.setNombre(dto.getNombre());
+        usuarioBD.setApellido(dto.getApellido());
+        usuarioBD.setGenero(dto.getGenero());
+        usuarioBD.setCorreo(dto.getCorreo());
+        usuarioBD.setFechaNacimiento(dto.getFechaNacimiento());
 
-        } else {
-            usuario.setContrasena(usuarioAutenticado.getContrasena());
-        }
-        if(null == usuario.getFechaRegistro()){
-            usuario.setFechaRegistro(usuarioAutenticado.getFechaRegistro());
-        }
-        if(null == usuario.getRol()){
-            usuario.setRol(usuarioAutenticado.getRol());
-        }
-        if(null == usuario.getActivo()){
-            usuario.setActivo(usuarioAutenticado.getActivo());
-        }
-
-        return usuariosServiceImpl.actualizarUsuario(usuario);
+        // Mantener campos controlados por el sistema
+        usuarioBD.setActivo(usuarioBD.getActivo());
+        usuarioBD.setFechaRegistro(usuarioBD.getFechaRegistro());
+        Usuarios actualizado = usuariosServiceImpl.actualizarUsuario(usuarioBD);
+        return usuarioConverter.toPerfilDTO(actualizado);
     }
 
     @PutMapping("/{id}/inactivate")
