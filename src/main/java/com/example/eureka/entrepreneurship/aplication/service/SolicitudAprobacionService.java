@@ -894,45 +894,28 @@ public class SolicitudAprobacionService {
         Map<String, Object> detalle = new HashMap<>();
         detalle.put("solicitud", mapSolicitudToDTO(solicitud));
 
-        // ===== PROpuestos =====
+        // ===== PROpuestos (sigue como antes) =====
         EmprendimientoDetallesDTO propuestosDto = null;
         if (solicitud.getDatosPropuestos() != null) {
-            try {
-                Map<String, Object> propuestosMap = new HashMap<>(solicitud.getDatosPropuestos());
-                propuestosMap.remove("usuario");
-                propuestosDto = objectMapper.convertValue(
-                        propuestosMap,
-                        EmprendimientoDetallesDTO.class
-                );
-            } catch (Exception e) {
-                log.error("Error al deserializar datos propuestos de solicitud {}", solicitudId, e);
-                throw new RuntimeException("Error leyendo datos propuestos de la solicitud");
-            }
+            Map<String, Object> propuestosMap = new HashMap<>(solicitud.getDatosPropuestos());
+            propuestosMap.remove("usuario");
+            propuestosDto = objectMapper.convertValue(propuestosMap, EmprendimientoDetallesDTO.class);
         }
         detalle.put("datosPropuestos", propuestosDto);
 
-        // ===== ORIginAles (solo ACTUALIZACION) =====
-        EmprendimientoDetallesDTO originalesDto = null;
+        // ===== ORIginAles: NO usar convertValue, no lanzar excepción =====
         if (solicitud.getDatosOriginales() != null) {
-            try {
-                Map<String, Object> originalesMap = new HashMap<>(solicitud.getDatosOriginales());
-                originalesMap.remove("usuario");
+            Map<String, Object> originalesMap = new HashMap<>(solicitud.getDatosOriginales());
+            originalesMap.remove("usuario");
 
-                originalesDto = objectMapper.convertValue(
-                        originalesMap,
-                        EmprendimientoDetallesDTO.class
-                );
-                detalle.put("datosOriginales", originalesDto);
+            // Se devuelven crudos al front
+            detalle.put("datosOriginales", originalesMap);
 
-                // también aquí puedes proteger calcularDiferencias
-                detalle.put("diferencias", calcularDiferencias(
-                        solicitud.getDatosOriginales(),
-                        solicitud.getDatosPropuestos()
-                ));
-            } catch (Exception e) {
-                log.error("Error al deserializar datos originales de solicitud {}", solicitudId, e);
-                throw new RuntimeException("Error leyendo datos originales de la solicitud");
-            }
+            // Las diferencias se calculan con los mapas
+            detalle.put("diferencias", calcularDiferencias(
+                    solicitud.getDatosOriginales(),
+                    solicitud.getDatosPropuestos()
+            ));
         }
 
         return detalle;
