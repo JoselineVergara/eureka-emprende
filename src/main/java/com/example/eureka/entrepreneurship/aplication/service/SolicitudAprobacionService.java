@@ -892,10 +892,11 @@ public class SolicitudAprobacionService {
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada"));
 
         Map<String, Object> detalle = new HashMap<>();
-        // info básica de la solicitud
+
+        // 1) Info básica de la solicitud
         detalle.put("solicitud", mapSolicitudToDTO(solicitud));
 
-        // ===== solo PROpuestos =====
+        // 2) Solo datos PROpuestos (esto sabes que funciona)
         EmprendimientoDetallesDTO propuestosDto = null;
         if (solicitud.getDatosPropuestos() != null) {
             Map<String, Object> propuestosMap = new HashMap<>(solicitud.getDatosPropuestos());
@@ -903,21 +904,10 @@ public class SolicitudAprobacionService {
             propuestosDto = objectMapper.convertValue(propuestosMap, EmprendimientoDetallesDTO.class);
         }
         detalle.put("datosPropuestos", propuestosDto);
-
-        // ===== solo DIFERENCIAS, sin devolver originales =====
-        if (solicitud.getDatosOriginales() != null && solicitud.getDatosPropuestos() != null) {
-            Map<String, Object> diferencias = calcularDiferencias(
-                    solicitud.getDatosOriginales(),
-                    solicitud.getDatosPropuestos()
-            );
-            detalle.put("diferencias", diferencias);
-        }
-
-        // OJO: NO ponemos datosOriginales en el Map detalle
+        
 
         return detalle;
     }
-
 
 
     /**
