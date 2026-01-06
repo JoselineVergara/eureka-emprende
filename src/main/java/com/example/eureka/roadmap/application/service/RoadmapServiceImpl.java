@@ -3,8 +3,9 @@ package com.example.eureka.roadmap.application.service;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.entrepreneurship.domain.model.DescripcionEmprendimiento;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosDescripcionRepository;
-import com.example.eureka.roadmap.domain.Roadmap;
+import com.example.eureka.roadmap.domain.model.Roadmap;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
+import com.example.eureka.roadmap.domain.service.RoadmapDescripcionBuilder;
 import com.example.eureka.roadmap.infrastructure.dto.RoadmapDTO;
 import com.example.eureka.roadmap.port.out.IRoadmapRepository;
 import com.example.eureka.roadmap.port.in.RoadmapService;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +28,7 @@ public class RoadmapServiceImpl implements RoadmapService {
     private final GPTRoadmap gptRoadmap;
     private final IEmprendimientosRepository  emprendimientosRepository;
     private final IEmprendimientosDescripcionRepository emprendimientosDescripcionRepository;
+    private final RoadmapDescripcionBuilder descripcionBuilder = new RoadmapDescripcionBuilder();
 
     @Override
     public Roadmap findByIdCompany(Integer id) {
@@ -41,48 +44,56 @@ public class RoadmapServiceImpl implements RoadmapService {
     @Override
     public Roadmap save(RoadmapDTO roadmap) {
 
-        Emprendimientos emp = emprendimientosRepository.findById(roadmap.getIdEmprendimiento()).orElse(null);
-        List<DescripcionEmprendimiento> descripcionEmprendimientos = emprendimientosDescripcionRepository.findByEmprendimientoId(roadmap.getIdEmprendimiento());
-        String historia = "";
-        String objetivo = "";
-        for(DescripcionEmprendimiento e: descripcionEmprendimientos) {
-  /*          if(e.getTipoDescripcion().equals("HISTORIA")){
-                historia += " "+e.getTipoDescripcion();
-            }
-            if(e.getTipoDescripcion().equals("PROPOSITO")){
-                objetivo += " "+e.getTipoDescripcion();
-            }
-            if (e.getTipoDescripcion().equals("DIFERENCIAL")){
-                objetivo += " "+e.getTipoDescripcion();
-            }
-            if (e.getTipoDescripcion().equals("PUBLICO OBJETIVO")){
-                objetivo += " " + e.getTipoDescripcion();
-            }
-*/
+        Emprendimientos emp = emprendimientosRepository
+                .findById(roadmap.getIdEmprendimiento())
+                .orElse(null);
 
-        }
+        List<DescripcionEmprendimiento> descripcionEmprendimientos =
+                emprendimientosDescripcionRepository
+                        .findByEmprendimientoId(roadmap.getIdEmprendimiento());
+
+        String historia = descripcionBuilder.construirHistoria(descripcionEmprendimientos);
+        String objetivo = descripcionBuilder.construirObjetivo(descripcionEmprendimientos);
+
         roadmap.setHistoria(historia);
         roadmap.setObjetivo(objetivo);
-        Roadmap rm = new Roadmap();
-        if(!roadmapRepository.existsByEmprendimiento(emp)){
-            String contenido = gptRoadmap.generarRoadmap(
-                    roadmap.getHistoria(),
-                    roadmap.getObjetivo()
-            );
-            rm.setContenido(contenido);
+
+        Roadmap rm;
+
+        if (!roadmapRepository.existsByEmprendimiento(emp)) {
+            // Crear roadmap nuevo
+            String contenido = gptRoadmap.generarRoadmap(historia, objetivo);
+
+            rm = new Roadmap();
             rm.setEmprendimiento(emp);
-            rm.setHistoria(roadmap.getHistoria());
-            rm.setObjetivo(roadmap.getObjetivo());
-            rm.setFechaCreacion(roadmap.getFechaCreacion());
+            rm.setHistoria(historia);
+            rm.setObjetivo(objetivo);
+            rm.setContenido(contenido);
+            rm.setFechaCreacion(LocalDateTime.now());
+        } else {
+            rm = roadmapRepository.findByEmprendimiento(emp);
 
-        }else{
-            Roadmap r =  roadmapRepository.findByEmprendimiento(emp);
-            rm = r;
+            boolean cambioHistoria = historia != null
+                    ? !historia.equals(rm.getHistoria())
+                    : rm.getHistoria() != null;
+
+            boolean cambioObjetivo = objetivo != null
+                    ? !objetivo.equals(rm.getObjetivo())
+                    : rm.getObjetivo() != null;
+
+            if (cambioHistoria || cambioObjetivo) {
+                rm.setHistoria(historia);
+                rm.setObjetivo(objetivo);
+
+                String contenido = gptRoadmap.generarRoadmap(historia, objetivo);
+                rm.setContenido(contenido);
+            }
         }
-
 
         return roadmapRepository.save(rm);
     }
+
+
 
     @Override
     public Page<Roadmap> findAll(Pageable pageable) {

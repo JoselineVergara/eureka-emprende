@@ -1,6 +1,7 @@
 package com.example.eureka.shared.config.openapi;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GPTRoadmap {
@@ -20,7 +22,8 @@ public class GPTRoadmap {
     @Value("${open-ai-api-url:}")
     private String apiUrl;
     public String generarRoadmap(String historia, String objetivo) {
-
+        log.info("API KEY length = {}", apiKey != null ? apiKey.length() : 0);
+        log.info("API URL = {}", apiUrl);
         String prompt = """
     Genera un roadmap de 5 fases para un emprendimiento.
     Fases: Idea, Validación, Planificación, Desarrollo, Lanzamiento.

@@ -1,4 +1,4 @@
-package com.example.eureka.roadmap.domain;
+package com.example.eureka.roadmap.domain.model;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import jakarta.persistence.*;
