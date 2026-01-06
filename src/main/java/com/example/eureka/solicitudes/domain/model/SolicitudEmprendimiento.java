@@ -1,6 +1,7 @@
-package com.example.eureka.entrepreneurship.domain.model;
+package com.example.eureka.solicitudes.domain.model;
 
 import com.example.eureka.auth.domain.Usuarios;
+import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
-package com.example.eureka.entrepreneurship.port.in;
+package com.example.eureka.solicitudes.port.in;
 
-import com.example.eureka.entrepreneurship.infrastructure.dto.shared.SolicitudEmprendimientoDTO;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudEmprendimientoDTO;
 import java.util.List;
 
 public interface SolicitudEmprendimientoService {

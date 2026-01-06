@@ -1,7 +1,7 @@
-package com.example.eureka.entrepreneurship.infrastructure.controller;
+package com.example.eureka.solicitudes.infrastructure.controller;
 
-import com.example.eureka.entrepreneurship.infrastructure.dto.shared.SolicitudEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.port.in.SolicitudEmprendimientoService;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudEmprendimientoDTO;
+import com.example.eureka.solicitudes.port.in.SolicitudEmprendimientoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

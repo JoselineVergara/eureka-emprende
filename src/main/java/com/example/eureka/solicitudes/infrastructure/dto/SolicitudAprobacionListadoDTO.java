@@ -1,4 +1,4 @@
-package com.example.eureka.entrepreneurship.infrastructure.dto.response;
+package com.example.eureka.solicitudes.infrastructure.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

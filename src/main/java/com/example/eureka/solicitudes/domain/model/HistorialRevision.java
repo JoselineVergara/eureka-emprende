@@ -1,4 +1,4 @@
-package com.example.eureka.entrepreneurship.domain.model;
+package com.example.eureka.solicitudes.domain.model;
 
 import com.example.eureka.auth.domain.Usuarios;
 import jakarta.persistence.*;

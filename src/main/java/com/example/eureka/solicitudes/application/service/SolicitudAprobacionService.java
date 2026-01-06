@@ -1,4 +1,4 @@
-package com.example.eureka.entrepreneurship.aplication.service;
+package com.example.eureka.solicitudes.application.service;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.auth.port.out.IUserRepository;
@@ -6,9 +6,10 @@ import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.CategoriaListadoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoDetallesDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.MultimediaListadoDTO;
-import com.example.eureka.entrepreneurship.infrastructure.dto.response.SolicitudAprobacionListadoDTO;
+import com.example.eureka.solicitudes.port.out.IHistorialRevisionRepository;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudAprobacionDTO;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudAprobacionListadoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
-import com.example.eureka.entrepreneurship.infrastructure.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.port.out.*;
 import com.example.eureka.general.domain.model.*;
 import com.example.eureka.general.infrastructure.dto.CiudadDTO;
@@ -19,6 +20,9 @@ import com.example.eureka.shared.enums.EstadoEmprendimiento;
 import com.example.eureka.general.infrastructure.dto.CategoriasDTO;
 import com.example.eureka.notificacion.port.in.NotificacionService;
 import com.example.eureka.shared.util.PageResponseDTO;
+import com.example.eureka.solicitudes.domain.model.HistorialRevision;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
+import com.example.eureka.solicitudes.port.out.ISolicitudAprobacionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -904,7 +908,7 @@ public class SolicitudAprobacionService {
             propuestosDto = objectMapper.convertValue(propuestosMap, EmprendimientoDetallesDTO.class);
         }
         detalle.put("datosPropuestos", propuestosDto);
-        
+
 
         return detalle;
     }

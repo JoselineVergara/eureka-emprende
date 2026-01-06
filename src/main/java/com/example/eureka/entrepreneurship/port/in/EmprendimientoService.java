@@ -1,7 +1,7 @@
 package com.example.eureka.entrepreneurship.port.in;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
-import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;

@@ -2,7 +2,7 @@ package com.example.eureka.notificacion.domain;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
-import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
 import com.example.eureka.shared.enums.Prioridad;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

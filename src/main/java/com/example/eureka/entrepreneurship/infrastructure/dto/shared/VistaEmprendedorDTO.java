@@ -1,6 +1,6 @@
 package com.example.eureka.entrepreneurship.infrastructure.dto.shared;
 
-import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoDetallesDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

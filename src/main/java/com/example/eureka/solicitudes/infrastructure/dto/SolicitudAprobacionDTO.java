@@ -1,13 +1,12 @@
-package com.example.eureka.entrepreneurship.infrastructure.dto.shared;
+package com.example.eureka.solicitudes.infrastructure.dto;
 
-import com.example.eureka.entrepreneurship.domain.model.SolicitudAprobacion;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Data
 @Builder

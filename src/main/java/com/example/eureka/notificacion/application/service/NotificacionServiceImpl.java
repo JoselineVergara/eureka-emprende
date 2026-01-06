@@ -6,7 +6,7 @@ import com.example.eureka.auth.port.out.IUserRepository;
 import com.example.eureka.notificacion.domain.Notificacion;
 import com.example.eureka.notificacion.domain.TipoNotificacion;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
-import com.example.eureka.entrepreneurship.port.out.ISolicitudAprobacionRepository;
+import com.example.eureka.solicitudes.port.out.ISolicitudAprobacionRepository;
 import com.example.eureka.notificacion.infrastructure.dto.NotificacionDTO;
 import com.example.eureka.notificacion.port.out.INotificacionRepository;
 import com.example.eureka.notificacion.port.out.ITipoNotificacionRepository;

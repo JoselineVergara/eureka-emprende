@@ -1,13 +1,14 @@
-package com.example.eureka.entrepreneurship.infrastructure.controller;
+package com.example.eureka.solicitudes.infrastructure.controller;
 
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.EmprendimientoDetallesDTO;
-import com.example.eureka.entrepreneurship.infrastructure.dto.response.SolicitudAprobacionListadoDTO;
-import com.example.eureka.entrepreneurship.infrastructure.dto.shared.SolicitudAprobacionDTO;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudAprobacionListadoDTO;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudAprobacionDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.VistaEmprendedorDTO;
-import com.example.eureka.entrepreneurship.aplication.service.SolicitudAprobacionService;
+import com.example.eureka.solicitudes.application.service.SolicitudAprobacionService;
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.shared.util.CustomUserDetails;
 import com.example.eureka.shared.util.PageResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;

@@ -1,9 +1,9 @@
-package com.example.eureka.entrepreneurship.aplication.service;
+package com.example.eureka.solicitudes.application.service;
 
-import com.example.eureka.entrepreneurship.infrastructure.dto.shared.SolicitudEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.port.in.SolicitudEmprendimientoService;
-import com.example.eureka.entrepreneurship.port.out.ISolicitudesEmprendimientoRepository;
-import com.example.eureka.entrepreneurship.domain.model.SolicitudEmprendimiento;
+import com.example.eureka.solicitudes.infrastructure.dto.SolicitudEmprendimientoDTO;
+import com.example.eureka.solicitudes.port.in.SolicitudEmprendimientoService;
+import com.example.eureka.solicitudes.port.out.ISolicitudesEmprendimientoRepository;
+import com.example.eureka.solicitudes.domain.model.SolicitudEmprendimiento;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;

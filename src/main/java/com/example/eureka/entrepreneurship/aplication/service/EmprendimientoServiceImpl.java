@@ -2,28 +2,25 @@ package com.example.eureka.entrepreneurship.aplication.service;
 
 import com.example.eureka.auth.domain.Usuarios;
 import com.example.eureka.auth.port.out.IUserRepository;
-import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
-import com.example.eureka.entrepreneurship.aplication.service.SolicitudAprobacionService;
+import com.example.eureka.solicitudes.application.service.SolicitudAprobacionService;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
 import com.example.eureka.entrepreneurship.port.in.MultimediaService;
 import com.example.eureka.entrepreneurship.port.out.*;
-import com.example.eureka.formulario.domain.model.Pregunta;
 import com.example.eureka.general.domain.model.*;
 import com.example.eureka.general.port.out.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.metricas.domain.MetricasBasicas;
 import com.example.eureka.metricas.domain.MetricasGenerales;
-import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.port.out.IMetricasGeneralesRepository;
-import com.example.eureka.metricas.port.out.IMetricasPreguntaRepository;
-import com.example.eureka.shared.storage.FileStorageService;
 import com.example.eureka.entrepreneurship.infrastructure.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
 import com.example.eureka.shared.enums.EstadoEmprendimiento;
+import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
+import com.example.eureka.entrepreneurship.infrastructure.dto.response.MultimediaListadoDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -31,12 +28,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -377,9 +371,6 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         }
     }
 
-    // ... (incluir los otros métodos de actualización similarmente)
-
-    // ... (resto de métodos sin cambios)
 
     private void agregarCategoriaEmprendimiento(Emprendimientos emprendimientos, List<EmprendimientoCategoriaDTO> lsCategorias) {
         if (CollectionUtils.isEmpty(lsCategorias)) {
@@ -388,19 +379,6 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         }
 
         log.debug("Agregando {} categorías al emprendimiento: {}", lsCategorias.size(), emprendimientos);
-
-        /*List<EmprendimientoCategorias> categorias = lsCategorias.stream()
-                .map(categoriaDTO -> {
-                    EmprendimientoCategorias categoria = new EmprendimientoCategorias();
-                    categoria.setEmprendimiento(emprendimientos);
-                    Categorias cat = emprendimientoCategoriasRepository.findById(categoriaDTO.getCategoria().getId())
-                            .orElseThrow(() -> new EntityNotFoundException(
-                                    "Categoría no encontrada con ID: " + categoriaDTO.getCategoria())).getCategoria();
-                    categoria.setCategoria(cat);
-                    return categoria;
-                })
-                .collect(Collectors.toList());*/
-
 
         List<EmprendimientoCategorias> categorias = lsCategorias.stream()
                 .map(categoriaDTO -> {

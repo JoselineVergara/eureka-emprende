@@ -1,8 +1,10 @@
 package com.example.eureka.roadmap.infrastructure.controller;
 
 
-import com.example.eureka.roadmap.domain.Roadmap;
+import com.example.eureka.roadmap.domain.model.Roadmap;
 import com.example.eureka.roadmap.infrastructure.dto.RoadmapDTO;
+import com.example.eureka.roadmap.infrastructure.dto.RoadmapResponseDTO;
+import com.example.eureka.roadmap.infrastructure.mapper.RoadmapMapper;
 import com.example.eureka.roadmap.port.in.RoadmapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class RoadmapController {
 
     private final RoadmapService  roadmapService;
+    private final RoadmapMapper roadmapMapper;
 
     @GetMapping
     public ResponseEntity<Page<Roadmap>> findAll(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
@@ -25,14 +28,20 @@ public class RoadmapController {
     }
 
     @GetMapping("/emprendimiento/{id}")
-    public ResponseEntity<Roadmap> findAllByEmprendimientoId(@PathVariable String id) {
-        return ResponseEntity.ok(roadmapService.findByIdCompany(Integer.parseInt(id)));
+    public ResponseEntity<RoadmapResponseDTO> findAllByEmprendimientoId(@PathVariable Integer id) {
+        Roadmap rm = roadmapService.findByIdCompany(id);
+        RoadmapResponseDTO dto = roadmapMapper.toDto(rm);
+        return ResponseEntity.ok(dto);
     }
 
+
     @PostMapping("/save")
-    public ResponseEntity<Roadmap> save(@RequestBody RoadmapDTO roadmap) {
-        return ResponseEntity.ok(roadmapService.save(roadmap));
+    public ResponseEntity<RoadmapResponseDTO> save(@RequestBody RoadmapDTO roadmap) {
+        Roadmap rm = roadmapService.save(roadmap);
+        RoadmapResponseDTO dto = roadmapMapper.toDto(rm);
+        return ResponseEntity.ok(dto);
     }
+
 
 
 
