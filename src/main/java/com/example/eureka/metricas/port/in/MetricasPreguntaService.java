@@ -1,6 +1,7 @@
 package com.example.eureka.metricas.port.in;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
+import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
 import com.example.eureka.formulario.domain.model.Pregunta;
 import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO;
@@ -28,4 +29,7 @@ public interface MetricasPreguntaService {
     Page<RankingPreguntaDTO> obtenerRankingPorPregunta(Long idPregunta,
                                                        Long idTipoEmprendimiento,
                                                        Pageable pageable);
+
+    void procesarValoracionPorPreguntas(Emprendimientos emp, List<OpcionRespuesta> respuestasGuardadas);
+
 }

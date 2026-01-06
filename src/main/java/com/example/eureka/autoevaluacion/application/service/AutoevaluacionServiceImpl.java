@@ -1,17 +1,12 @@
 package com.example.eureka.autoevaluacion.application.service;
 
+import com.example.eureka.autoevaluacion.domain.service.ValoracionCalculator;
 import com.example.eureka.autoevaluacion.infrastructure.dto.*;
-import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.autoevaluacion.port.in.AutoevaluacionService;
-import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
-import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
-import com.example.eureka.formulario.domain.model.Formulario;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
-import com.example.eureka.formulario.port.out.IFormularioRepository;
-import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
 import com.example.eureka.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +22,8 @@ import java.util.List;
 public class AutoevaluacionServiceImpl implements AutoevaluacionService {
 
     private final IAutoevaluacionRepository valoracionRepository;
-    private final IFormularioRepository formularioRepository;
-    private final IEmprendimientosRepository  emprendimientosRepository;
     private final OpcionRespuestaService opcionRespuestaService;
-    private final IOpcionRespuestaRepository opcionRespuestaRepository;// inyéctalo
+    private final ValoracionCalculator valoracionCalculator;
 
 
     public Page<ListadoAutoevaluacionDTO> listarAutoevaluaciones(Pageable pageable) {
@@ -55,7 +48,7 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
                 valoracion.setTipoFormulario(r.getRespuesta().getFormulario().getTipoFormulario().getNombre());
 
                 // Calcular promedio de la valoración
-                Double promedio = calcularPromedioValoracion(r.getRespuesta().getId());
+                Double promedio = valoracionCalculator.calcularPromedioValoracion(r.getRespuesta().getId());
                 valoracion.setPromedio(promedio);
 
                 dto.setValoracionOrigen(valoracion);
@@ -64,29 +57,6 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
             return dto;
         });
     }
-
-    // Método auxiliar para calcular el promedio
-    private Double calcularPromedioValoracion(Integer idRespuestaValoracion) {
-        // Busca todas las OpcionRespuesta de esa valoración y calcula el promedio
-        List<OpcionRespuesta> opciones = opcionRespuestaRepository
-                .findByRespuestaId(idRespuestaValoracion);
-
-        if (opciones.isEmpty()) {
-            return 0.0;
-        }
-
-        Double suma = opciones.stream()
-                .filter(o -> o.getValorescala() != null)
-                .mapToDouble(OpcionRespuesta::getValorescala)
-                .sum();
-
-        long cantidad = opciones.stream()
-                .filter(o -> o.getValorescala() != null)
-                .count();
-
-        return cantidad > 0 ? suma / cantidad : 0.0;
-    }
-
 
     public Page<OpcionRespuestaDTO> obtenerDetalleAutoevaluacion(Long idAutoevaluacion, Pageable pageable) {
         Respuesta autoeval = valoracionRepository.findById(idAutoevaluacion.intValue())
@@ -102,18 +72,4 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
         return valoracionRepository.findById(idRespuesta.intValue()).orElse(null);
     }
 
-    @Override
-    public Respuesta saveRespuesta(RespuestaResponseDTO respuesta){
-        Formulario fm = formularioRepository.findById(respuesta.getIdFormulario().longValue()).orElse(null);
-        Respuesta idR = valoracionRepository.findById(respuesta.getIdRespuesta().intValue()).orElse(null);
-        Emprendimientos emp = emprendimientosRepository.findById(respuesta.getIdEmprendimiento().intValue()).orElse(null);
-
-        Respuesta data = new Respuesta();
-        data.setRespuesta(idR);
-        data.setEmprendimientos(emp);
-        data.setFormulario(fm);
-        data.setFechaRespuesta(respuesta.getFechaRespuesta());
-        data.setEsAutoEvaluacion(respuesta.getEsAutoevaluacion());
-        return valoracionRepository.save(data);
-    }
 }

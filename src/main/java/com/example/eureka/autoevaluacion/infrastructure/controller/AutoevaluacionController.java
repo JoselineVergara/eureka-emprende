@@ -21,28 +21,6 @@ public class AutoevaluacionController {
 
     private final AutoevaluacionService autoevaluacionService;
 
-
-    /**
-     * Listar todas las autoevaluaciones con paginación
-     * GET /api/autoevaluaciones?page=0&size=10&sort=fechaRespuesta,desc
-
-    @GetMapping
-    public ResponseEntity<Page<ListadoAutoevaluacionDTO>> listarAutoevaluaciones(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "fechaRespuesta,desc") String sort) {
-
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                page,
-                size,
-                org.springframework.data.domain.Sort.by(sort)
-        );
-
-        Page<ListadoAutoevaluacionDTO> autoevaluaciones = autoevaluacionService.listarAutoevaluaciones(pageable);
-
-        return ResponseEntity.ok(autoevaluaciones);
-    }   */
-
     @GetMapping("/{idAutoevaluacion}/detalle")
     public ResponseEntity<PageResponseDTO<OpcionRespuestaDTO>> obtenerDetalleAutoevaluacion(
             @PathVariable Long idAutoevaluacion,
@@ -58,13 +36,6 @@ public class AutoevaluacionController {
 
         Page<ListadoAutoevaluacionDTO> page = autoevaluacionService.listarAutoevaluaciones(pageable);
         return ResponseEntity.ok(PageResponseDTO.fromPage(page));
-    }
-
-    //NO SE PARA QUE SIRVE
-
-    @PostMapping("/save")
-    public ResponseEntity<Respuesta> saveRespuesta(@RequestBody RespuestaResponseDTO respuesta){
-        return ResponseEntity.ok(autoevaluacionService.saveRespuesta(respuesta));
     }
 
 }

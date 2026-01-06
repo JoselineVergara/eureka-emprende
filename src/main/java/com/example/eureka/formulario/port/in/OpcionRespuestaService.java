@@ -12,12 +12,9 @@ import java.util.List;
 
 public interface OpcionRespuestaService {
 
-    Page<OpcionRespuestaDTO> findAllByOpciones(Opciones opciones, Pageable pageable);
 
     Page<OpcionRespuestaDTO> findAllByRespuesta(Respuesta respuesta, Pageable pageable);
 
     List<OpcionRespuestaDTO> save(List<OpcionRespuestaRequestDTO> opcionRespuesta);
 
-    /*
-    RespuestaResponseDTO generaRespuestaAutoevaluacion(RespuestaResponseDTO respuesta);*/
-}
+    }

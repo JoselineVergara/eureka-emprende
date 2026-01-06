@@ -1,6 +1,7 @@
 package com.example.eureka.metricas.application.service;
 
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
+import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
 import com.example.eureka.formulario.domain.model.Pregunta;
 import com.example.eureka.metricas.domain.MetricasPregunta;
 import com.example.eureka.metricas.infrastructure.dto.RankingGlobalDTO;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -101,5 +104,32 @@ public class MetricasPreguntaServiceImpl implements MetricasPreguntaService {
                                                               Pageable pageable) {
         return metricasPreguntaRepository.rankingPorPregunta(idPregunta, idTipoEmprendimiento, pageable);
     }
+
+    @Override
+    public void procesarValoracionPorPreguntas(Emprendimientos emp, List<OpcionRespuesta> respuestasGuardadas) {
+
+        Map<Pregunta, List<OpcionRespuesta>> porPregunta = respuestasGuardadas.stream()
+                .filter(r -> r.getPregunta() != null)
+                .collect(Collectors.groupingBy(OpcionRespuesta::getPregunta));
+
+        for (Map.Entry<Pregunta, List<OpcionRespuesta>> entry : porPregunta.entrySet()) {
+            Pregunta pregunta = entry.getKey();
+            List<OpcionRespuesta> respuestasPregunta = entry.getValue();
+
+            double suma = respuestasPregunta.stream()
+                    .filter(r -> r.getValorescala() != null)
+                    .mapToInt(OpcionRespuesta::getValorescala)
+                    .sum();
+
+            long total = respuestasPregunta.stream()
+                    .filter(r -> r.getValorescala() != null)
+                    .count();
+
+            double promedioPregunta = total > 0 ? suma / total : 0.0;
+
+            this.guardarOActualizar(emp, pregunta, promedioPregunta, total);
+        }
+    }
+
 
 }

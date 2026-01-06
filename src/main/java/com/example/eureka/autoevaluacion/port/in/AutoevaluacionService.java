@@ -14,9 +14,6 @@ public interface AutoevaluacionService {
 
     Respuesta findById(Long idRespuesta);
 
-
-    Respuesta saveRespuesta(RespuestaResponseDTO respuesta);
-
     Page<ListadoAutoevaluacionDTO> listarAutoevaluaciones(Pageable pageable);
     Page<OpcionRespuestaDTO> obtenerDetalleAutoevaluacion(Long idAutoevaluacion, Pageable pageable);
 
