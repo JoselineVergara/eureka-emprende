@@ -1,9 +1,11 @@
 package com.example.eureka.formulario.application.service;
 
+import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
 import com.example.eureka.entrepreneurship.port.out.IPreguntaRepository;
+import com.example.eureka.formulario.domain.model.Formulario;
 import com.example.eureka.formulario.domain.model.Opciones;
 import com.example.eureka.autoevaluacion.domain.model.Respuesta;
 import com.example.eureka.formulario.domain.model.Pregunta;
@@ -11,6 +13,7 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionResponseD
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaRequestDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
+import com.example.eureka.formulario.port.out.IFormularioRepository;
 import com.example.eureka.formulario.port.out.IOpcionRepository;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
 import com.example.eureka.metricas.port.in.MetricasPreguntaService;
@@ -21,35 +24,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
     private final IOpcionRespuestaRepository opcionRespuestaRepository;
-    private final IEmprendimientosRepository emprendimientosRepository;
-    private final IOpcionRepository opcionRepository;
+    private final IEmprendimientosRepository  emprendimientosRepository;
+    private final IOpcionRepository  opcionRepository;
+    private final IAutoevaluacionRepository   autoevaluacionRepository;
+    private final IFormularioRepository formularioRepository;
     private final IPreguntaRepository preguntaRepository;
-    private final NotificacionService notificacionService;
+    private final NotificacionService  notificacionService;
     private final MetricasPreguntaService metricasPreguntaService;
-    private final RespuestaManager respuestaManager; // NUEVO
 
-    public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository,
-                                      IEmprendimientosRepository emprendimientosRepository,
-                                      IOpcionRepository opcionRepository,
-                                      IPreguntaRepository preguntaRepository,
-                                      NotificacionService notificacionService,
-                                      MetricasPreguntaService metricasPreguntaService,
-                                      RespuestaManager respuestaManager) { // NUEVO
+
+    public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository, IEmprendimientosRepository emprendimientosRepository, IOpcionRepository opcionRepository, IAutoevaluacionRepository autoevaluacionRepository, IFormularioRepository formularioRepository,  IPreguntaRepository preguntaRepository, NotificacionService notificacionService,  MetricasPreguntaService metricasPreguntaService) {
         this.opcionRespuestaRepository = opcionRespuestaRepository;
         this.emprendimientosRepository = emprendimientosRepository;
         this.opcionRepository = opcionRepository;
+        this.autoevaluacionRepository = autoevaluacionRepository;
+        this.formularioRepository = formularioRepository;
         this.preguntaRepository = preguntaRepository;
         this.notificacionService = notificacionService;
-        this.metricasPreguntaService = metricasPreguntaService;
-        this.respuestaManager = respuestaManager; // NUEVO
+        this.metricasPreguntaService = metricasPreguntaService;   // <--
+
     }
 
     @Override
@@ -58,14 +62,17 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
         List<OpcionRespuesta> opcionRespuestas = opcionRespuestaRepository.findAllByRespuesta(respuesta);
         if(opcionRespuestas != null) {
 
+
             for(OpcionRespuesta opcionRespuesta : opcionRespuestas) {
 
+                // Buscar si ya existe un DTO con el mismo ID
                 OpcionRespuestaDTO existente = opcionRespuestaDTOs.stream()
                         .filter(dto -> dto.getId().equals(opcionRespuesta.getId()))
                         .findFirst()
                         .orElse(null);
 
                 if (existente != null) {
+                    // Ya existe → solo agregamos la opción a la lista
                     if (existente.getOpciones() == null) {
                         existente.setOpciones(new ArrayList<>());
                     }
@@ -73,12 +80,14 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                     op.setIdOpcion(opcionRespuesta.getOpciones().getIdOpcion());
                     op.setOpcion(opcionRespuesta.getOpciones().getOpcion());
                     existente.getOpciones().add(op);
-                    continue;
+                    continue; // No crear un nuevo DTO
                 }
 
+                // No existe → crear uno nuevo
                 OpcionRespuestaDTO nuevo = new OpcionRespuestaDTO();
                 nuevo.setId(opcionRespuesta.getId());
 
+                // Crear lista de opciones
                 List<OpcionResponseDTO> listaOpciones = new ArrayList<>();
                 OpcionResponseDTO op = new OpcionResponseDTO();
                 op.setIdOpcion(opcionRespuesta.getOpciones().getIdOpcion());
@@ -94,7 +103,10 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                         opcionRespuesta.getPregunta() == null ? null : opcionRespuesta.getPregunta().getPregunta()
                 );
                 opcionRespuestaDTOs.add(nuevo);
+
+
             }
+
 
             return  new PageImpl<>(opcionRespuestaDTOs, pageable, opcionRespuestaDTOs.size());
         }
@@ -105,7 +117,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
     @Transactional
     public List<OpcionRespuestaDTO> save(List<OpcionRespuestaRequestDTO> ls) {
         List<OpcionRespuestaDTO> opcionRespuestaDTOs = new ArrayList<>();
-        List<OpcionRespuesta> respuestasGuardadas = new ArrayList<>();
+        List<OpcionRespuesta> respuestasGuardadas = new ArrayList<>();   // NUEVO: acumular respuestas
         double sumaValores = 0;
         int contador = 0;
 
@@ -115,6 +127,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
         for (OpcionRespuestaRequestDTO opcionRespuesta : ls) {
 
+            // Emprendimiento (solo se carga una vez)
             if (emp == null) {
                 emp = emprendimientosRepository.findById(opcionRespuesta.getIdEmprendimiento())
                         .orElse(null);
@@ -123,21 +136,62 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
             Pregunta p = preguntaRepository.findById(opcionRespuesta.getIdsPregunta().longValue())
                     .orElse(null);
 
-            // AQUÍ ES DONDE ANTES TENÍAS TODO EL BLOQUE GIGANTE DE CABECERAS
-            RespuestaManager.ResultadoCabeceras resultado = respuestaManager.obtenerRespuestaCabecera(
-                    opcionRespuesta,
-                    emp,
-                    cabeceraValoracion,
-                    cabeceraAutoevaluacion
-            );
+            // 1) Determinar la cabecera Respuesta a usar (rp)
+            Respuesta rp;
 
-            Respuesta rp = resultado.getRespuestaPrincipal();
-            cabeceraValoracion = resultado.getCabeceraValoracion();
-            cabeceraAutoevaluacion = resultado.getCabeceraAutoevaluacion();
+            if (opcionRespuesta.getIdRespuesta() != null) {
+                // CASO: Ya existe cabecera (valoración o autoevaluación)
+                rp = autoevaluacionRepository.findById(opcionRespuesta.getIdRespuesta())
+                        .orElse(null);
+            } else {
+                // No hay cabecera aún: decidir si es VALORACIÓN o AUTOEVALUACIÓN
+                if (opcionRespuesta.getIdRespuestaValoracion() == null) {
+                    // CASO: VALORACIÓN (primer guardado)
+                    if (cabeceraValoracion == null) {
+                        String tipo = opcionRespuesta.getTipoFormulario();
+
+                        Formulario fm = formularioRepository
+                                .findByTipoFormularioNombre(tipo)
+                                .orElse(null);
+
+                        cabeceraValoracion = new Respuesta();
+                        cabeceraValoracion.setEmprendimientos(emp);
+                        cabeceraValoracion.setFormulario(fm);
+                        cabeceraValoracion.setEsAutoEvaluacion(false);
+                        cabeceraValoracion.setFechaRespuesta(LocalDateTime.now());
+
+                        cabeceraValoracion = autoevaluacionRepository.save(cabeceraValoracion);
+                    }
+                    rp = cabeceraValoracion;
+                } else {
+                    // CASO: AUTOEVALUACIÓN (primer guardado)
+                    if (cabeceraAutoevaluacion == null) {
+                        // Cargar la valoración origen
+                        Respuesta valoracionOrigen = autoevaluacionRepository
+                                .findById(opcionRespuesta.getIdRespuestaValoracion())
+                                .orElse(null);
+
+                        Formulario fmAuto = formularioRepository
+                                .findByTipoFormularioNombre("AUTOEVALUACION")
+                                .orElse(null);
+
+                        cabeceraAutoevaluacion = new Respuesta();
+                        cabeceraAutoevaluacion.setEmprendimientos(emp);
+                        cabeceraAutoevaluacion.setFormulario(fmAuto);
+                        cabeceraAutoevaluacion.setEsAutoEvaluacion(true);
+                        cabeceraAutoevaluacion.setFechaRespuesta(LocalDateTime.now());
+                        cabeceraAutoevaluacion.setRespuesta(valoracionOrigen);  // relación con la valoración origen
+
+                        cabeceraAutoevaluacion = autoevaluacionRepository.save(cabeceraAutoevaluacion);
+                    }
+                    rp = cabeceraAutoevaluacion;
+                }
+            }
 
             List<OpcionResponseDTO> idsOpciones = new ArrayList<>();
             OpcionRespuesta op = null;
 
+            // 2) Guardar opciones (para MULTIPLE / OPCION_UNICA)
             if (opcionRespuesta.getIdsOpciones() != null && !opcionRespuesta.getIdsOpciones().isEmpty()) {
                 for (Integer id : opcionRespuesta.getIdsOpciones()) {
                     op = new OpcionRespuesta();
@@ -148,7 +202,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                     op.setPregunta(p);
                     op.setValorescala(opcionRespuesta.getValorescala());
                     op = opcionRespuestaRepository.save(op);
-                    respuestasGuardadas.add(op);
+                    respuestasGuardadas.add(op);   // NUEVO
 
                     OpcionResponseDTO opr = new OpcionResponseDTO();
                     opr.setIdOpcion(op.getOpciones().getIdOpcion());
@@ -156,6 +210,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                     idsOpciones.add(opr);
                 }
             } else {
+                // 3) CASO ESCALA sin opciones: guardar registro solo con valorescala
                 op = new OpcionRespuesta();
                 op.setRespuesta(rp);
                 op.setOpciones(null);
@@ -163,9 +218,10 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
                 op.setPregunta(p);
                 op.setValorescala(opcionRespuesta.getValorescala());
                 op = opcionRespuestaRepository.save(op);
-                respuestasGuardadas.add(op);
+                respuestasGuardadas.add(op);       // NUEVO
             }
 
+            // 4) Construir DTO de salida
             OpcionRespuestaDTO opcionRespuestaDTO = new OpcionRespuestaDTO();
             opcionRespuestaDTO.setId(op.getId());
             opcionRespuestaDTO.setOpciones(idsOpciones);
@@ -176,6 +232,7 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
             opcionRespuestaDTOs.add(opcionRespuestaDTO);
 
+            // 5) Acumular para promedio (solo si hay escala) - promedio general
             if (opcionRespuesta.getValorescala() != null) {
                 sumaValores += opcionRespuesta.getValorescala();
                 contador++;
@@ -184,16 +241,21 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
         double promedio = contador > 0 ? sumaValores / contador : 0;
 
+        System.out.println("Promedio de valorescala: " + promedio);
+
+        // NUEVO: procesar métricas por pregunta con las respuestas guardadas
         if (emp != null && !respuestasGuardadas.isEmpty() && cabeceraValoracion != null) {
-            metricasPreguntaService.procesarValoracionPorPreguntas(emp, respuestasGuardadas);
+            // Aquí sabes que en este request se creó/uso una cabecera de VALORACIÓN
+            procesarValoracion(emp, respuestasGuardadas);
         }
 
 
+        // 6) Si el promedio es bajo, crear notificación de AUTOEVALUACION_REQUERIDA
         if (promedio <= 2 && emp != null && cabeceraValoracion != null) {
             Integer idEmprendedor = emp.getUsuarios().getId();
             Integer idValoracion = cabeceraValoracion.getId();
             String mensaje = "El emprendimiento " + emp.getNombreComercial()
-                    + " necesita realizar una autoevaluación debido a la valoración obtenida : " + promedio;
+                    + " se debe de generar la autoevaluación la valoración obtenida es: " + promedio;
             notificacionService.crearNotificacionAutoevaluacion(
                     idEmprendedor,
                     "AUTOEVALUACION_REQUERIDA",
@@ -205,6 +267,34 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
         }
 
         return opcionRespuestaDTOs;
+    }
+
+
+
+
+    private void procesarValoracion(Emprendimientos emp, List<OpcionRespuesta> respuestasGuardadas) {
+
+        Map<Pregunta, List<OpcionRespuesta>> porPregunta = respuestasGuardadas.stream()
+                .filter(r -> r.getPregunta() != null)
+                .collect(Collectors.groupingBy(OpcionRespuesta::getPregunta));
+
+        for (Map.Entry<Pregunta, List<OpcionRespuesta>> entry : porPregunta.entrySet()) {
+            Pregunta pregunta = entry.getKey();
+            List<OpcionRespuesta> respuestasPregunta = entry.getValue();
+
+            double suma = respuestasPregunta.stream()
+                    .filter(r -> r.getValorescala() != null)
+                    .mapToInt(OpcionRespuesta::getValorescala)
+                    .sum();
+
+            long total = respuestasPregunta.stream()
+                    .filter(r -> r.getValorescala() != null)
+                    .count();
+
+            double promedioPregunta = total > 0 ? suma / total : 0.0;
+
+            metricasPreguntaService.guardarOActualizar(emp, pregunta, promedioPregunta, total);
+        }
     }
 
 }
