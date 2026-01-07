@@ -13,6 +13,8 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuesta
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
 import com.example.eureka.formulario.port.out.IOpcionRepository;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
+import com.example.eureka.metricas.port.in.MetricasPreguntaService;
+import com.example.eureka.notificacion.port.in.NotificacionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,22 +32,24 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IOpcionRepository opcionRepository;
     private final IPreguntaRepository preguntaRepository;
+    private final NotificacionService notificacionService;
+    private final MetricasPreguntaService metricasPreguntaService;
     private final RespuestaManager respuestaManager; // NUEVO
-    private final EvaluacionEmprendimientoService evaluacionEmprendimientoService;
-
 
     public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository,
                                       IEmprendimientosRepository emprendimientosRepository,
                                       IOpcionRepository opcionRepository,
                                       IPreguntaRepository preguntaRepository,
-                                      RespuestaManager respuestaManager,
-                                      EvaluacionEmprendimientoService evaluacionEmprendimientoService) { // NUEVO
+                                      NotificacionService notificacionService,
+                                      MetricasPreguntaService metricasPreguntaService,
+                                      RespuestaManager respuestaManager) { // NUEVO
         this.opcionRespuestaRepository = opcionRespuestaRepository;
         this.emprendimientosRepository = emprendimientosRepository;
         this.opcionRepository = opcionRepository;
         this.preguntaRepository = preguntaRepository;
+        this.notificacionService = notificacionService;
+        this.metricasPreguntaService = metricasPreguntaService;
         this.respuestaManager = respuestaManager; // NUEVO
-        this.evaluacionEmprendimientoService = evaluacionEmprendimientoService;
     }
 
     @Override
@@ -172,14 +176,33 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
             opcionRespuestaDTOs.add(opcionRespuestaDTO);
 
+            if (opcionRespuesta.getValorescala() != null) {
+                sumaValores += opcionRespuesta.getValorescala();
+                contador++;
+            }
         }
 
-        evaluacionEmprendimientoService.procesarEvaluacion(
-                emp,
-                respuestasGuardadas,
-                cabeceraValoracion,
-                ls
-        );
+        double promedio = contador > 0 ? sumaValores / contador : 0;
+
+        if (emp != null && !respuestasGuardadas.isEmpty() && cabeceraValoracion != null) {
+            metricasPreguntaService.procesarValoracionPorPreguntas(emp, respuestasGuardadas);
+        }
+
+
+        if (promedio <= 2 && emp != null && cabeceraValoracion != null) {
+            Integer idEmprendedor = emp.getUsuarios().getId();
+            Integer idValoracion = cabeceraValoracion.getId();
+            String mensaje = "El emprendimiento " + emp.getNombreComercial()
+                    + " necesita realizar una autoevaluación debido a la valoración obtenida : " + promedio;
+            notificacionService.crearNotificacionAutoevaluacion(
+                    idEmprendedor,
+                    "AUTOEVALUACION_REQUERIDA",
+                    "Autoevaluación requerida",
+                    mensaje,
+                    idValoracion != null ? idValoracion.toString() : "",
+                    emp.getId()
+            );
+        }
 
         return opcionRespuestaDTOs;
     }
