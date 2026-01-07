@@ -92,7 +92,7 @@ public class WebSecurityConfig {
                                 "/v1/emprendimientos/filtrar",
                                 "v1/formularios/tipo/{tipo}",
                                 "/v1/valoraciones",
-                                "v1/formularios/save-opcion-respuesta}",
+                                "v1/formularios/save-opcion-respuesta",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
