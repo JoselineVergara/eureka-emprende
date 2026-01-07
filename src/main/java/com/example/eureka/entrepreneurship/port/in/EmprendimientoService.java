@@ -51,15 +51,6 @@ public interface EmprendimientoService {
 
     Page<EmprendimientoListadoResponseDTO> obtenerEmprendimientosPorUsuario(Usuarios usuario, Pageable pageable);
 
-    /**
-     * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad
-     * @param nombre
-     * @param tipo
-     * @param categoria
-     * @param ciudad
-     * @return
-     */
-   // List<EmprendimientoResponseDTO> obtenerEmprendimientosFiltrado(String nombre, String tipo, String categoria, String ciudad);
 
     /**
      * Obtener emprendimientos filtrados por nombre, tipo, categoría y ciudad, paginado

@@ -5,6 +5,7 @@ import com.example.eureka.auth.port.out.IUserRepository;
 import com.example.eureka.entrepreneurship.domain.model.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.EmprendimientoListaPublicoDTO;
 import com.example.eureka.entrepreneurship.infrastructure.dto.publico.MiniEmprendimientoDTO;
+import com.example.eureka.shared.exception.BusinessException;
 import com.example.eureka.solicitudes.application.service.SolicitudAprobacionService;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.shared.*;
@@ -14,14 +15,11 @@ import com.example.eureka.general.domain.model.*;
 import com.example.eureka.general.port.out.*;
 import com.example.eureka.entrepreneurship.infrastructure.dto.request.EmprendimientoRequestDTO;
 import com.example.eureka.metricas.domain.MetricasBasicas;
-import com.example.eureka.metricas.domain.MetricasGenerales;
-import com.example.eureka.metricas.port.out.IMetricasGeneralesRepository;
 import com.example.eureka.entrepreneurship.infrastructure.mappers.EmprendimientoMapper;
 import com.example.eureka.entrepreneurship.port.in.EmprendimientoService;
 import com.example.eureka.shared.enums.EstadoEmprendimiento;
 import com.example.eureka.solicitudes.domain.model.SolicitudAprobacion;
 import com.example.eureka.entrepreneurship.infrastructure.dto.response.MultimediaListadoDTO;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +60,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     private final IEmprendimientoMultimediaRepository emprendimientoMultimediaRepository;
     private final ICategoriaRepository categoriasRepository;
     private final MultimediaService multimediaService;
-
-
-    private final IMetricasGeneralesRepository metricasGeneralesRepository;
+    private final MetricasEmprendimientoService metricasEmprendimientoService;
     private final IDescripcionesRepository descripcionesRepository;
 
 
@@ -99,20 +94,20 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         log.info("Iniciando creación de estructura de emprendimiento para usuario: {}",
                 emprendimientoRequestDTO.getUsuarioId());
 
-        // Validaciones
         if (emprendimientoRequestDTO == null) {
-            throw new IllegalArgumentException("Request no puede ser nulo");
+            throw new BusinessException("El cuerpo de la solicitud no puede ser nulo");
         }
+
         if (emprendimientoRequestDTO.getUsuarioId() == null) {
-            throw new IllegalArgumentException("Usuario ID no puede ser nulo");
+            throw new BusinessException("Usuario ID no puede ser nulo");
         }
         if (emprendimientoRequestDTO.getEmprendimiento() == null) {
-            throw new IllegalArgumentException("Datos del emprendimiento no pueden ser nulos");
+            throw new BusinessException("Datos del emprendimiento no pueden ser nulos");
         }
 
         // Buscar usuario
         Usuarios usuario = userRepository.findById(emprendimientoRequestDTO.getUsuarioId())
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new BusinessException(
                         "Usuario no encontrado con ID: " + emprendimientoRequestDTO.getUsuarioId()));
 
         // Crear emprendimiento principal
@@ -199,12 +194,12 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         log.debug("Creando emprendimiento con nombre: {}", emprendimientoDTO.getNombreComercialEmprendimiento());
 
         Ciudades ciudad = ciudadesRepository.findById(emprendimientoDTO.getCiudad())
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new BusinessException(
                         "Ciudad no encontrada con ID: " + emprendimientoDTO.getCiudad()));
 
         TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository
                 .findById(emprendimientoDTO.getTipoEmprendimientoId())
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new BusinessException(
                         "Tipo de emprendimiento no encontrado con ID: " + emprendimientoDTO.getTipoEmprendimientoId()));
         
 
@@ -212,7 +207,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         if (emprendimientoDTO.getTipoPersonaJuridicaId() != null) {
             OpcionesPersonaJuridica personaJuridica = opcionesPersonaJuridicaRepository
                     .findById(emprendimientoDTO.getTipoPersonaJuridicaId())
-                    .orElseThrow(() -> new EntityNotFoundException(
+                    .orElseThrow(() -> new BusinessException(
                             "Tipo persona jurídica no encontrado con ID: " + emprendimientoDTO.getTipoPersonaJuridicaId()));
             emprendimiento.setTipoPersonaJuridica(personaJuridica);
         }
@@ -241,7 +236,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Transactional
     public EmprendimientoResponseDTO actualizarEmprendimiento(Integer id, EmprendimientoRequestDTO emprendimientoRequestDTO) throws Exception {
         Emprendimientos emprendimiento = emprendimientosRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con ID: " + id));
+                .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado con ID: " + id));
 
         // Actualizar campos principales
         EmprendimientoDTO dto = emprendimientoRequestDTO.getEmprendimiento();
@@ -254,12 +249,12 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
             if (dto.getCiudad() != null) {
                 Ciudades ciudad = ciudadesRepository.findById(dto.getCiudad())
-                        .orElseThrow(() -> new EntityNotFoundException("Ciudad no encontrada con ID: " + dto.getCiudad()));
+                        .orElseThrow(() -> new BusinessException("Ciudad no encontrada con ID: " + dto.getCiudad()));
                 emprendimiento.setCiudades(ciudad);
             }
             if (dto.getTipoEmprendimientoId() != null) {
                 TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository.findById(dto.getTipoEmprendimientoId())
-                        .orElseThrow(() -> new EntityNotFoundException("Tipo de emprendimiento no encontrado con ID: " + dto.getTipoEmprendimientoId()));
+                        .orElseThrow(() -> new BusinessException("Tipo de emprendimiento no encontrado con ID: " + dto.getTipoEmprendimientoId()));
                 emprendimiento.setTiposEmprendimientos(tipoEmprendimiento);
             }
         }
@@ -353,10 +348,6 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         for (EmprendimientoDescripcionDTO nueva : nuevasDescripciones) {
             Descripciones de = descripcionesRepository.findById(nueva.getIdDescripcion()).orElse(null);
             DescripcionEmprendimiento actual = emprendimientosDescripcionRepository.findByEmprendimientoAndDescripciones(emprendimiento, de);
-            /*DescripcionEmprendimiento actual = actuales.stream()
-                    .filter(d -> d.getRespuesta().equals(nueva.getRespuesta()))
-                    .findFirst()
-                    .orElse(null);*/
 
             if (actual != null) {
                 actual.setRespuesta(nueva.getRespuesta());
@@ -385,7 +376,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
                     // 1. Buscar categoría REAL
                     Categorias categoria = categoriasRepository.findById(categoriaDTO.getCategoria().getId())
-                            .orElseThrow(() -> new EntityNotFoundException(
+                            .orElseThrow(() -> new BusinessException(
                                     "Categoría no encontrada con ID: " + categoriaDTO.getCategoria().getId()));
 
                     // 2. Crear ID compuesto
@@ -458,7 +449,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         // Validar que el usuario no sea null
         if (usuario == null) {
-            throw new RuntimeException("Usuario no autenticado");
+            throw new BusinessException("Usuario no autenticado");
         }
 
         List<Emprendimientos> lista;
@@ -473,7 +464,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         // Validar si la lista está vacía
         if (lista.isEmpty()) {
-            throw new RuntimeException("No se encontraron emprendimientos");
+            throw new BusinessException("No se encontraron emprendimientos");
         }
 
         return lista.stream()
@@ -488,14 +479,14 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Override
     public EmprendimientoResponseDTO obtenerEmprendimientoPorId(Integer id) {
         Emprendimientos emp = emprendimientosRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
+                .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado con id: " + id));
         return EmprendimientoMapper.toResponseDTO(emp);
     }
 
     @Override
     public EmprendimientoPublicoDTO obtenerEmprendimientoPublicoPorId(Integer id) {
         Emprendimientos e = emprendimientosRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new BusinessException(
                         "Emprendimiento no encontrado con id: " + id));
 
         // 1) Datos básicos
@@ -540,24 +531,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                         .toList()
         );
 
-        // 6) Registrar vista pública
-        try {
-            MetricasGenerales metricasGenerales =  metricasGeneralesRepository.findByEmprendimientos(e).orElse(null);
-
-            if (metricasGenerales == null) {
-                metricasGenerales = new MetricasGenerales();
-                metricasGenerales.setEmprendimientos(e);
-                metricasGenerales.setVistas(1);
-                metricasGenerales.setFechaRegistro(LocalDateTime.now());
-            } else {
-                metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
-            }
-
-            metricasGeneralesRepository.save(metricasGenerales);
-        } catch (Exception ex) {
-            log.error("ERROR AL GUARDAR MÉTRICA DE VISTAS DEL EMPRENDIMIENTO PÚBLICO {}", e.getId(), ex);
-        }
-
+        metricasEmprendimientoService.registrarVistaPublica(e);
         return dto;
     }
 
@@ -567,7 +541,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Transactional
     public EmprendimientoResponseDTO obtenerEmprendimientoCompletoPorId(Integer id) {
         Emprendimientos emprendimiento = emprendimientosRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Emprendimiento no encontrado con id: " + id));
+                .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado con id: " + id));
 
         EmprendimientoResponseDTO dto = EmprendimientoMapper.toResponseDTO(emprendimiento);
 
@@ -595,25 +569,6 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
         // Multimedia
         dto.setMultimedia(obtenerMultimediaPorEmprendimiento(id));
-
-        // Solo métricas de vistas
-        try {
-            MetricasGenerales metricasGenerales =
-                    metricasGeneralesRepository.findByEmprendimientos(emprendimiento).orElse(null);
-
-            if (metricasGenerales == null) {
-                metricasGenerales = new MetricasGenerales();
-                metricasGenerales.setEmprendimientos(emprendimiento);
-                metricasGenerales.setVistas(1);
-                metricasGenerales.setFechaRegistro(LocalDateTime.now());
-            } else {
-                metricasGenerales.setVistas(metricasGenerales.getVistas() + 1);
-            }
-
-            metricasGeneralesRepository.save(metricasGenerales);
-        } catch (Exception e) {
-            log.error("ERROR AL GUARDAR MÉTRICA DE VISTAS DEL EMPRENDIMIENTO {}", emprendimiento.getId(), e);
-        }
 
         return dto;
     }
@@ -722,7 +677,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
     @Override
     public EmprendimientoPorCategoriaDTO obtenerEmprendimientosPorCategoria(Integer categoriaId) {
         Categorias categoria = categoriaRepository.findById(categoriaId)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoriaId));
+                .orElseThrow(() -> new BusinessException("Categoría no encontrada con id: " + categoriaId));
 
         List<EmprendimientoCategorias> emprendimientoCategorias =
                 emprendimientoCategoriasRepository.findByCategoriaId(categoriaId);
@@ -753,11 +708,11 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         log.info("Creando borrador de emprendimiento para usuario: {}", usuario.getId());
 
         Ciudades ciudad = ciudadesRepository.findById(emprendimientoDTO.getCiudad())
-                .orElseThrow(() -> new EntityNotFoundException("Ciudad no encontrada con ID: " + emprendimientoDTO.getCiudad()));
+                .orElseThrow(() -> new BusinessException("Ciudad no encontrada con ID: " + emprendimientoDTO.getCiudad()));
 
         TiposEmprendimientos tipoEmprendimiento = tiposEmprendimientoRepository
                 .findById(emprendimientoDTO.getTipoEmprendimientoId())
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new BusinessException(
                         "Tipo de emprendimiento no encontrado con ID: " + emprendimientoDTO.getTipoEmprendimientoId()));
 
         Emprendimientos emprendimiento = new Emprendimientos();
@@ -965,7 +920,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
         List<EmprendimientoMetricas> metricas = lsMetricas.stream()
                 .map(dto -> {
                     MetricasBasicas metrica = tiposMetricasRepository.findById(dto.getMetricaId())
-                            .orElseThrow(() -> new EntityNotFoundException(
+                            .orElseThrow(() -> new BusinessException(
                                     "Métrica no encontrada con ID: " + dto.getMetricaId()));
 
                     EmprendimientoMetricas metricaEmp = new EmprendimientoMetricas();
@@ -992,7 +947,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                 .map(dto -> {
                     OpcionesParticipacionComunidad opcion = opcionesParticipacionComunidadRepository
                             .findById(dto.getOpcionParticipacionId())
-                            .orElseThrow(() -> new EntityNotFoundException(
+                            .orElseThrow(() -> new BusinessException(
                                     "Opción de participación no encontrada con ID: " + dto.getOpcionParticipacionId()));
 
                     EmprendimientoParticipacion participacion = new EmprendimientoParticipacion();
@@ -1022,7 +977,7 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
                 .map(dto -> {
                     DeclaracionesFinales declaracion = declaracionesFinalesRepository
                             .findById(dto.getDeclaracionId())
-                            .orElseThrow(() -> new EntityNotFoundException(
+                            .orElseThrow(() -> new BusinessException(
                                     "Declaración final no encontrada con ID: " + dto.getDeclaracionId()));
 
                     EmprendimientoDeclaraciones declaracionEmp = new EmprendimientoDeclaraciones();
@@ -1041,14 +996,16 @@ public class EmprendimientoServiceImpl implements EmprendimientoService {
 
     @Override
     public void inactivarEmprendimiento(Integer id) throws Exception {
-        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado con id " + id));
         emprendimientos.setActivoEmprendimiento(false);
         emprendimientosRepository.save(emprendimientos);
     }
 
     @Override
     public void activarEmprendimiento(Integer id) throws Exception {
-        Emprendimientos emprendimientos = emprendimientosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        Emprendimientos emprendimientos = emprendimientosRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Emprendimiento no encontrado con id " + id));
         emprendimientos.setActivoEmprendimiento(true);
         emprendimientosRepository.save(emprendimientos);
     }

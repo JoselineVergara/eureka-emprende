@@ -1,6 +1,5 @@
 package com.example.eureka.formulario.application.service;
 
-import com.example.eureka.autoevaluacion.port.out.IAutoevaluacionRepository;
 import com.example.eureka.entrepreneurship.domain.model.Emprendimientos;
 import com.example.eureka.entrepreneurship.domain.model.OpcionRespuesta;
 import com.example.eureka.entrepreneurship.port.out.IEmprendimientosRepository;
@@ -12,11 +11,8 @@ import com.example.eureka.formulario.infrastructure.dto.response.OpcionResponseD
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaDTO;
 import com.example.eureka.formulario.infrastructure.dto.response.OpcionRespuestaRequestDTO;
 import com.example.eureka.formulario.port.in.OpcionRespuestaService;
-import com.example.eureka.formulario.port.out.IFormularioRepository;
 import com.example.eureka.formulario.port.out.IOpcionRepository;
 import com.example.eureka.formulario.port.out.IOpcionRespuestaRepository;
-import com.example.eureka.metricas.port.in.MetricasPreguntaService;
-import com.example.eureka.notificacion.port.in.NotificacionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,26 +30,22 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
     private final IEmprendimientosRepository emprendimientosRepository;
     private final IOpcionRepository opcionRepository;
     private final IPreguntaRepository preguntaRepository;
-    private final NotificacionService notificacionService;
-    private final MetricasPreguntaService metricasPreguntaService;
     private final RespuestaManager respuestaManager; // NUEVO
+    private final EvaluacionEmprendimientoService evaluacionEmprendimientoService;
+
 
     public OpcionRespuestaServiceImpl(IOpcionRespuestaRepository opcionRespuestaRepository,
                                       IEmprendimientosRepository emprendimientosRepository,
                                       IOpcionRepository opcionRepository,
-                                      IAutoevaluacionRepository autoevaluacionRepository,
-                                      IFormularioRepository formularioRepository,
                                       IPreguntaRepository preguntaRepository,
-                                      NotificacionService notificacionService,
-                                      MetricasPreguntaService metricasPreguntaService,
-                                      RespuestaManager respuestaManager) { // NUEVO
+                                      RespuestaManager respuestaManager,
+                                      EvaluacionEmprendimientoService evaluacionEmprendimientoService) { // NUEVO
         this.opcionRespuestaRepository = opcionRespuestaRepository;
         this.emprendimientosRepository = emprendimientosRepository;
         this.opcionRepository = opcionRepository;
         this.preguntaRepository = preguntaRepository;
-        this.notificacionService = notificacionService;
-        this.metricasPreguntaService = metricasPreguntaService;
         this.respuestaManager = respuestaManager; // NUEVO
+        this.evaluacionEmprendimientoService = evaluacionEmprendimientoService;
     }
 
     @Override
@@ -180,33 +172,14 @@ public class OpcionRespuestaServiceImpl implements OpcionRespuestaService {
 
             opcionRespuestaDTOs.add(opcionRespuestaDTO);
 
-            if (opcionRespuesta.getValorescala() != null) {
-                sumaValores += opcionRespuesta.getValorescala();
-                contador++;
-            }
         }
 
-        double promedio = contador > 0 ? sumaValores / contador : 0;
-
-        if (emp != null && !respuestasGuardadas.isEmpty() && cabeceraValoracion != null) {
-            metricasPreguntaService.procesarValoracionPorPreguntas(emp, respuestasGuardadas);
-        }
-
-
-        if (promedio <= 2 && emp != null && cabeceraValoracion != null) {
-            Integer idEmprendedor = emp.getUsuarios().getId();
-            Integer idValoracion = cabeceraValoracion.getId();
-            String mensaje = "El emprendimiento " + emp.getNombreComercial()
-                    + " necesita realizar una autoevaluación debido a la valoración obtenida : " + promedio;
-            notificacionService.crearNotificacionAutoevaluacion(
-                    idEmprendedor,
-                    "AUTOEVALUACION_REQUERIDA",
-                    "Autoevaluación requerida",
-                    mensaje,
-                    idValoracion != null ? idValoracion.toString() : "",
-                    emp.getId()
-            );
-        }
+        evaluacionEmprendimientoService.procesarEvaluacion(
+                emp,
+                respuestasGuardadas,
+                cabeceraValoracion,
+                ls
+        );
 
         return opcionRespuestaDTOs;
     }

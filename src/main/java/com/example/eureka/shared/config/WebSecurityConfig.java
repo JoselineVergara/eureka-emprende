@@ -71,6 +71,8 @@ public class WebSecurityConfig {
                                 "/api/public/**",
                                 "/v1/categorias",
                                 "/v1/categorias/{id}",
+                                "/v1/tipos-emprendimiento",
+                                "/v1/tipos-emprendimiento/{id}",
                                 "/v1/auth/test-bcrypt",
                                 "/v1/auth/rehash-password",
                                 "/v1/provincia",

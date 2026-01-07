@@ -249,6 +249,9 @@ public class ArticuloServiceImpl implements ArticuloService {
                 .collect(Collectors.toList());
     }
     private ArticuloPublicoDTO convertirAPublicoDTO(ArticulosBlog articulo) {
+        if (articulo.getImagen() == null) {
+            throw new BusinessException("El artículo no tiene una imagen asociada");
+        }
         return ArticuloPublicoDTO.builder()
                 .idArticulo(articulo.getIdArticulo())
                 .titulo(articulo.getTitulo())

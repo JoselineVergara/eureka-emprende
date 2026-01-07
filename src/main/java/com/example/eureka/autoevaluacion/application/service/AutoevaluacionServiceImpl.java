@@ -30,6 +30,12 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
         Page<Respuesta> page = valoracionRepository.findAllByEsAutoEvaluacionTrue(pageable);
 
         return page.map(r -> {
+            if (r.getFormulario() == null) {
+                throw new BusinessException("La autoevaluación " + r.getId() + " no tiene formulario asociado");
+            }
+            if (r.getEmprendimientos() == null) {
+                throw new BusinessException("La autoevaluación " + r.getId() + " no tiene emprendimiento asociado");
+            }
             ListadoAutoevaluacionDTO dto = new ListadoAutoevaluacionDTO();
             dto.setIdAutoevaluacion(r.getId());
             dto.setIdValoracionOrigen(r.getRespuesta() != null ? r.getRespuesta().getId() : null);
@@ -59,6 +65,10 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
     }
 
     public Page<OpcionRespuestaDTO> obtenerDetalleAutoevaluacion(Long idAutoevaluacion, Pageable pageable) {
+        if (idAutoevaluacion == null) {
+            throw new BusinessException("El identificador de la autoevaluación es obligatorio");
+        }
+
         Respuesta autoeval = valoracionRepository.findById(idAutoevaluacion.intValue())
                 .orElseThrow(() -> new BusinessException("Autoevaluación no encontrada"));
 
